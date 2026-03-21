@@ -5,6 +5,41 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.5.0] — 2026-03-21 (current)
+
+### Added — Web Dashboard
+- `eiva-web/index.html` — full single-page dashboard (works as website + Telegram Mini App)
+  * TON Connect wallet authentication via `@tonconnect/ui`
+  * NFT gallery: loads user's Soulbound NFTs from tonapi.io, shows image + metadata
+  * NFT detail modal: name, image, address, metadata JSON link, Getgems + Tonscan links
+  * Drag-and-drop Telegram JSON upload (validates file, shows message count)
+  * Tier comparison section (Bronze / Silver / Gold / Exclusive)
+  * Hero section, "How it works" steps, footer
+  * Fully responsive (mobile + desktop), dark TON-aesthetic design
+  * Works as GitHub Pages site AND as Telegram Mini App (iframe / webview)
+- `eiva-web/tonconnect-manifest.json` — TON Connect manifest for wallet auth
+
+### Added — Real Soulbound NFT
+- `nft_contract.py` — complete Soulbound NFT deployment pipeline (TEP-85 standard)
+  * `build_metadata()` — creates TEP-64 JSON with name, description, image (DiceBear or DALL-E), attributes
+  * `upload_metadata_to_github()` — publishes metadata JSON to GitHub repo via API → permanent raw URL
+  * `build_nft_state_init()` — constructs NFT item StateInit from tonutils bytecode + pytoniq_core cells
+  * `deploy_soulbound_nft()` — derives NFT address, deploys via tonsdk `create_transfer_message` with state_init
+  * NFT visible on testnet.getgems.io + testnet.tonscan.org after deploy
+- `/mint` now deploys a real on-chain Soulbound NFT (not just an anchor transaction)
+- Response includes Getgems link + Tonscan link + metadata JSON link
+
+### Added — Bot UX improvements
+- `/wallet` command — link/show TON wallet address; saved to user's ChromaDB metadata
+  * Inline button: "Connect on Dashboard" → opens web UI
+  * Inline button: "Mint Soul Certificate"
+- `/start` shows inline keyboard: "Open Dashboard" + "Mint NFT" or "Start Setup"
+- Message handler intercepts TON wallet addresses (regex) → saves to profile automatically
+- Avatar URL saved to metadata for reuse in NFT deploy
+- `config.py`: added `GITHUB_TOKEN` variable
+
+---
+
 ## [0.3.0] — 2026-03-21
 
 ### Fixed

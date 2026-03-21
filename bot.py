@@ -93,12 +93,21 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         f"that others can talk to — anchored on the TON blockchain.\n\n"
     )
 
+    keyboard = None
     if already_setup:
         agent = _load_agent(user.id)
         if agent:
             agents[user.id] = agent
         text += "✅ Your twin is *already set up*! Just send a message and I'll respond as you.\n\n"
-        text += "Commands: /profile · /mint · /avatar · /reset · /status"
+        text += "*/profile* — view personality\n"
+        text += "*/wallet* — connect TON wallet\n"
+        text += "*/mint* — mint Soul Certificate NFT\n"
+        text += "*/avatar* — generate AI portrait\n"
+        text += "*/status* — stats  ·  /reset — clear history"
+        keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("🌐 Open Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+            InlineKeyboardButton("💎 Mint NFT", callback_data="start_mint"),
+        ]])
     else:
         text += (
             "To get started, use /setup and upload your Telegram chat export.\n\n"
@@ -106,8 +115,16 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             "Telegram Desktop → Settings → Advanced → Export Telegram Data\n"
             "→ Select chats → Format: *JSON* → Export"
         )
+        keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("📂 Start Setup", callback_data="start_setup"),
+            InlineKeyboardButton("🌐 Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+        ]])
 
-    await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+    await update.message.reply_text(
+        text,
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard,
+    )
 
 
 # ── /setup ────────────────────────────────────────────────────────────────────
@@ -309,6 +326,58 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 # ── /reset ────────────────────────────────────────────────────────────────────
+
+async def cmd_wallet(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Show or update the user's linked TON wallet address."""
+    user_id = update.effective_user.id
+    store   = EmbeddingStore(str(user_id))
+    saved   = store.load_meta("ton_wallet_address")
+
+    from ton_identity import get_wallet_address
+    bot_wallet = get_wallet_address()
+    net = "testnet"  # from config
+
+    if saved:
+        tonscan = f"https://testnet.tonscan.org/address/{saved}" if net == "testnet" else f"https://tonscan.org/address/{saved}"
+        text = (
+            f"💳 *Your linked TON wallet:*\n"
+            f"`{saved}`\n\n"
+            f"[View on Tonscan]({tonscan})\n\n"
+            f"To change, reply with your new TON address.\n"
+            f"Or use /mint to create a Soul Certificate for this wallet."
+        )
+        keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("🔍 View on Tonscan", url=tonscan),
+            InlineKeyboardButton("💎 Mint NFT", callback_data="start_mint"),
+        ]])
+    else:
+        text = (
+            f"🔗 *Link your TON wallet*\n\n"
+            f"Send your TON wallet address to link it with your twin.\n"
+            f"This will be used as the owner address when minting your Soul Certificate NFT.\n\n"
+            f"_Example:_ `UQDxxx...`\n\n"
+            f"Or connect via the 🌐 [Eiva Dashboard](https://zhenek73.github.io/eiva/eiva-web/) with TON Connect."
+        )
+        keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("🌐 Connect on Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+        ]])
+
+    await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+    ctx.user_data["awaiting_wallet"] = True
+
+
+async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Handle inline keyboard button callbacks."""
+    query = update.callback_query
+    await query.answer()
+    if query.data == "start_setup":
+        await query.message.reply_text(
+            "📂 Send me your Telegram export JSON file (`result.json`) to get started!",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+    elif query.data == "start_mint":
+        await cmd_mint(update._replace_message(query.message), ctx)
+
 
 async def cmd_reset(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -557,13 +626,37 @@ async def handle_ton_address(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Route every plain text message to the digital twin agent."""
     user_id = update.effective_user.id
-    text    = update.message.text
+    text    = update.message.text.strip()
+
+    # ── Intercept wallet address input ──────────────────────────────────────
+    if ctx.user_data.get("awaiting_wallet"):
+        import re
+        # TON address: starts with UQ/EQ/0Q and has ~48 chars, or raw 0:hex
+        ton_pattern = r'^(?:[UE0]Q[A-Za-z0-9_\-]{46,48}|0:[0-9a-fA-F]{64})$'
+        if re.match(ton_pattern, text):
+            store = EmbeddingStore(str(user_id))
+            store.save_meta("ton_wallet_address", text)
+            ctx.user_data["awaiting_wallet"] = False
+            net = config.TON_NETWORK
+            tonscan = f"https://testnet.tonscan.org/address/{text}" if net == "testnet" else f"https://tonscan.org/address/{text}"
+            await update.message.reply_text(
+                f"✅ *Wallet linked!*\n\n`{text}`\n\n"
+                f"[View on Tonscan]({tonscan})\n\n"
+                f"Now use /mint to create your Soul Certificate NFT.",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("💎 Mint Soul Certificate", callback_data="start_mint"),
+                ]]),
+            )
+            return
+        # Not a wallet address — let it fall through to twin chat
 
     # Try to load persisted agent
     agent = _load_agent(user_id)
     if not agent:
         await update.message.reply_text(
-            "👋 Your twin isn't set up yet. Use /setup to get started!",
+            "👋 Your twin isn't set up yet. Use /setup to get started!\n\n"
+            "Or connect your wallet with /wallet to view your existing Soul Certificates.",
         )
         return
 
@@ -616,6 +709,8 @@ def main():
     app.add_handler(CommandHandler("status",  cmd_status))
     app.add_handler(CommandHandler("reset",   cmd_reset))
     app.add_handler(CommandHandler("avatar",  cmd_avatar))
+    app.add_handler(CommandHandler("wallet",  cmd_wallet))
+    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint)$"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

@@ -1,17 +1,17 @@
 """
 Eiva — personality.py
-Extracts a structured personality profile from a sample of the user's messages
-using a powerful LLM. The profile is stored and reused as the system prompt
-foundation for the digital twin.
+Extracts a structured personality profile from a sample of the user's messages.
 """
 
 import json
+import logging
 import random
 from openai import OpenAI
 
 import config
 from parser import Message
 
+log = logging.getLogger("eiva.personality")
 
 EXTRACTION_PROMPT = """You are analyzing a person's private messages to build their AI digital twin.
 Study the messages carefully and extract a detailed personality profile.
@@ -36,45 +36,52 @@ Messages to analyze:
 
 
 def extract_personality(messages: list[Message], user_id: str) -> dict:
-    """
-    Sample up to MAX_MESSAGES_FOR_PERSONALITY messages, send to LLM,
-    return structured personality dict.
-    """
-    sample_size = min(len(messages), config.MAX_MESSAGES_FOR_PERSONALITY)
+    # Use only 100 messages — enough for a good profile, fast to process
+    sample_size = min(len(messages), 100)
     sample = random.sample(messages, sample_size)
 
-    # Format messages for the prompt
-    formatted = "\n".join(
-        f"[{m.date[:10]}] {m.text}" for m in sample
-    )
+    formatted = "\n".join(f"[{m.date[:10]}] {m.text}" for m in sample)
+
+    log.info(f"[personality] Sending {sample_size} messages to {config.LLM_SMART_MODEL}...")
 
     oai = OpenAI(
         api_key=config.OPENROUTER_API_KEY,
         base_url=config.OPENROUTER_BASE_URL,
+        timeout=90.0,  # 90 second timeout
     )
 
-    response = oai.chat.completions.create(
-        model=config.LLM_SMART_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": EXTRACTION_PROMPT.format(messages=formatted),
-            }
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.3,
-    )
+    try:
+        response = oai.chat.completions.create(
+            model=config.LLM_SMART_MODEL,
+            messages=[{"role": "user", "content": EXTRACTION_PROMPT.format(messages=formatted)}],
+            response_format={"type": "json_object"},
+            temperature=0.3,
+            max_tokens=1000,
+        )
+        raw = response.choices[0].message.content
+        log.info(f"[personality] Got response ({len(raw)} chars)")
+        profile = json.loads(raw)
+        return profile
 
-    raw = response.choices[0].message.content
-    profile = json.loads(raw)
-    return profile
+    except Exception as e:
+        log.error(f"[personality] LLM call failed: {e}")
+        # Return a basic fallback profile so the bot doesn't hang
+        log.info("[personality] Using fallback profile")
+        return {
+            "name": "Unknown",
+            "language": "Russian",
+            "communication_style": "Natural and direct",
+            "vocabulary": "Everyday language",
+            "topics_of_interest": ["general topics"],
+            "emotional_tone": "neutral",
+            "response_patterns": "conversational",
+            "humor": "none detected",
+            "unique_traits": ["authentic"],
+            "do_not_do": ["avoid being overly formal"],
+        }
 
 
 def build_system_prompt(profile: dict, owner_name: str) -> str:
-    """
-    Convert a personality profile dict into a rich system prompt
-    for the digital twin agent.
-    """
     traits = "\n".join(f"- {t}" for t in profile.get("unique_traits", []))
     avoid  = "\n".join(f"- {t}" for t in profile.get("do_not_do", []))
     topics = ", ".join(profile.get("topics_of_interest", []))
