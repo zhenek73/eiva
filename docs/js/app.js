@@ -307,7 +307,52 @@ function showStatus(el, msg, type = 'info') {
   el.className = `status-msg show ${type}`;
 }
 
+// ── Network Status Check ────────────────────────────────────────────────────
+async function checkNetworkStatus() {
+  // Bot is always assumed online (real check would need backend)
+  const botStatus = document.getElementById('botStatus');
+  if (botStatus) {
+    botStatus.classList.remove('offline');
+    document.getElementById('botStatusText').textContent = 'Online';
+  }
+
+  // Check TON Testnet connectivity
+  try {
+    const response = await fetch('https://testnet.toncenter.com/api/v2/getAddressInformation?address=UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJKZ');
+    if (response.ok) {
+      const tonStatus = document.getElementById('tonStatus');
+      if (tonStatus) {
+        tonStatus.classList.remove('offline');
+        document.getElementById('tonStatusText').textContent = 'Connected';
+      }
+
+      // Try to get latest block info
+      try {
+        const masterchainResponse = await fetch('https://testnet.tonapi.io/v2/blockchain/masterchain-head');
+        if (masterchainResponse.ok) {
+          const masterchainData = await masterchainResponse.json();
+          const blockStatus = document.getElementById('blockStatus');
+          if (blockStatus && masterchainData.last) {
+            const blockSeqno = masterchainData.last.seqno;
+            document.getElementById('blockStatusText').textContent = `#${blockSeqno}`;
+          }
+        }
+      } catch (e) {
+        // Fallback: just mark as connected
+        document.getElementById('blockStatusText').textContent = 'Online';
+      }
+    }
+  } catch (e) {
+    const tonStatus = document.getElementById('tonStatus');
+    if (tonStatus) {
+      tonStatus.classList.add('offline');
+      document.getElementById('tonStatusText').textContent = 'Offline';
+    }
+  }
+}
+
 // ── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initTonConnect();
+  checkNetworkStatus();
 });

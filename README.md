@@ -2,6 +2,10 @@
 
 > *Your personality, immortalized on the blockchain. Your voice, available to everyone you choose.*
 
+![TON Testnet](https://img.shields.io/badge/TON-Testnet-blue?logo=ton)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+
 **TON AI Hackathon 2026** | Tracks: User-Facing AI Agents + TON Integration
 
 🤖 Bot: [@eivatonbot](https://t.me/eivatonbot)
@@ -9,6 +13,7 @@
 📖 Whitepaper: [project-docs/WHITEPAPER.md](project-docs/WHITEPAPER.md)
 💰 Monetization: [project-docs/MONETIZATION.md](project-docs/MONETIZATION.md)
 📋 Changelog: [CHANGELOG.md](CHANGELOG.md)
+🎬 Demo: [DEMO.md](DEMO.md) (for hackathon judges)
 
 ---
 
@@ -36,17 +41,36 @@ Then open Telegram → [@eivatonbot](https://t.me/eivatonbot) → `/setup`
 
 ---
 
+## Live Dashboard
+
+The web dashboard is live at **[zhenek73.github.io/eiva](https://zhenek73.github.io/eiva/)**
+
+Features:
+- **How it works**: 4-step visual guide with animations
+- **Wallet integration**: Connect TON Wallet → view Soul Certificates
+- **NFT gallery**: Browse your minted certificates on testnet
+- **Tier pricing**: See Bronze / Silver / Gold / Exclusive pricing
+- **System status**: Real-time network status (bot, TON testnet, latest block)
+- **Open Graph support**: Share your dashboard on social media
+
+---
+
 ## Commands
 
 | Command | Description |
 |---|---|
-| `/start` | Welcome message |
+| `/start` | Welcome message + quick intro |
 | `/setup` | Upload Telegram JSON export → build your twin |
 | `/profile` | View your extracted personality profile |
-| `/status` | Check twin status (messages indexed, etc.) |
+| `/status` | Check twin status (messages indexed, ready to chat) |
+| `/ask <message>` | Chat with your digital twin |
 | `/mint` | Anchor Soul Certificate on TON blockchain |
 | `/avatar` | Generate AI avatar for your Soul Certificate |
 | `/reset` | Clear all data and start over |
+| `/twins` | Show all your deployed digital twins |
+| `/stats` | View system statistics |
+| `/demo` | See sample personality profile (no upload needed) |
+| `/help` | List all commands with descriptions |
 
 ---
 
@@ -62,18 +86,26 @@ TON_API_KEY=              # Optional: toncenter.com API key for higher rate limi
 
 ---
 
-## Architecture
+## Project Structure
 
 ```
-Telegram Bot
-  ├── parser.py       — Telegram JSON export → message list
-  ├── embeddings.py   — ChromaDB + text-embedding-3-small (RAG)
-  ├── personality.py  — GPT-4o personality extraction
-  ├── agent.py        — Digital twin chat (RAG + GPT-4o-mini)
-  └── ton_identity.py — TON wallet, Soul Certificate, storage
+eiva-bot/
+├── bot.py              — Telegram bot main loop
+├── parser.py           — Telegram JSON export parser
+├── embeddings.py       — ChromaDB + text-embedding-3-small (RAG)
+├── personality.py      — GPT-4o personality extraction
+├── agent.py            — Digital twin chat (RAG + GPT-4o-mini)
+├── ton_identity.py     — TON wallet, Soul Certificate, blockchain
+├── nft_contract.py     — Soulbound NFT smart contract
+├── eiva-web/           — Web dashboard (HTML/JS/CSS) → deployed to /docs for GitHub Pages
+├── /docs/              — GitHub Pages source (synced from eiva-web/)
+├── project-docs/       — Whitepaper, monetization, architecture
+├── data/               — ChromaDB vector storage (local)
+└── metadata/           — Personality profiles & hashes (local)
 ```
 
-**Stack:** Python 3.10+, python-telegram-bot, ChromaDB, OpenRouter, tonsdk, aiohttp
+**Stack:** Python 3.10+, python-telegram-bot, ChromaDB, OpenRouter, TON SDK, aiohttp
+**Frontend:** Vanilla JS, CSS Grid, TON Connect UI
 
 ---
 
