@@ -396,6 +396,7 @@ async def cmd_avatar(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                         parse_mode=ParseMode.MARKDOWN,
                     )
                     store.save_meta("avatar_generated", True)
+                    store.save_meta("avatar_url", image_url)
                     log.info(f"[Avatar] Generated for user {user_id}")
                 else:
                     error_text = await r.text()
@@ -472,35 +473,82 @@ async def handle_ton_address(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     name        = ctx.user_data.get("mint_name", "Unknown")
     profile     = ctx.user_data.get("mint_profile", {})
 
-    await update.message.reply_text("⏳ Creating your Soul Certificate on TON blockchain...")
+    await update.message.reply_text(
+        "⏳ *Creating your Soulbound NFT on TON...*\n\n"
+        "1️⃣ Building metadata JSON\n"
+        "2️⃣ Uploading to GitHub (public URL)\n"
+        "3️⃣ Deploying NFT contract on-chain\n\n"
+        "_This takes ~15 seconds..._",
+        parse_mode=ParseMode.MARKDOWN,
+    )
     await update.message.chat.send_action(ChatAction.TYPING)
 
+    # Step A: also anchor personality hash (original cert)
     result = await create_soul_certificate(
         user_id    = str(user_id),
         owner_name = name,
         personality= profile,
         ton_address= ton_address,
     )
+    personality_hash = result["personality_hash"]
 
-    hash_short = result["personality_hash"][:16] + "..."
-    bag_id     = result.get("storage_bag_id", "N/A")
-    tx_hash    = result.get("tx_hash")
-    explorer   = result.get("explorer_url")
+    # Step B: deploy real Soulbound NFT
+    from nft_contract import deploy_soulbound_nft
+    from ton_identity import get_wallet_address
 
-    resp = (
-        f"🎉 *Soul Certificate Created!*\n\n"
-        f"🔐 Personality hash: `{hash_short}`\n"
-        f"📦 TON Storage bag: `{bag_id[:20]}...`\n"
-        f"🌐 Network: {result['network']}\n"
-    )
-    if tx_hash:
-        resp += f"\n✅ NFT minted!\n🔍 [View on explorer]({explorer})"
+    owner_addr = ton_address or get_wallet_address()
+    nft_result = None
+    if owner_addr and config.TON_MNEMONIC:
+        # Retrieve avatar URL if generated
+        store2 = EmbeddingStore(str(user_id))
+        avatar_url = store2.load_meta("avatar_url")
+        try:
+            nft_result = await deploy_soulbound_nft(
+                owner_address   = owner_addr,
+                owner_name      = name,
+                personality_hash= personality_hash,
+                personality     = profile,
+                avatar_url      = avatar_url,
+            )
+        except Exception as e:
+            log.error(f"NFT deploy error: {e}")
+
+    # Build response
+    hash_short = personality_hash[:16] + "..."
+    resp_lines = [
+        "🎉 *Soul Certificate Created!*\n",
+        f"👤 Owner: `{(owner_addr or 'N/A')[:24]}...`",
+        f"🔐 Personality hash: `{hash_short}`",
+        f"🌐 Network: {result['network']}",
+    ]
+
+    if nft_result and nft_result.get("tx_hash"):
+        nft_addr = nft_result["nft_address"]
+        resp_lines += [
+            "",
+            "✅ *Soulbound NFT deployed!*",
+            f"📝 NFT address: `{nft_addr[:24]}...`",
+            f"🔍 [View on Tonscan]({nft_result['explorer_url']})",
+            f"🖼 [View on Getgems]({nft_result['getgems_url']})",
+            f"📋 [Metadata JSON]({nft_result['metadata_url']})",
+        ]
+    elif nft_result:
+        resp_lines += [
+            "",
+            "⚠️ NFT deploy tx failed — check terminal.",
+            f"📝 NFT address (not yet deployed): `{nft_result.get('nft_address', 'N/A')[:24]}...`",
+        ]
     elif not config.TON_MNEMONIC:
-        resp += "\n⚠️ NFT mint skipped — TON_MNEMONIC not set in .env"
+        resp_lines.append("\n⚠️ NFT skipped — TON_MNEMONIC not set in .env")
     else:
-        resp += "\n⚠️ NFT mint failed — check terminal for details (likely: V4R2 wallet has no testnet TON, or toncenter.com error)"
+        bag_id = result.get("storage_bag_id", "N/A")
+        resp_lines.append(f"\n📦 TON Storage bag: `{bag_id[:20]}...`")
+        resp_lines.append("⚠️ NFT deploy failed — check terminal")
 
-    await update.message.reply_text(resp, parse_mode=ParseMode.MARKDOWN)
+    await update.message.reply_text(
+        "\n".join(resp_lines),
+        parse_mode=ParseMode.MARKDOWN,
+    )
     return ConversationHandler.END
 
 

@@ -29,6 +29,9 @@ TON_MNEMONIC        = os.getenv("TON_MNEMONIC", "")  # space-separated 24 words
 TON_NETWORK         = os.getenv("TON_NETWORK", "testnet")   # "testnet" | "mainnet"
 TON_API_KEY         = os.getenv("TON_API_KEY", "")    # toncenter.com API key (optional)
 
+# ── GitHub ────────────────────────────────────────────────────────────────────
+GITHUB_TOKEN        = os.getenv("GITHUB_TOKEN", "")   # PAT for metadata upload
+
 # ── Storage ───────────────────────────────────────────────────────────────────
 BASE_DIR            = Path(__file__).parent
 DATA_DIR            = BASE_DIR / "data"
