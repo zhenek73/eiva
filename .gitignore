@@ -34,3 +34,23 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# ── AVATARS / GENERATED IMAGES (local cache) ─────────────────────────────────
+avatars/
+*.png
+*.jpg
+*.jpeg
+!docs/*.png
+!docs/*.jpg
+
+# ── LOGS ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── TEMP / MISC ───────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.orig
+node_modules/
+.cursor/
+.claude/

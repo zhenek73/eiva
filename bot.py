@@ -98,7 +98,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         if agent:
             agents[user.id] = agent
         text += "✅ Your twin is *already set up*! Just send a message and I'll respond as you.\n\n"
-        text += "Commands: /profile · /mint · /reset · /status"
+        text += "Commands: /profile · /mint · /avatar · /reset · /status"
     else:
         text += (
             "To get started, use /setup and upload your Telegram chat export.\n\n"
@@ -215,12 +215,25 @@ async def _process_export(update: Update, ctx: ContextTypes.DEFAULT_TYPE, owner_
 
     # Index into ChromaDB
     store = EmbeddingStore(str(user_id))
+    await msg.reply_text(f"⏳ Indexing {len(messages)} messages into vector memory (may take 1-2 min)...")
+    log.info(f"[setup] Starting embedding for user {user_id}, {len(messages)} messages")
     added = store.add_messages(messages)
+    log.info(f"[setup] Embedding done: {added} added")
     await msg.reply_text(f"🧠 Indexed *{added}* messages into memory.", parse_mode=ParseMode.MARKDOWN)
 
     # Extract personality
-    await msg.reply_text("🔬 Analyzing your personality (this takes ~30 seconds)...")
-    profile = extract_personality(messages, str(user_id))
+    await msg.reply_text("🔬 Analyzing your personality (sending 100 messages to GPT-4o, ~20 sec)...")
+    log.info(f"[setup] Starting personality extraction for user {user_id}")
+    try:
+        profile = extract_personality(messages, str(user_id))
+        log.info(f"[setup] Personality extracted: {profile.get('name')}, tone={profile.get('emotional_tone')}")
+    except Exception as e:
+        log.error(f"[setup] Personality extraction failed: {e}")
+        await msg.reply_text(f"⚠️ Personality analysis failed: {e}\nUsing default profile.")
+        profile = {"name": owner_name, "language": "Russian", "communication_style": "natural",
+                   "vocabulary": "", "topics_of_interest": [], "emotional_tone": "neutral",
+                   "response_patterns": "conversational", "humor": "none",
+                   "unique_traits": [], "do_not_do": []}
 
     # Build system prompt
     system_prompt = build_system_prompt(profile, owner_name)
@@ -307,6 +320,110 @@ async def cmd_reset(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No active twin loaded. Use /setup first.")
 
 
+# ── /avatar ───────────────────────────────────────────────────────────────────
+
+async def cmd_avatar(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Generate an AI avatar for the Soul Certificate using personality profile."""
+    user_id = update.effective_user.id
+    store   = EmbeddingStore(str(user_id))
+    profile = store.load_meta("personality")
+    name    = store.load_meta("owner_name", "Unknown")
+
+    if not profile:
+        await update.message.reply_text("❌ No profile yet. Run /setup first.")
+        return
+
+    await update.message.reply_text("🎨 Generating your Soul Certificate avatar...")
+    await ctx.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO)
+
+    try:
+        import aiohttp, base64
+        # Build a rich prompt from personality profile
+        style      = profile.get("communication_style", "thoughtful and expressive")
+        tone       = profile.get("emotional_tone", "warm")
+        topics     = ", ".join(profile.get("key_topics", ["technology", "life"])[:3])
+        prompt = (
+            f"A beautiful, artistic portrait avatar for a digital soul certificate NFT. "
+            f"The person named {name} has a {tone} and {style} personality. "
+            f"They care deeply about: {topics}. "
+            f"Style: glowing holographic portrait on a dark background, "
+            f"digital art, futuristic, TON blockchain aesthetic, blue and violet tones, "
+            f"minimalist, professional. No text."
+        )
+
+        headers = {
+            "Authorization": f"Bearer {config.OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": "openai/dall-e-3",
+            "prompt": prompt,
+            "n": 1,
+            "size": "1024x1024",
+            "response_format": "url",
+        }
+
+        async with aiohttp.ClientSession() as s:
+            async with s.post(
+                "https://openrouter.ai/api/v1/images/generations",
+                json=payload,
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=60),
+            ) as r:
+                if r.status == 200:
+                    data = await r.json()
+                    image_url = data["data"][0]["url"]
+                    # Download and send the image
+                    async with s.get(image_url, timeout=aiohttp.ClientTimeout(total=30)) as img_r:
+                        img_bytes = await img_r.read()
+
+                    # Save locally for reference
+                    avatars_dir = Path("avatars")
+                    avatars_dir.mkdir(exist_ok=True)
+                    avatar_path = avatars_dir / f"{user_id}_avatar.png"
+                    avatar_path.write_bytes(img_bytes)
+
+                    # Send to Telegram
+                    await update.message.reply_photo(
+                        photo=img_bytes,
+                        caption=(
+                            f"✨ *Soul Certificate Avatar*\n"
+                            f"👤 *{name}*\n\n"
+                            f"This avatar was generated from your personality profile "
+                            f"and will be attached to your Soul Certificate NFT.\n\n"
+                            f"_Traits: {tone} · {style}_"
+                        ),
+                        parse_mode=ParseMode.MARKDOWN,
+                    )
+                    store.save_meta("avatar_generated", True)
+                    log.info(f"[Avatar] Generated for user {user_id}")
+                else:
+                    error_text = await r.text()
+                    log.warning(f"[Avatar] API error {r.status}: {error_text[:200]}")
+                    await _avatar_fallback(update, name, profile)
+
+    except Exception as e:
+        log.error(f"[Avatar] Error: {e}")
+        await _avatar_fallback(update, name, profile)
+
+
+async def _avatar_fallback(update: Update, name: str, profile: dict):
+    """Fallback: show DiceBear avatar (deterministic, no API needed)."""
+    import hashlib
+    seed = hashlib.md5(name.encode()).hexdigest()[:8]
+    avatar_url = f"https://api.dicebear.com/9.x/pixel-art/png?seed={seed}&size=256&backgroundColor=1a1a2e"
+    await update.message.reply_photo(
+        photo=avatar_url,
+        caption=(
+            f"🎨 *Soul Certificate Avatar*\n"
+            f"👤 *{name}*\n\n"
+            f"_Pixel art avatar (AI generation unavailable)._\n"
+            f"Your Soul Certificate is still valid on-chain."
+        ),
+        parse_mode=ParseMode.MARKDOWN,
+    )
+
+
 # ── /mint ─────────────────────────────────────────────────────────────────────
 
 async def cmd_mint(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -378,8 +495,10 @@ async def handle_ton_address(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
     if tx_hash:
         resp += f"\n✅ NFT minted!\n🔍 [View on explorer]({explorer})"
+    elif not config.TON_MNEMONIC:
+        resp += "\n⚠️ NFT mint skipped — TON_MNEMONIC not set in .env"
     else:
-        resp += "\nℹ️ NFT mint skipped (no wallet/mnemonic configured)."
+        resp += "\n⚠️ NFT mint failed — check terminal for details (likely: V4R2 wallet has no testnet TON, or toncenter.com error)"
 
     await update.message.reply_text(resp, parse_mode=ParseMode.MARKDOWN)
     return ConversationHandler.END
@@ -448,6 +567,7 @@ def main():
     app.add_handler(CommandHandler("profile", cmd_profile))
     app.add_handler(CommandHandler("status",  cmd_status))
     app.add_handler(CommandHandler("reset",   cmd_reset))
+    app.add_handler(CommandHandler("avatar",  cmd_avatar))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
