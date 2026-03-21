@@ -35,7 +35,7 @@ echo Using: %PYTHON%
 echo.
 echo Installing dependencies...
 %PYTHON% -m pip install -r requirements.txt --quiet
-%PYTHON% -m pip install tonsdk --quiet
+%PYTHON% -m pip install tonsdk tonutils pytoniq-core --quiet
 echo.
 echo Starting Eiva bot...
 echo Open Telegram: @eivatonbot

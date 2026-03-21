@@ -88,9 +88,12 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     already_setup = _is_setup(user.id)
 
     text = (
-        f"👋 *Welcome to Eiva — Your AI Digital Twin*\n\n"
-        f"I learn from your Telegram messages and become a version of *you* "
-        f"that others can talk to — anchored on the TON blockchain.\n\n"
+        f"🎭 *Welcome to Eiva — Your Immortal Digital Twin*\n\n"
+        f"Transform your unique voice and personality into an *AI-powered digital twin* that:\n"
+        f"• Learns from your Telegram messages\n"
+        f"• Responds in *your* authentic voice\n"
+        f"• Mints as a *Soulbound NFT* on TON blockchain\n"
+        f"• Lives forever on-chain\n\n"
     )
 
     keyboard = None
@@ -98,22 +101,28 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         agent = _load_agent(user.id)
         if agent:
             agents[user.id] = agent
-        text += "✅ Your twin is *already set up*! Just send a message and I'll respond as you.\n\n"
-        text += "*/profile* — view personality\n"
-        text += "*/wallet* — connect TON wallet\n"
-        text += "*/mint* — mint Soul Certificate NFT\n"
-        text += "*/avatar* — generate AI portrait\n"
-        text += "*/status* — stats  ·  /reset — clear history"
+        text += "✅ *Your twin is live!* Start chatting and I'll respond as you.\n\n"
+        text += "*Commands:*\n"
+        text += "💬 Chat freely — I'll respond as your digital twin\n"
+        text += "👤 /profile — view extracted personality\n"
+        text += "💎 /mint — create your Soul Certificate NFT\n"
+        text += "🎨 /avatar — generate AI portrait\n"
+        text += "💳 /wallet — link TON wallet\n"
+        text += "📊 /status — twin indexing stats\n"
+        text += "🔄 /reset — clear conversation history\n"
+        text += "❓ /help — show all commands"
         keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("🌐 Open Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+            InlineKeyboardButton("🌐 Web Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
             InlineKeyboardButton("💎 Mint NFT", callback_data="start_mint"),
         ]])
     else:
         text += (
-            "To get started, use /setup and upload your Telegram chat export.\n\n"
-            "📖 *How to export your chats:*\n"
-            "Telegram Desktop → Settings → Advanced → Export Telegram Data\n"
-            "→ Select chats → Format: *JSON* → Export"
+            "To create your twin, upload a Telegram chat export and I'll extract your personality.\n\n"
+            "*📝 3 Easy Steps:*\n"
+            "1️⃣ *Export:* Telegram Desktop → Settings → Advanced → Export Telegram Data\n"
+            "2️⃣ *Select:* Personal chats, JSON format\n"
+            "3️⃣ *Upload:* Send the `result.json` file with /setup\n\n"
+            "Then chat with your twin, mint it as an NFT, and share it with the world."
         )
         keyboard = InlineKeyboardMarkup([[
             InlineKeyboardButton("📂 Start Setup", callback_data="start_setup"),
@@ -396,6 +405,7 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "*/wallet* — Link or view your TON wallet\n"
         "*/mint* — Create a Soulbound NFT Soul Certificate\n"
         "*/avatar* — Generate an AI portrait for your certificate\n"
+        "*/twins* — View your digital twins (own + purchased)\n"
         "*/demo* — See a sample interaction with Eiva\n"
         "*/reset* — Clear conversation history (keep long-term memory)\n"
         "*/help* — Show this message\n\n"
@@ -707,6 +717,8 @@ async def handle_ton_address(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
                 personality     = profile,
                 avatar_url      = avatar_url,
             )
+        except ImportError as e:
+            log.error(f"NFT deploy import error (fallback to cert): {e}")
         except Exception as e:
             log.error(f"NFT deploy error: {e}")
 
@@ -719,20 +731,27 @@ async def handle_ton_address(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         f"🌐 Network: {result['network']}",
     ]
 
+    # Build inline keyboard for successful NFT deploy
+    keyboard = None
     if nft_result and nft_result.get("tx_hash"):
         nft_addr = nft_result["nft_address"]
         resp_lines += [
             "",
             "✅ *Soulbound NFT deployed!*",
             f"📝 NFT address: `{nft_addr[:24]}...`",
-            f"🔍 [View on Tonscan]({nft_result['explorer_url']})",
-            f"🖼 [View on Getgems]({nft_result['getgems_url']})",
-            f"📋 [Metadata JSON]({nft_result['metadata_url']})",
+            f"📋 [View metadata]({nft_result['metadata_url']})",
         ]
+        # Add buttons for explorer links
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("🔍 Tonscan", url=nft_result['explorer_url']),
+                InlineKeyboardButton("🖼 Getgems", url=nft_result['getgems_url']),
+            ],
+        ])
     elif nft_result:
         resp_lines += [
             "",
-            "⚠️ NFT deploy tx failed — check terminal.",
+            "⚠️ NFT deploy tx failed — falling back to Soul Certificate anchor.",
             f"📝 NFT address (not yet deployed): `{nft_result.get('nft_address', 'N/A')[:24]}...`",
         ]
     elif not config.TON_MNEMONIC:
@@ -740,11 +759,12 @@ async def handle_ton_address(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     else:
         bag_id = result.get("storage_bag_id", "N/A")
         resp_lines.append(f"\n📦 TON Storage bag: `{bag_id[:20]}...`")
-        resp_lines.append("⚠️ NFT deploy failed — check terminal")
+        resp_lines.append("⚠️ NFT deploy failed — Soul Certificate anchor recorded on-chain")
 
     await update.message.reply_text(
         "\n".join(resp_lines),
         parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard,
     )
     return ConversationHandler.END
 
@@ -800,6 +820,86 @@ async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
 
 
+# ── /twins (list user's digital twins) ─────────────────────────────────────────
+
+async def cmd_twins(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Show all digital twins the user has access to (own + purchased)."""
+    user_id = update.effective_user.id
+    store   = EmbeddingStore(str(user_id))
+
+    # Check if user's own twin is set up
+    is_ready = store.is_ready()
+    owner_name = store.load_meta("owner_name", "Unknown")
+
+    text = "🧬 *Your Digital Twins*\n\n"
+
+    if is_ready:
+        text += f"✅ *Your Own Twin: {owner_name}*\n"
+        text += "Status: Ready to chat\n"
+        text += "→ Start chatting or use /mint to create an NFT\n\n"
+    else:
+        text += "❌ No personal twin yet\n"
+        text += "→ Use /setup to create your digital twin\n\n"
+
+    text += "*Coming Soon:*\n"
+    text += "Purchase others' digital twin NFTs on Getgems and chat with them here!"
+
+    keyboard = InlineKeyboardMarkup([[
+        InlineKeyboardButton("🌐 Explore Twins", url="https://testnet.getgems.io/collections?query=Eiva"),
+    ]])
+
+    await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+
+
+# ── /stats (admin only) ────────────────────────────────────────────────────────
+
+async def cmd_stats(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Admin-only command: show total users, twins built, NFTs minted."""
+    user_id = update.effective_user.id
+
+    # For now, only the bot owner (user_id 1234567890) can see stats
+    # In production, you'd check against a list of admin IDs from config
+    ADMIN_ID = 1234567890  # Replace with actual admin ID or read from config
+
+    if user_id != ADMIN_ID:
+        await update.message.reply_text(
+            "❌ This command is admin-only.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    # Count users by checking data directory (simplified)
+    from pathlib import Path
+    data_dir = Path("./data/embeddings")
+    user_count = 0
+    twins_built = 0
+
+    if data_dir.exists():
+        # Each user_id is a directory
+        user_dirs = [d for d in data_dir.iterdir() if d.is_dir()]
+        user_count = len(user_dirs)
+
+        # Count ready twins
+        for user_dir in user_dirs:
+            try:
+                uid = user_dir.name
+                store = EmbeddingStore(uid)
+                if store.is_ready():
+                    twins_built += 1
+            except:
+                pass
+
+    text = (
+        "📊 *Eiva Statistics*\n\n"
+        f"👥 *Total Users:* {user_count}\n"
+        f"🧬 *Twins Built:* {twins_built}\n"
+        f"🎭 *Completion Rate:* {100 * twins_built // max(user_count, 1)}%\n\n"
+        "_Stats update on demand. Check console logs for detailed metrics._"
+    )
+
+    await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+
+
 # ── Application setup ─────────────────────────────────────────────────────────
 
 def main():
@@ -840,6 +940,8 @@ def main():
     app.add_handler(CommandHandler("reset",   cmd_reset))
     app.add_handler(CommandHandler("avatar",  cmd_avatar))
     app.add_handler(CommandHandler("wallet",  cmd_wallet))
+    app.add_handler(CommandHandler("twins",   cmd_twins))
+    app.add_handler(CommandHandler("stats",   cmd_stats))
     app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint)$"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)

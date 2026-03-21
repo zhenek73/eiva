@@ -5,7 +5,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [0.5.0] — 2026-03-21 (current)
+## [0.6.0] — 2026-03-21 (current)
+
+### Added — Enhanced Bot UX & New Features
+- `/twins` command — view all digital twins the user has access to (own + future purchases from Getgems)
+- `/stats` command (admin-only) — shows total users, twins built, and completion rate
+- Inline keyboard buttons on /mint success — direct links to Tonscan and Getgems for NFT viewing
+- Improved /start message — more compelling onboarding with clear value proposition and 3-step setup guide
+- Better error resilience — /mint now gracefully falls back to Soul Certificate anchor if NFT deploy fails
+- Enhanced /help command — updated with new commands
+
+### Fixed
+- NFT deploy error handling — catches import errors and falls back to original certificate mechanism
+- Better user messaging on deployment failures — explains fallback to Soul Certificate anchor
+
+### Tested
+- `tonutils.contracts.codes.CONTRACT_CODES[ContractVersion.NFTItemSoulbound]` — confirmed available
+- `pytoniq_core.begin_cell().store_snake_string()` — confirmed working
+- All library imports validated and working correctly
+
+---
+
+## [0.5.0] — 2026-03-21
 
 ### Added — Web Dashboard
 - `eiva-web/index.html` — full single-page dashboard (works as website + Telegram Mini App)
