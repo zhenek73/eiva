@@ -81,6 +81,23 @@ Telegram Bot (python-telegram-bot 21.6)
 
 ---
 
+## Web Dashboard
+
+The **Eiva Web Dashboard** provides a web-based interface to manage your digital twin:
+
+**URL:** https://zhenek73.github.io/eiva/eiva-web/ (available after enabling GitHub Pages)
+
+**Features:**
+- **TON Connect Authentication** — Secure wallet-based login to your Eiva account
+- **NFT Gallery** — View all Soul Certificate NFTs you own or have created
+- **Wallet Management** — Connect and manage your TON wallet for minting and transactions
+- **Profile View** — See extracted personality profiles and traits
+- **Telegram Mini App** — Works as a native Telegram Mini App for seamless in-chat experience
+
+The dashboard complements the Telegram bot, offering a rich visual interface while maintaining the same underlying digital twin technology.
+
+---
+
 ## What Makes It Different
 
 | Feature | Eiva | Typical chatbot |
@@ -123,7 +140,7 @@ Document the communication style and knowledge of elders, cultural figures, or c
 - [x] TON Storage integration (demo mode)
 
 ### v1.1 — Avatar & Visual Identity
-- [ ] AI-generated avatar (DALL-E / Stable Diffusion) from personality profile
+- [x] AI-generated avatar (DALL-E / Stable Diffusion) from personality profile
 - [ ] NFT metadata standard (TEP-64) with avatar + personality hash
 - [ ] Real TON NFT collection contract deploy
 
