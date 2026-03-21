@@ -325,6 +325,63 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
+# ── /demo ──────────────────────────────────────────────────────────────────────
+
+async def cmd_demo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Show a demo interaction with a sample digital twin."""
+    await update.message.reply_text(
+        "🎬 *Welcome to Eiva Demo*\n\n"
+        "Let me show you what your digital twin can do...\n\n"
+        "This is a sample personality profile for a fictional tech enthusiast:",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+
+    # Sample personality profile
+    demo_profile = {
+        "name": "Alex Chen",
+        "communication_style": "casual and witty, loves technical deep dives",
+        "emotional_tone": "enthusiastic and optimistic",
+        "vocabulary": "uses a mix of technical jargon and casual expressions",
+        "topics_of_interest": ["AI/ML", "blockchain", "startup culture", "science fiction"],
+        "unique_traits": ["explains complex ideas simply", "dry humor", "asks questions to understand deeply"],
+        "humor": "dry wit and clever puns"
+    }
+
+    profile_text = (
+        f"👤 *{demo_profile['name']}*\n\n"
+        f"*Communication Style:* {demo_profile['communication_style']}\n"
+        f"*Tone:* {demo_profile['emotional_tone']}\n"
+        f"*Topics:* {', '.join(demo_profile['topics_of_interest'][:4])}\n"
+        f"*Special Traits:* {', '.join(demo_profile['unique_traits'][:3])}\n"
+    )
+
+    await update.message.reply_text(profile_text, parse_mode=ParseMode.MARKDOWN)
+
+    # Sample interaction
+    await update.message.reply_text(
+        "💬 *Sample Conversation:*\n\n"
+        "*You:* What's your take on the current state of AI?\n\n"
+        "*Twin (Alex):* Oh, we're in that fascinating phase where models "
+        "are getting smarter but we're still figuring out how to use them wisely. "
+        "It's like having a really powerful tool and slowly realizing what you can actually build with it. "
+        "The real bottleneck now isn't the models — it's the data, the UX, and honestly, "
+        "the human side of understanding when NOT to use AI.\n\n"
+        "---\n\n"
+        "*Ready to create your own?*\n"
+        "Use /setup to upload your Telegram export and build YOUR digital twin! 🚀",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+
+    keyboard = InlineKeyboardMarkup([[
+        InlineKeyboardButton("📂 Start Setup", callback_data="start_setup"),
+    ]])
+
+    await update.message.reply_text(
+        "This demo shows how your twin learns from your unique voice and responds in your style.",
+        reply_markup=keyboard,
+    )
+
+
 # ── /help ──────────────────────────────────────────────────────────────────────
 
 async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -779,6 +836,7 @@ def main():
     app.add_handler(CommandHandler("profile", cmd_profile))
     app.add_handler(CommandHandler("status",  cmd_status))
     app.add_handler(CommandHandler("help",    cmd_help))
+    app.add_handler(CommandHandler("demo",    cmd_demo))
     app.add_handler(CommandHandler("reset",   cmd_reset))
     app.add_handler(CommandHandler("avatar",  cmd_avatar))
     app.add_handler(CommandHandler("wallet",  cmd_wallet))
