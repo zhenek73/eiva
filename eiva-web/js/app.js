@@ -351,8 +351,79 @@ async function checkNetworkStatus() {
   }
 }
 
+// ── Settings Management ─────────────────────────────────────────────────────
+function loadSettings() {
+  const stored = localStorage.getItem('eiva_settings');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Failed to parse settings:', e);
+    }
+  }
+  // Default settings
+  return {
+    signature_phrases: true,
+    formal_mode: false,
+    emoji: true,
+    humor: true,
+    short_responses: false,
+    language: 'auto',
+  };
+}
+
+function saveSettings(settings) {
+  localStorage.setItem('eiva_settings', JSON.stringify(settings));
+  const statusEl = document.getElementById('settingsSaveStatus');
+  if (statusEl) {
+    statusEl.textContent = '✅ Settings saved to browser (synced with bot on next update)';
+    statusEl.style.display = 'block';
+    setTimeout(() => {
+      statusEl.style.display = 'none';
+    }, 3000);
+  }
+}
+
+function initSettings() {
+  const settings = loadSettings();
+
+  // Load toggle states
+  const toggles = [
+    'signature_phrases', 'formal_mode', 'emoji', 'humor', 'short_responses'
+  ];
+  toggles.forEach(key => {
+    const checkbox = document.getElementById(`toggle_${key}`);
+    if (checkbox) {
+      checkbox.checked = settings[key] || false;
+      checkbox.addEventListener('change', () => {
+        settings[key] = checkbox.checked;
+        saveSettings(settings);
+      });
+    }
+  });
+
+  // Load language selector
+  const langSelect = document.getElementById('language_select');
+  if (langSelect) {
+    langSelect.value = settings.language || 'auto';
+    langSelect.addEventListener('change', () => {
+      settings.language = langSelect.value;
+      saveSettings(settings);
+    });
+  }
+
+  // Save button
+  const saveBtn = document.getElementById('saveSettingsBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      saveSettings(settings);
+    });
+  }
+}
+
 // ── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initTonConnect();
   checkNetworkStatus();
+  initSettings();
 });

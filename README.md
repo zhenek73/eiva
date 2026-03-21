@@ -59,9 +59,24 @@ Features:
 - **How it works**: 4-step visual guide with animations
 - **Wallet integration**: Connect TON Wallet → view Soul Certificates
 - **NFT gallery**: Browse your minted certificates on testnet
+- **Settings panel**: Configure your twin's personality response settings
 - **Tier pricing**: See Bronze / Silver / Gold / Exclusive pricing
 - **System status**: Real-time network status (bot, TON testnet, latest block)
 - **Open Graph support**: Share your dashboard on social media
+
+### Running Web Dashboard Locally
+
+You can run the web dashboard locally during development:
+
+```bash
+# Windows
+run_web.bat
+
+# Linux/Mac
+./run_web.sh
+```
+
+Then open **http://localhost:8080** in your browser.
 
 ---
 
@@ -71,6 +86,8 @@ Features:
 |---|---|
 | `/start` | Welcome message + quick intro |
 | `/setup` | Upload Telegram JSON export → build your twin |
+| `/add_source` | Add another export to augment personality (tier-limited) |
+| `/settings` | Configure twin response settings (formal, emoji, humor, language) |
 | `/profile` | View your extracted personality profile |
 | `/status` | Check twin status (messages indexed, ready to chat) |
 | `/ask <message>` | Chat directly with your digital twin (can also just send messages) |

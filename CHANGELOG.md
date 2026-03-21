@@ -5,7 +5,84 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [0.6.0] — 2026-03-21 (current)
+## [0.7.0] — 2026-03-21 (current)
+
+### Added — Multi-Source Personality + Tier System + Settings
+
+#### Multi-Source Personality (Task 1)
+- `/add_source` command — upload additional Telegram exports to augment existing personality (tier-limited)
+- Tier system with limits:
+  * **Bronze 🥉**: 1 source (default)
+  * **Silver 🥈**: 3 sources
+  * **Gold 🥇**: 5 sources
+  * **Exclusive 💎**: 99 sources
+- `merge_personality()` function in personality.py — intelligently merges new exports with existing profile
+  * Combines signature phrases, topics, and traits (union of sets)
+  * Blends communication style and response patterns
+  * Preserves emotional tone and language
+  * Adds new messages to ChromaDB without clearing existing ones
+- Metadata methods in embeddings.py:
+  * `get_source_count()` — read source count
+  * `get_tier()` — read tier
+  * `increment_source_count()` — increment by 1
+- User state machine to distinguish `/setup` vs `/add_source` document uploads
+
+#### Personality Settings Page (Task 2)
+- `/settings` command with inline keyboard UI:
+  * ✅ Signature phrases toggle
+  * ✅ Formal mode toggle
+  * ✅ Emoji in replies toggle
+  * ✅ Humor toggle
+  * ✅ Short responses toggle
+  * 🌐 Language selector (auto/English/Russian)
+  * 💾 Save button
+- Settings stored in ChromaDB metadata as JSON
+- `DEFAULT_SETTINGS` in config.py for new users
+- Agent uses settings when generating responses — settings context injected into system prompt
+- `_build_settings_notes()` helper in agent.py to format settings as system instructions
+
+#### Settings Web UI (Task 2)
+- Settings section added to eiva-web/index.html:
+  * Toggle switches for each setting (HTML/CSS toggles)
+  * Language dropdown
+  * Save button
+- JavaScript in app.js:
+  * `loadSettings()` — load from localStorage with defaults
+  * `saveSettings()` — persist to localStorage
+  * `initSettings()` — wire up all controls
+- Settings synced locally; future update will push to bot
+
+#### Web Run Scripts (Task 3)
+- `run_web.bat` — Windows script to run dashboard locally on port 8080
+- `run_web.sh` — Linux/Mac script (executable) to run dashboard locally
+- Updated README with "Running Web Dashboard Locally" section
+- Synced eiva-web to docs/ directory for GitHub Pages
+
+### Updated
+- `config.py` — added `TIER_LIMITS` dict and `DEFAULT_SETTINGS` dict
+- `embeddings.py` — added tier/source count management methods
+- `personality.py` — added `merge_personality()` and `_merge_text_field()` functions
+- `agent.py` — updated `reply()` to inject settings context; added `_build_settings_notes()` helper
+- `bot.py`:
+  * Added state machine: `AWAITING_SOURCE_DOC` state + `user_state` dict
+  * New `/add_source` and `/settings` commands
+  * Updated `handle_json_upload()` to support both `/setup` and `/add_source` flows
+  * Updated `handle_inline_callback()` to handle settings toggles and language selector
+  * Enhanced callback pattern to match `setting_*` callbacks
+  * Added `/add_source` and `/settings` to conversation handler entry points
+- `eiva-web/index.html` — added settings card with 6 toggles, language dropdown, save button
+- `eiva-web/js/app.js` — added settings initialization and persistence functions
+- `README.md` — added `/add_source` and `/settings` commands to table; added web dashboard local run instructions
+
+### Testing
+- All Python files compile without syntax errors ✅
+- Settings toggles and language selector functional
+- merge_personality() integrates with existing RAG pipeline
+- Tier checks prevent exceeding source limits
+
+---
+
+## [0.6.0] — 2026-03-21
 
 ### Added — Enhanced Bot UX & New Features
 - `/twins` command — view all digital twins the user has access to (own + future purchases from Getgems)

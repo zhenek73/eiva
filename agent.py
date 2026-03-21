@@ -56,8 +56,15 @@ class EivaAgent:
         similar = self.store.search(user_message, top_k=config.TOP_K_SIMILAR)
         memory_block = self._format_memory(similar)
 
-        # 2. Build system message with injected memory
+        # 2. Build system message with injected memory and settings
         system_with_memory = self.system_prompt
+
+        # Add settings context
+        settings = self.store.load_meta("settings") or config.DEFAULT_SETTINGS
+        settings_notes = self._build_settings_notes(settings)
+        if settings_notes:
+            system_with_memory += f"\n\n## Response Settings\n{settings_notes}"
+
         if memory_block:
             system_with_memory += f"\n\n## Relevant things you said before\n{memory_block}"
 
@@ -93,3 +100,31 @@ class EivaAgent:
             return ""
         lines = [f"- {t}" for t in similar_texts]
         return "\n".join(lines)
+
+    @staticmethod
+    def _build_settings_notes(settings: dict) -> str:
+        """Build context notes from user settings."""
+        notes = []
+
+        if not settings.get("signature_phrases", True):
+            notes.append("- Avoid using signature phrases and expressions")
+
+        if settings.get("formal_mode", False):
+            notes.append("- Use formal, professional language")
+        else:
+            notes.append("- Use casual, conversational language")
+
+        if not settings.get("emoji", True):
+            notes.append("- Do not include emojis in responses")
+
+        if not settings.get("humor", True):
+            notes.append("- Maintain a serious tone, minimize humor")
+
+        if settings.get("short_responses", False):
+            notes.append("- Keep responses brief (1-3 sentences max)")
+
+        lang = settings.get("language", "auto")
+        if lang and lang != "auto":
+            notes.append(f"- Respond in {lang}")
+
+        return "\n".join(notes)

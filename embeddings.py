@@ -137,3 +137,20 @@ class EmbeddingStore:
             return default
         data = json.loads(meta_file.read_text())
         return data.get(key, default)
+
+    # ── Tier & Multi-Source Management ────────────────────────────────────────
+
+    def get_source_count(self) -> int:
+        """Get the number of personality sources added by this user."""
+        return self.load_meta("source_count", 0)
+
+    def get_tier(self) -> str:
+        """Get the user's current tier."""
+        return self.load_meta("tier", config.DEFAULT_TIER)
+
+    def increment_source_count(self) -> int:
+        """Increment source count by 1 and return the new count."""
+        current = self.get_source_count()
+        new_count = current + 1
+        self.save_meta("source_count", new_count)
+        return new_count

@@ -48,6 +48,25 @@ MIN_MESSAGES_REQUIRED        = 50    # minimum to build a useful twin
 CONTEXT_MESSAGES             = 8     # conversation turns kept in memory
 TOP_K_SIMILAR                = 5     # similar messages retrieved from vector DB
 
+# ── Tier System (Multi-Source Personality) ────────────────────────────────────
+TIER_LIMITS = {
+    "bronze": {"sources": 1, "label": "Bronze 🥉"},
+    "silver": {"sources": 3, "label": "Silver 🥈"},
+    "gold": {"sources": 5, "label": "Gold 🥇"},
+    "exclusive": {"sources": 99, "label": "Exclusive 💎"},
+}
+DEFAULT_TIER = "bronze"
+
+# ── Default Settings ──────────────────────────────────────────────────────────
+DEFAULT_SETTINGS = {
+    "signature_phrases": True,
+    "formal_mode": False,
+    "emoji": True,
+    "humor": True,
+    "short_responses": False,
+    "language": "auto",
+}
+
 def validate():
     """Raise if critical env vars are missing."""
     missing = []

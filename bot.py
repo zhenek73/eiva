@@ -52,9 +52,13 @@ log = logging.getLogger("eiva")
 AWAITING_JSON    = 1
 AWAITING_NAME    = 2
 AWAITING_TON_ADDR = 3
+AWAITING_SOURCE_DOC = 4
 
 # ── In-memory registry: user_id → EivaAgent ───────────────────────────────────
 agents: dict[int, EivaAgent] = {}
+
+# ── Document context state: which command triggered the upload ────────────────
+user_state: dict[int, str] = {}  # {user_id: "setup" | "add_source"}
 
 
 # ── Helper: get or create agent for user ─────────────────────────────────────
@@ -156,11 +160,13 @@ async def cmd_setup(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_json_upload(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    """Receive the JSON file, detect owner, ask for name confirmation."""
+    """Receive the JSON file for /setup or /add_source."""
+    user_id = update.effective_user.id
     doc = update.message.document
     if not doc or not doc.file_name.endswith(".json"):
         await update.message.reply_text("⚠️ Please send a .json file.")
-        return AWAITING_JSON
+        # Return to the appropriate state
+        return AWAITING_JSON if user_state.get(user_id) == "setup" else AWAITING_SOURCE_DOC
 
     await update.message.reply_text("⏳ Downloading and analyzing your export...")
     await update.message.chat.send_action(ChatAction.TYPING)
@@ -170,41 +176,92 @@ async def handle_json_upload(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     tmp_path = Path(tempfile.mktemp(suffix=".json"))
     await tg_file.download_to_drive(tmp_path)
 
-    # Store path in context
-    ctx.user_data["export_path"] = str(tmp_path)
+    # Check which command triggered this
+    mode = user_state.get(user_id, "setup")
 
-    # Auto-detect owner name
-    detected = detect_owner_name(tmp_path)
-    ctx.user_data["detected_name"] = detected
+    if mode == "add_source":
+        # For /add_source, use existing owner name and merge
+        store = EmbeddingStore(str(user_id))
+        owner_name = store.load_meta("owner_name", "Unknown")
 
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(f"✅ Yes, that's me: {detected}", callback_data=f"name_confirm:{detected}")],
-        [InlineKeyboardButton("✏️ Enter my name manually", callback_data="name_manual")],
-    ]) if detected else None
+        # Read the export text
+        export_text = tmp_path.read_text(encoding="utf-8")
 
-    if detected:
-        await update.message.reply_text(
-            f"🔍 I detected the most active sender: *{detected}*\n\nIs that you?",
-            reply_markup=keyboard,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-        return AWAITING_NAME
+        # Call merge_personality
+        from personality import merge_personality
+
+        await update.message.reply_text("📖 Parsing your messages...")
+        try:
+            merge_personality(str(user_id), export_text, owner_name)
+
+            # Increment source count
+            count = store.increment_source_count()
+            tier = store.get_tier()
+            tier_info = config.TIER_LIMITS.get(tier, config.TIER_LIMITS["bronze"])
+
+            await update.message.reply_text(
+                f"✅ *Source {count}/{tier_info['sources']} added!*\n\n"
+                f"Your twin now knows you even better! 🎭\n\n"
+                f"Use /profile to see the updated personality, or just chat away!",
+                parse_mode=ParseMode.MARKDOWN,
+            )
+
+            # Clear state
+            user_state.pop(user_id, None)
+            return ConversationHandler.END
+        except Exception as e:
+            log.error(f"[add_source] Merge failed for user {user_id}: {e}")
+            await update.message.reply_text(
+                f"⚠️ Merge failed: {e}\n\nPlease try again or use /setup for troubleshooting.",
+            )
+            user_state.pop(user_id, None)
+            return ConversationHandler.END
+        finally:
+            # Clean up temp file
+            try:
+                tmp_path.unlink()
+            except Exception:
+                pass
     else:
-        await update.message.reply_text(
-            "❓ Couldn't auto-detect your name.\n\nWhat is your name *exactly as it appears* in Telegram exports?",
-            parse_mode=ParseMode.MARKDOWN,
-        )
-        return AWAITING_NAME
+        # Standard /setup flow
+        # Store path in context
+        ctx.user_data["export_path"] = str(tmp_path)
+
+        # Auto-detect owner name
+        detected = detect_owner_name(tmp_path)
+        ctx.user_data["detected_name"] = detected
+
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(f"✅ Yes, that's me: {detected}", callback_data=f"name_confirm:{detected}")],
+            [InlineKeyboardButton("✏️ Enter my name manually", callback_data="name_manual")],
+        ]) if detected else None
+
+        if detected:
+            await update.message.reply_text(
+                f"🔍 I detected the most active sender: *{detected}*\n\nIs that you?",
+                reply_markup=keyboard,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+            return AWAITING_NAME
+        else:
+            await update.message.reply_text(
+                "❓ Couldn't auto-detect your name.\n\nWhat is your name *exactly as it appears* in Telegram exports?",
+                parse_mode=ParseMode.MARKDOWN,
+            )
+            return AWAITING_NAME
 
 
 async def handle_name_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
     query = update.callback_query
     await query.answer()
 
     if query.data.startswith("name_confirm:"):
         name = query.data.split(":", 1)[1]
         await query.edit_message_text(f"✅ Got it! Processing as *{name}*...", parse_mode=ParseMode.MARKDOWN)
+        user_state[user_id] = "setup"  # Mark this as setup flow
         await _process_export(update, ctx, name)
+        user_state.pop(user_id, None)
         return ConversationHandler.END
     elif query.data == "name_manual":
         await query.edit_message_text("✏️ Please type your name exactly as it appears in the export:")
@@ -212,9 +269,12 @@ async def handle_name_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_name_text(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
     name = update.message.text.strip()
     await update.message.reply_text(f"✅ Processing as *{name}*...", parse_mode=ParseMode.MARKDOWN)
+    user_state[user_id] = "setup"  # Mark this as setup flow
     await _process_export(update, ctx, name)
+    user_state.pop(user_id, None)
     return ConversationHandler.END
 
 
@@ -337,6 +397,137 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         f"Agent loaded: {'✅' if user_id in agents else '⚠️ (will load on next message)'}",
         parse_mode=ParseMode.MARKDOWN,
     )
+
+
+# ── /add_source ────────────────────────────────────────────────────────────────
+
+async def cmd_add_source(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Add another Telegram export to augment the personality (tier-limited)."""
+    user_id = update.effective_user.id
+    store   = EmbeddingStore(str(user_id))
+
+    # Check if setup is complete
+    if not store.is_ready():
+        await update.message.reply_text(
+            "❌ You need to run /setup first to create your initial digital twin.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    # Check tier and source count
+    tier = store.get_tier()
+    source_count = store.get_source_count()
+    tier_info = config.TIER_LIMITS.get(tier, config.TIER_LIMITS["bronze"])
+    max_sources = tier_info["sources"]
+
+    if source_count >= max_sources:
+        # Build tier table for upgrade message
+        tier_table = "*Available Tiers:*\n\n"
+        for tier_key, tier_data in config.TIER_LIMITS.items():
+            tier_table += f"{tier_data['label']} — {tier_data['sources']} sources\n"
+
+        await update.message.reply_text(
+            f"⚠️ You've reached your limit: *{source_count}/{max_sources}* sources\n\n"
+            f"Your tier: {tier_info['label']}\n\n"
+            f"{tier_table}\n"
+            f"_Upgrade coming soon in the dashboard!_",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    # Under limit — ask for upload
+    user_state[user_id] = "add_source"
+    await update.message.reply_text(
+        "📂 *Add Another Personality Source*\n\n"
+        f"Your current tier: {tier_info['label']} ({source_count}/{max_sources} sources used)\n\n"
+        "Send me another Telegram export JSON file to merge with your existing personality.\n\n"
+        "This will enrich your twin with new communication patterns and traits from a different context "
+        "(e.g., work chats, family chats, friend groups).\n\n"
+        "Upload the `result.json` file 👇",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+    return AWAITING_SOURCE_DOC
+
+
+# ── /settings ──────────────────────────────────────────────────────────────────
+
+async def cmd_settings(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Show and edit personality response settings."""
+    user_id = update.effective_user.id
+    store   = EmbeddingStore(str(user_id))
+
+    # Check if setup is complete
+    if not store.is_ready():
+        await update.message.reply_text(
+            "❌ You need to run /setup first to create your digital twin.",
+        )
+        return
+
+    settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+    ctx.user_data["editing_settings"] = True
+
+    # Build keyboard with toggle buttons
+    keyboard = _build_settings_keyboard(settings)
+
+    await update.message.reply_text(
+        "⚙️ *Personality Settings*\n\n"
+        "Configure how your digital twin responds:\n",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard,
+    )
+
+
+def _build_settings_keyboard(settings: dict) -> InlineKeyboardMarkup:
+    """Build an inline keyboard for settings toggles."""
+    buttons = []
+
+    # First row: signature_phrases, formal_mode
+    buttons.append([
+        InlineKeyboardButton(
+            f"{'✅' if settings.get('signature_phrases') else '❌'} Signature phrases",
+            callback_data="setting_toggle:signature_phrases"
+        ),
+        InlineKeyboardButton(
+            f"{'✅' if settings.get('formal_mode') else '❌'} Formal mode",
+            callback_data="setting_toggle:formal_mode"
+        ),
+    ])
+
+    # Second row: emoji, humor
+    buttons.append([
+        InlineKeyboardButton(
+            f"{'✅' if settings.get('emoji') else '❌'} Emoji in replies",
+            callback_data="setting_toggle:emoji"
+        ),
+        InlineKeyboardButton(
+            f"{'✅' if settings.get('humor') else '❌'} Humor",
+            callback_data="setting_toggle:humor"
+        ),
+    ])
+
+    # Third row: short_responses, language
+    buttons.append([
+        InlineKeyboardButton(
+            f"{'✅' if settings.get('short_responses') else '❌'} Short responses",
+            callback_data="setting_toggle:short_responses"
+        ),
+    ])
+
+    # Language selector
+    current_lang = settings.get("language", "auto")
+    buttons.append([
+        InlineKeyboardButton(
+            f"🌐 Language: {current_lang.title()}",
+            callback_data="setting_lang"
+        ),
+    ])
+
+    # Save button
+    buttons.append([
+        InlineKeyboardButton("💾 Save Settings", callback_data="setting_save"),
+    ])
+
+    return InlineKeyboardMarkup(buttons)
 
 
 # ── /demo ──────────────────────────────────────────────────────────────────────
@@ -569,10 +760,14 @@ async def cmd_wallet(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    """Handle inline keyboard button callbacks."""
+    """Handle inline keyboard button callbacks (setup, mint, settings)."""
+    user_id = update.effective_user.id
     query = update.callback_query
     await query.answer()
+
+    # ── Setup callback ────────────────────────────────────────────────────────
     if query.data == "start_setup":
+        user_state[user_id] = "setup"
         await query.message.reply_text(
             "📂 *Setup your Digital Twin*\n\n"
             "Send me your Telegram export JSON file (`result.json`).\n\n"
@@ -581,8 +776,9 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
             "Then upload the `result.json` file here 👇",
             parse_mode=ParseMode.MARKDOWN,
         )
+
+    # ── Mint callback ────────────────────────────────────────────────────────
     elif query.data == "start_mint":
-        user_id = update.effective_user.id
         store   = EmbeddingStore(str(user_id))
         profile = store.load_meta("personality")
         name    = store.load_meta("owner_name", "Unknown")
@@ -616,6 +812,49 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
         )
         ctx.user_data["mint_name"]    = name
         ctx.user_data["mint_profile"] = profile
+
+    # ── Settings callbacks ────────────────────────────────────────────────────
+    elif query.data.startswith("setting_toggle:"):
+        store = EmbeddingStore(str(user_id))
+        setting_name = query.data.split(":", 1)[1]
+        settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+
+        # Toggle the setting
+        settings[setting_name] = not settings.get(setting_name, True)
+        store.save_meta("settings", settings)
+
+        # Update the keyboard
+        keyboard = _build_settings_keyboard(settings)
+        await query.edit_message_reply_markup(reply_markup=keyboard)
+
+    elif query.data == "setting_lang":
+        store = EmbeddingStore(str(user_id))
+        settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+        current_lang = settings.get("language", "auto")
+
+        # Cycle through languages
+        langs = ["auto", "English", "Russian"]
+        current_idx = langs.index(current_lang.title() if current_lang != "auto" else "auto")
+        next_idx = (current_idx + 1) % len(langs)
+        new_lang = langs[next_idx]
+
+        settings["language"] = new_lang
+        store.save_meta("settings", settings)
+
+        # Update keyboard
+        keyboard = _build_settings_keyboard(settings)
+        await query.edit_message_reply_markup(reply_markup=keyboard)
+
+    elif query.data == "setting_save":
+        store = EmbeddingStore(str(user_id))
+        settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+
+        await query.edit_message_text(
+            "✅ *Settings Saved!*\n\n"
+            "Your personality response settings have been updated. "
+            "I'll use these preferences from now on.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
 
 
 async def cmd_reset(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -1008,15 +1247,19 @@ def main():
 
     app = Application.builder().token(config.TELEGRAM_BOT_TOKEN).build()
 
-    # Setup conversation
+    # Setup & Add Source conversation (both handle JSON uploads)
     setup_conv = ConversationHandler(
-        entry_points=[CommandHandler("setup", cmd_setup)],
+        entry_points=[
+            CommandHandler("setup", cmd_setup),
+            CommandHandler("add_source", cmd_add_source),
+        ],
         states={
             AWAITING_JSON: [MessageHandler(filters.Document.ALL, handle_json_upload)],
             AWAITING_NAME: [
                 CallbackQueryHandler(handle_name_callback),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_name_text),
             ],
+            AWAITING_SOURCE_DOC: [MessageHandler(filters.Document.ALL, handle_json_upload)],
         },
         fallbacks=[CommandHandler("start", cmd_start)],
     )
@@ -1036,6 +1279,8 @@ def main():
     app.add_handler(CommandHandler("start",    cmd_start))
     app.add_handler(CommandHandler("profile",  cmd_profile))
     app.add_handler(CommandHandler("status",   cmd_status))
+    app.add_handler(CommandHandler("add_source", cmd_add_source))
+    app.add_handler(CommandHandler("settings", cmd_settings))
     app.add_handler(CommandHandler("help",     cmd_help))
     app.add_handler(CommandHandler("demo",     cmd_demo))
     app.add_handler(CommandHandler("ask",      cmd_ask))
@@ -1045,7 +1290,8 @@ def main():
     app.add_handler(CommandHandler("wallet",   cmd_wallet))
     app.add_handler(CommandHandler("twins",    cmd_twins))
     app.add_handler(CommandHandler("stats",    cmd_stats))
-    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint)$"))
+    # Callback handlers: setup, mint, and settings
+    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|setting_)$"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

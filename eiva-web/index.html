@@ -151,6 +151,99 @@
       </div>
     </div>
 
+    <!-- Twin Settings -->
+    <div class="card" style="margin-top:24px" id="settingsSection">
+      <div class="card-title"><span class="dot" style="background:var(--violet)"></span> ⚙️ Twin Settings</div>
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">Configure how your digital twin responds</p>
+
+      <div class="settings-grid" style="display:grid;gap:16px">
+        <!-- Signature Phrases Toggle -->
+        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
+          <div>
+            <div style="font-weight:500">Signature phrases</div>
+            <div style="font-size:.85rem;color:var(--muted)">Use your characteristic expressions</div>
+          </div>
+          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
+            <input type="checkbox" id="toggle_signature_phrases" style="opacity:0;width:0;height:0" />
+            <label for="toggle_signature_phrases" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
+              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Formal Mode Toggle -->
+        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
+          <div>
+            <div style="font-weight:500">Formal mode</div>
+            <div style="font-size:.85rem;color:var(--muted)">Professional tone for business contexts</div>
+          </div>
+          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
+            <input type="checkbox" id="toggle_formal_mode" style="opacity:0;width:0;height:0" />
+            <label for="toggle_formal_mode" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
+              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Emoji Toggle -->
+        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
+          <div>
+            <div style="font-weight:500">Emoji in replies</div>
+            <div style="font-size:.85rem;color:var(--muted)">Include emojis naturally</div>
+          </div>
+          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
+            <input type="checkbox" id="toggle_emoji" style="opacity:0;width:0;height:0" />
+            <label for="toggle_emoji" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
+              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Humor Toggle -->
+        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
+          <div>
+            <div style="font-weight:500">Humor</div>
+            <div style="font-size:.85rem;color:var(--muted)">Maintain your sense of humor</div>
+          </div>
+          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
+            <input type="checkbox" id="toggle_humor" style="opacity:0;width:0;height:0" />
+            <label for="toggle_humor" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
+              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Short Responses Toggle -->
+        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
+          <div>
+            <div style="font-weight:500">Short responses</div>
+            <div style="font-size:.85rem;color:var(--muted)">Brief answers (1-3 sentences)</div>
+          </div>
+          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
+            <input type="checkbox" id="toggle_short_responses" style="opacity:0;width:0;height:0" />
+            <label for="toggle_short_responses" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
+              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Language Selector -->
+        <div style="padding:12px;background:var(--bg2);border-radius:8px">
+          <label style="display:block;font-weight:500;margin-bottom:8px">🌐 Language</label>
+          <select id="language_select" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit">
+            <option value="auto">Auto (detect from user)</option>
+            <option value="English">English</option>
+            <option value="Russian">Russian</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="saveSettingsBtn" style="width:100%;margin-top:16px;padding:12px;background:var(--violet);color:white;border:none;border-radius:8px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+        💾 Save Settings
+      </button>
+      <div id="settingsSaveStatus" style="margin-top:8px;text-align:center;color:var(--muted);font-size:.9rem;display:none"></div>
+    </div>
+
   </div>
 </section>
 

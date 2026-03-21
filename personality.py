@@ -85,6 +85,104 @@ def extract_personality(messages: list[Message], user_id: str) -> dict:
         }
 
 
+def merge_personality(user_id: str, new_export_text: str, owner_name: str):
+    """
+    Merge a new Telegram export into an existing personality profile.
+    Extracts new messages from the export and adds them to ChromaDB,
+    then re-extracts personality and merges traits with existing profile.
+    """
+    from embeddings import EmbeddingStore
+
+    store = EmbeddingStore(user_id)
+
+    # Parse the new export
+    from parser import parse_export
+    import tempfile
+
+    # Write export text to temp file for parsing
+    tmp_path = tempfile.mktemp(suffix=".json")
+    with open(tmp_path, "w") as f:
+        f.write(new_export_text)
+
+    # Parse messages (will detect owner from content)
+    new_messages = parse_export(tmp_path, owner_name)
+
+    if not new_messages:
+        log.warning(f"[merge] No new messages found in export for user {user_id}")
+        return
+
+    # Add new messages to ChromaDB (they'll be skipped if already indexed)
+    added = store.add_messages(new_messages)
+    log.info(f"[merge] Added {added} new messages to vector DB")
+
+    # Load existing personality profile
+    existing_profile = store.load_meta("personality") or {}
+
+    # Extract personality from new messages
+    new_profile = extract_personality(new_messages, user_id)
+    log.info(f"[merge] Extracted new personality profile")
+
+    # Merge profiles: union of sets, average of numeric values
+    merged_profile = {
+        "name": new_profile.get("name") or existing_profile.get("name", owner_name),
+        "language": existing_profile.get("language", new_profile.get("language", "Russian")),
+        "communication_style": _merge_text_field(
+            existing_profile.get("communication_style", ""),
+            new_profile.get("communication_style", "")
+        ),
+        "vocabulary": _merge_text_field(
+            existing_profile.get("vocabulary", ""),
+            new_profile.get("vocabulary", "")
+        ),
+        "signature_phrases": list(set(
+            existing_profile.get("signature_phrases", []) +
+            new_profile.get("signature_phrases", [])
+        )),
+        "topics_of_interest": list(set(
+            existing_profile.get("topics_of_interest", []) +
+            new_profile.get("topics_of_interest", [])
+        )),
+        "emotional_tone": existing_profile.get("emotional_tone", new_profile.get("emotional_tone", "neutral")),
+        "response_patterns": _merge_text_field(
+            existing_profile.get("response_patterns", ""),
+            new_profile.get("response_patterns", "")
+        ),
+        "humor": new_profile.get("humor") or existing_profile.get("humor", "none detected"),
+        "unique_traits": list(set(
+            existing_profile.get("unique_traits", []) +
+            new_profile.get("unique_traits", [])
+        )),
+        "do_not_do": list(set(
+            existing_profile.get("do_not_do", []) +
+            new_profile.get("do_not_do", [])
+        )),
+    }
+
+    # Build and save merged system prompt
+    system_prompt = build_system_prompt(merged_profile, owner_name)
+    store.save_meta("system_prompt", system_prompt)
+    store.save_meta("personality", merged_profile)
+
+    log.info(f"[merge] Personality merged successfully for user {user_id}")
+
+    # Clean up
+    try:
+        import os
+        os.unlink(tmp_path)
+    except Exception:
+        pass
+
+
+def _merge_text_field(existing: str, new: str) -> str:
+    """Merge two text descriptions by combining them."""
+    parts = []
+    if existing.strip():
+        parts.append(existing.strip())
+    if new.strip():
+        parts.append(new.strip())
+    return " + ".join(parts) if parts else ""
+
+
 def build_system_prompt(profile: dict, owner_name: str) -> str:
     traits = "\n".join(f"- {t}" for t in profile.get("unique_traits", []))
     avoid  = "\n".join(f"- {t}" for t in profile.get("do_not_do", []))
