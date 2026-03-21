@@ -255,8 +255,8 @@ async def _deploy_nft_transaction(nft_address: str, state_init_cell) -> Optional
         addr = wallet.address.to_string(True, True, False)
 
         headers = {}
-        if config.TONCENTER_API_KEY if hasattr(config, "TONCENTER_API_KEY") else None:
-            headers["X-API-Key"] = config.TONCENTER_API_KEY
+        if config.TON_API_KEY:
+            headers["X-API-Key"] = config.TON_API_KEY
 
         # Read seqno
         seqno = 0
