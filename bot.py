@@ -372,11 +372,48 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     if query.data == "start_setup":
         await query.message.reply_text(
-            "📂 Send me your Telegram export JSON file (`result.json`) to get started!",
+            "📂 *Setup your Digital Twin*\n\n"
+            "Send me your Telegram export JSON file (`result.json`).\n\n"
+            "To export: *Telegram Desktop → Settings → Advanced → Export Telegram Data*\n"
+            "Choose: ✅ Personal chats, Format: *JSON*\n\n"
+            "Then upload the `result.json` file here 👇",
             parse_mode=ParseMode.MARKDOWN,
         )
     elif query.data == "start_mint":
-        await cmd_mint(update._replace_message(query.message), ctx)
+        user_id = update.effective_user.id
+        store   = EmbeddingStore(str(user_id))
+        profile = store.load_meta("personality")
+        name    = store.load_meta("owner_name", "Unknown")
+
+        if not profile:
+            await query.message.reply_text("❌ No profile yet. Use /setup first.")
+            return
+
+        # Show wallet info from config
+        from ton_identity import get_wallet_address
+        bot_wallet = get_wallet_address()
+
+        wallet_info = ""
+        if bot_wallet:
+            wallet_info = (
+                f"\n\n💳 *Bot signing wallet (V4R2):*\n"
+                f"`{bot_wallet}`\n"
+                f"⚠️ This wallet needs testnet TON to sign the mint tx.\n"
+                f"Send from your W5 wallet in Tonkeeper → this address."
+            )
+
+        await query.message.reply_text(
+            "💎 *Mint your Soul Certificate*\n\n"
+            "Your personality profile will be:\n"
+            "1️⃣ Uploaded to TON Storage (permanent)\n"
+            "2️⃣ Minted as a soulbound NFT on TON blockchain\n"
+            f"{wallet_info}\n\n"
+            "Enter *your* TON wallet address to record as NFT owner\n"
+            "(or /skip to use the bot wallet as owner):",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        ctx.user_data["mint_name"]    = name
+        ctx.user_data["mint_profile"] = profile
 
 
 async def cmd_reset(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
