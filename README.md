@@ -5,8 +5,9 @@
 **TON AI Hackathon 2026** | Tracks: User-Facing AI Agents + TON Integration
 
 🤖 Bot: [@eivatonbot](https://t.me/eivatonbot)
-📖 Whitepaper: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
-💰 Monetization: [docs/MONETIZATION.md](docs/MONETIZATION.md)
+🌐 Dashboard: [zhenek73.github.io/eiva](https://zhenek73.github.io/eiva/)
+📖 Whitepaper: [project-docs/WHITEPAPER.md](project-docs/WHITEPAPER.md)
+💰 Monetization: [project-docs/MONETIZATION.md](project-docs/MONETIZATION.md)
 📋 Changelog: [CHANGELOG.md](CHANGELOG.md)
 
 ---
@@ -88,7 +89,7 @@ The Soul Certificate is an on-chain transaction anchoring your personality hash 
 
 ## Business Model
 
-Three tiers (detailed in [docs/MONETIZATION.md](docs/MONETIZATION.md)):
+Three tiers (detailed in [project-docs/MONETIZATION.md](project-docs/MONETIZATION.md)):
 
 **🥉 Bronze** — Communication style only → fans / light access ($5–20)
 **🥈 Silver** — Full personality + memory → coaches, clients ($30–100)
