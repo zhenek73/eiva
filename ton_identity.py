@@ -293,6 +293,9 @@ async def create_soul_certificate(
       2. Upload to TON Storage
       3. Mint Soul Certificate NFT
       4. Return result dict
+
+    The wallet address is persisted in ChromaDB metadata for the user.
+    On restart, bot will use the stored address if available.
     """
     personality_json = json.dumps(personality, ensure_ascii=False)
     personality_hash = hashlib.sha256(personality_json.encode()).hexdigest()
@@ -300,7 +303,7 @@ async def create_soul_certificate(
     # Auto-detect address from mnemonic if not provided
     if not ton_address:
         ton_address = get_wallet_address()
-        print(f"[TON] Auto-detected wallet: {ton_address}")
+        print(f"[TON] Auto-detected wallet from mnemonic: {ton_address}")
 
     print(f"[TON] Mnemonic configured: {bool(config.TON_MNEMONIC)}")
     print(f"[TON] Wallet address: {ton_address}")

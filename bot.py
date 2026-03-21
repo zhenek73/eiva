@@ -69,7 +69,8 @@ def _is_setup(user_id: int) -> bool:
 
 
 def _load_agent(user_id: int) -> EivaAgent | None:
-    """Load an existing agent from persisted data (after bot restart)."""
+    """Load an existing agent from persisted data (after bot restart).
+    Also loads wallet address from metadata if available."""
     if user_id in agents:
         return agents[user_id]
     store = EmbeddingStore(str(user_id))
@@ -77,6 +78,10 @@ def _load_agent(user_id: int) -> EivaAgent | None:
     if system_prompt and store.is_ready():
         agent = EivaAgent(str(user_id), system_prompt)
         agents[user_id] = agent
+        # Preload wallet address from metadata (if previously saved)
+        wallet_addr = store.load_meta("ton_wallet_address")
+        if wallet_addr:
+            log.info(f"[bot] Loaded wallet for user {user_id}: {wallet_addr[:20]}...")
         return agent
     return None
 
@@ -424,6 +429,102 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     ]])
 
     await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+
+
+# ── /ask (direct twin chat) ────────────────────────────────────────────────────
+
+async def cmd_feedback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """
+    Collect feedback from users (useful for hackathon judges).
+    Usage: /feedback Your feedback message here
+    """
+    user_id = update.effective_user.id
+    user_name = update.effective_user.first_name or "Unknown"
+    args = update.message.text[10:].strip()  # Skip "/feedback "
+
+    if not args:
+        await update.message.reply_text(
+            "💬 *Share Your Feedback*\n\n"
+            "Usage: `/feedback [your feedback]`\n\n"
+            "Example: `/feedback The personality extraction was spot-on!`\n\n"
+            "Your feedback helps us improve Eiva. Thank you!",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    # Save feedback to local file
+    feedback_dir = Path("data/feedback")
+    feedback_dir.mkdir(exist_ok=True, parents=True)
+
+    import time
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    feedback_file = feedback_dir / "feedback.txt"
+
+    feedback_entry = f"[{timestamp}] User {user_id} ({user_name}): {args}\n"
+    with open(feedback_file, "a", encoding="utf-8") as f:
+        f.write(feedback_entry)
+
+    log.info(f"[feedback] Collected from user {user_id}: {args[:80]}")
+
+    # Try to send to admin via Telegram (if ADMIN_ID is set)
+    try:
+        ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+        if ADMIN_ID:
+            admin_text = (
+                f"📬 *Feedback from {user_name}* (ID: {user_id})\n\n"
+                f"{args}"
+            )
+            await ctx.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=admin_text,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+    except Exception as e:
+        log.debug(f"[feedback] Could not send to admin: {e}")
+
+    # Confirm to user
+    await update.message.reply_text(
+        "✅ *Thank you for your feedback!*\n\n"
+        "Your message has been saved and will help us improve Eiva.",
+        parse_mode=ParseMode.MARKDOWN,
+    )
+
+
+async def cmd_ask(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """
+    Direct chat with your digital twin.
+    Usage: /ask How would you handle a difficult situation?
+    """
+    user_id = update.effective_user.id
+    args = update.message.text[5:].strip()  # Skip "/ask "
+
+    if not args:
+        await update.message.reply_text(
+            "💬 *Ask your Digital Twin*\n\n"
+            "Usage: `/ask [your question]`\n\n"
+            "Example: `/ask What's your take on AI?`\n\n"
+            "Or just send a message — I'm always listening!",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    agent = _load_agent(user_id)
+    if not agent:
+        await update.message.reply_text(
+            "👋 Your twin isn't set up yet. Use /setup to get started!"
+        )
+        return
+
+    await update.message.chat.send_action(ChatAction.TYPING)
+
+    try:
+        reply = agent.reply(args)
+        await update.message.reply_text(reply)
+    except Exception as e:
+        log.error(f"Agent error in /ask for user {user_id}: {e}")
+        await update.message.reply_text(
+            "⚠️ Something went wrong. Make sure your OpenRouter API key is configured."
+        )
 
 
 # ── /reset ────────────────────────────────────────────────────────────────────
@@ -932,16 +1033,18 @@ def main():
         fallbacks=[CommandHandler("start", cmd_start)],
     )
 
-    app.add_handler(CommandHandler("start",   cmd_start))
-    app.add_handler(CommandHandler("profile", cmd_profile))
-    app.add_handler(CommandHandler("status",  cmd_status))
-    app.add_handler(CommandHandler("help",    cmd_help))
-    app.add_handler(CommandHandler("demo",    cmd_demo))
-    app.add_handler(CommandHandler("reset",   cmd_reset))
-    app.add_handler(CommandHandler("avatar",  cmd_avatar))
-    app.add_handler(CommandHandler("wallet",  cmd_wallet))
-    app.add_handler(CommandHandler("twins",   cmd_twins))
-    app.add_handler(CommandHandler("stats",   cmd_stats))
+    app.add_handler(CommandHandler("start",    cmd_start))
+    app.add_handler(CommandHandler("profile",  cmd_profile))
+    app.add_handler(CommandHandler("status",   cmd_status))
+    app.add_handler(CommandHandler("help",     cmd_help))
+    app.add_handler(CommandHandler("demo",     cmd_demo))
+    app.add_handler(CommandHandler("ask",      cmd_ask))
+    app.add_handler(CommandHandler("feedback", cmd_feedback))
+    app.add_handler(CommandHandler("reset",    cmd_reset))
+    app.add_handler(CommandHandler("avatar",   cmd_avatar))
+    app.add_handler(CommandHandler("wallet",   cmd_wallet))
+    app.add_handler(CommandHandler("twins",    cmd_twins))
+    app.add_handler(CommandHandler("stats",    cmd_stats))
     app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint)$"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)

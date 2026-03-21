@@ -34,9 +34,9 @@ class EivaAgent:
     The digital twin agent.
 
     Flow per message:
-      1. Retrieve top-K similar messages from the user's history (RAG)
+      1. Retrieve top-K similar messages from the user's history (RAG via ChromaDB)
       2. Build full prompt: system + memory context + conversation history + new message
-      3. Call LLM → return response
+      3. Call LLM → return response in user's authentic voice
     """
 
     def __init__(self, user_id: str, system_prompt: str):

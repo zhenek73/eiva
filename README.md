@@ -1,19 +1,29 @@
-# Eiva — AI Digital Twin on TON
+# 🎭 Eiva — AI Digital Twin on TON
 
 > *Your personality, immortalized on the blockchain. Your voice, available to everyone you choose.*
 
 ![TON Testnet](https://img.shields.io/badge/TON-Testnet-blue?logo=ton)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
-
-**TON AI Hackathon 2026** | Tracks: User-Facing AI Agents + TON Integration
+![Hackathon 2026](https://img.shields.io/badge/TON%20AI-Hackathon%202026-FF4500)
 
 🤖 Bot: [@eivatonbot](https://t.me/eivatonbot)
 🌐 Dashboard: [zhenek73.github.io/eiva](https://zhenek73.github.io/eiva/)
+🎬 **[DEMO Guide →](DEMO.md)** — Start here if you're a hackathon judge!
 📖 Whitepaper: [project-docs/WHITEPAPER.md](project-docs/WHITEPAPER.md)
 💰 Monetization: [project-docs/MONETIZATION.md](project-docs/MONETIZATION.md)
 📋 Changelog: [CHANGELOG.md](CHANGELOG.md)
-🎬 Demo: [DEMO.md](DEMO.md) (for hackathon judges)
+
+---
+
+## ⚡ Judges Quick Start (3 min demo)
+
+👉 **New to Eiva?** Check out [**DEMO.md**](DEMO.md) for a complete walkthrough!
+
+Three things to try right now:
+1. **Chat with the bot**: [@eivatonbot](https://t.me/eivatonbot) → `/demo` → See sample personality in action
+2. **Create your own twin**: `/setup` → Upload a Telegram export → Chat as yourself!
+3. **Mint an NFT**: `/mint` → Generate a Soul Certificate on TON testnet (visible on [testnet.tonscan.org](https://testnet.tonscan.org))
 
 ---
 
@@ -63,13 +73,14 @@ Features:
 | `/setup` | Upload Telegram JSON export → build your twin |
 | `/profile` | View your extracted personality profile |
 | `/status` | Check twin status (messages indexed, ready to chat) |
-| `/ask <message>` | Chat with your digital twin |
+| `/ask <message>` | Chat directly with your digital twin (can also just send messages) |
+| `/feedback <message>` | Send feedback (helps judges during hackathon!) |
 | `/mint` | Anchor Soul Certificate on TON blockchain |
 | `/avatar` | Generate AI avatar for your Soul Certificate |
-| `/reset` | Clear all data and start over |
+| `/wallet` | Link or view your TON wallet address |
+| `/reset` | Clear conversation history (keep long-term memory) |
 | `/twins` | Show all your deployed digital twins |
-| `/stats` | View system statistics |
-| `/demo` | See sample personality profile (no upload needed) |
+| `/demo` | See sample personality profile (no setup needed) |
 | `/help` | List all commands with descriptions |
 
 ---

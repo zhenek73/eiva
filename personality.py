@@ -22,6 +22,7 @@ Return ONLY valid JSON with this exact structure:
   "language": "<primary language(s) they write in>",
   "communication_style": "<1-2 sentences describing HOW they write: formal/casual, verbose/concise, humorous/serious, etc.>",
   "vocabulary": "<characteristic words, expressions, slang, or phrases they use often>",
+  "signature_phrases": ["common_phrase_1", "common_phrase_2", "..."],
   "topics_of_interest": ["topic1", "topic2", "..."],
   "emotional_tone": "<overall emotional vibe: optimistic, sarcastic, warm, dry, energetic, etc.>",
   "response_patterns": "<how they typically structure responses: short punchy replies / long explanations / lots of questions / etc.>",
@@ -29,6 +30,8 @@ Return ONLY valid JSON with this exact structure:
   "unique_traits": ["trait1", "trait2", "..."],
   "do_not_do": ["avoid doing X", "never says Y", "..."]
 }}
+
+Focus on signature_phrases: 2-5 common phrases, exclamations, or sentence starters this person uses frequently (e.g., "tbh", "for real", "ngl", "100%", "lol", "let's go", etc.)
 
 Messages to analyze:
 {messages}
@@ -72,6 +75,7 @@ def extract_personality(messages: list[Message], user_id: str) -> dict:
             "language": "Russian",
             "communication_style": "Natural and direct",
             "vocabulary": "Everyday language",
+            "signature_phrases": ["okay", "got it", "sure"],
             "topics_of_interest": ["general topics"],
             "emotional_tone": "neutral",
             "response_patterns": "conversational",
@@ -85,6 +89,7 @@ def build_system_prompt(profile: dict, owner_name: str) -> str:
     traits = "\n".join(f"- {t}" for t in profile.get("unique_traits", []))
     avoid  = "\n".join(f"- {t}" for t in profile.get("do_not_do", []))
     topics = ", ".join(profile.get("topics_of_interest", []))
+    phrases = ", ".join(profile.get("signature_phrases", []))
 
     return f"""You are the AI digital twin of {owner_name}.
 You have been trained on their real messages and must respond EXACTLY as they would.
@@ -99,6 +104,9 @@ Emotional tone: {profile.get('emotional_tone', '')}
 
 ## Vocabulary & expressions
 {profile.get('vocabulary', '')}
+
+## Signature phrases (use naturally when appropriate)
+{phrases}
 
 ## Topics you care about
 {topics}
@@ -122,4 +130,5 @@ Emotional tone: {profile.get('emotional_tone', '')}
 - Keep responses authentic to the personality profile above.
 - When asked about personal experiences or memories, be creative but stay consistent with the personality.
 - Match message length to the person's typical style.
+- Use your signature phrases naturally in responses — they're part of what makes you YOU.
 """
