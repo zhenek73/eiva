@@ -325,6 +325,40 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
 
+# ── /help ──────────────────────────────────────────────────────────────────────
+
+async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Show a help message with all commands and dashboard link."""
+    help_text = (
+        "🆘 *Eiva Help*\n\n"
+        "*Available Commands:*\n\n"
+        "*/start* — Welcome screen and quick links\n"
+        "*/setup* — Upload your Telegram export to create your digital twin\n"
+        "*/profile* — View your personality profile\n"
+        "*/status* — Check memory and readiness status\n"
+        "*/wallet* — Link or view your TON wallet\n"
+        "*/mint* — Create a Soulbound NFT Soul Certificate\n"
+        "*/avatar* — Generate an AI portrait for your certificate\n"
+        "*/demo* — See a sample interaction with Eiva\n"
+        "*/reset* — Clear conversation history (keep long-term memory)\n"
+        "*/help* — Show this message\n\n"
+        "*Getting Started:*\n"
+        "1. Use /setup to upload your Telegram chat export (JSON)\n"
+        "2. I'll analyze your messages and create your digital twin\n"
+        "3. Chat freely — I'll respond as you!\n"
+        "4. Use /mint to immortalize your twin as an on-chain NFT\n\n"
+        "🌐 *[Open Dashboard](https://zhenek73.github.io/eiva/eiva-web/)* — "
+        "View your NFTs, manage settings, and connect your TON wallet\n\n"
+        "Need help? Check out the project docs or ask in the dashboard."
+    )
+
+    keyboard = InlineKeyboardMarkup([[
+        InlineKeyboardButton("🌐 Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+    ]])
+
+    await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+
+
 # ── /reset ────────────────────────────────────────────────────────────────────
 
 async def cmd_wallet(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -744,6 +778,7 @@ def main():
     app.add_handler(CommandHandler("start",   cmd_start))
     app.add_handler(CommandHandler("profile", cmd_profile))
     app.add_handler(CommandHandler("status",  cmd_status))
+    app.add_handler(CommandHandler("help",    cmd_help))
     app.add_handler(CommandHandler("reset",   cmd_reset))
     app.add_handler(CommandHandler("avatar",  cmd_avatar))
     app.add_handler(CommandHandler("wallet",  cmd_wallet))
