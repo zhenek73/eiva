@@ -13,6 +13,9 @@ import time
 from pathlib import Path
 from typing import Optional
 
+_BROADCAST_RETRIES = 4
+_BROADCAST_DELAY   = 3.0   # seconds between retries
+
 import aiohttp
 
 import config
@@ -115,12 +118,24 @@ async def send_transaction(
                 headers=headers,
                 timeout=aiohttp.ClientTimeout(total=10),
             ) as r:
-                if r.status == 200:
-                    d = await r.json()
+                raw_resp = await r.json()
+                print(f"[TON] seqno API status={r.status} resp={raw_resp}")
+                if r.status == 200 and raw_resp.get("ok"):
                     try:
-                        seqno = int(d["result"]["stack"][0][1], 16)
+                        exit_code = raw_resp["result"].get("exit_code", -1)
+                        if exit_code == 0:
+                            # Contract is deployed — read actual seqno
+                            raw_val = raw_resp["result"]["stack"][0][1]
+                            seqno = int(raw_val, 16) if raw_val.startswith("0x") else int(raw_val)
+                            print(f"[TON] Wallet deployed, seqno={seqno}")
+                        else:
+                            # exit_code != 0 → wallet NOT deployed (e.g. -13 = not found)
+                            # The stack value is a TVM error code, NOT a real seqno!
+                            seqno = 0
+                            print(f"[TON] Wallet NOT deployed (exit_code={exit_code}) → seqno=0, will include state_init")
                     except Exception:
                         seqno = 0
+        print(f"[TON] Using seqno={seqno}")
 
         # Build transfer
         transfer = wallet.create_transfer_message(
@@ -131,25 +146,61 @@ async def send_transaction(
         )
         boc = bytes_to_b64str(transfer["message"].to_boc(False))
 
-        # Broadcast
-        async with aiohttp.ClientSession() as s:
-            async with s.post(
-                f"{TONCENTER[config.TON_NETWORK]}/sendBoc",
-                json={"boc": boc},
-                headers=headers,
-                timeout=aiohttp.ClientTimeout(total=15),
-            ) as r:
-                result = await r.json()
-                if r.status == 200 and result.get("ok"):
-                    # Compute hash from boc
-                    import base64, hashlib
-                    raw = base64.b64decode(boc)
-                    tx_hash = hashlib.sha256(raw).hexdigest()
-                    print(f"[TON] ✓ Transaction sent! Hash: {tx_hash}")
-                    return tx_hash
-                else:
-                    print(f"[TON] Broadcast error: {result}")
-                    return None
+        import base64 as _b64
+
+        def _make_tx_hash(boc_b64: str) -> str:
+            raw = _b64.b64decode(boc_b64)
+            return hashlib.sha256(raw).hexdigest()
+
+        # Primary: toncenter sendBoc — retry up to _BROADCAST_RETRIES times on 429
+        toncenter_ok = False
+        for attempt in range(1, _BROADCAST_RETRIES + 1):
+            async with aiohttp.ClientSession() as s:
+                async with s.post(
+                    f"{TONCENTER[config.TON_NETWORK]}/sendBoc",
+                    json={"boc": boc},
+                    headers=headers,
+                    timeout=aiohttp.ClientTimeout(total=15),
+                ) as r:
+                    result = await r.json()
+                    print(f"[TON] toncenter sendBoc attempt {attempt}: status={r.status} result={result}")
+                    if r.status == 200 and result.get("ok"):
+                        tx_hash = _make_tx_hash(boc)
+                        print(f"[TON] ✓ toncenter: Transaction sent! Hash: {tx_hash}")
+                        return tx_hash
+                    elif r.status == 429 or (not result.get("ok") and "Ratelimit" in str(result.get("result", ""))):
+                        wait = _BROADCAST_DELAY * attempt
+                        print(f"[TON] Rate-limited (attempt {attempt}/{_BROADCAST_RETRIES}). Waiting {wait:.0f}s…")
+                        await asyncio.sleep(wait)
+                    else:
+                        print(f"[TON] toncenter broadcast error — trying tonapi.io fallback")
+                        break  # non-rate-limit error → skip to fallback immediately
+
+        # Fallback: tonapi.io
+        print("[TON] Attempting tonapi.io fallback…")
+        tonapi_url = f"{TONAPI[config.TON_NETWORK]}/blockchain/message"
+        for attempt in range(1, 3):
+            async with aiohttp.ClientSession() as s:
+                async with s.post(
+                    tonapi_url,
+                    json={"boc": boc},
+                    headers={"Content-Type": "application/json"},
+                    timeout=aiohttp.ClientTimeout(total=15),
+                ) as r:
+                    result_text = await r.text()
+                    print(f"[TON] tonapi.io attempt {attempt}: status={r.status} body={result_text[:200]}")
+                    if r.status in (200, 201, 202):
+                        tx_hash = _make_tx_hash(boc)
+                        print(f"[TON] ✓ tonapi.io: Transaction sent! Hash: {tx_hash}")
+                        return tx_hash
+                    elif r.status == 429:
+                        await asyncio.sleep(5 * attempt)
+                    else:
+                        print(f"[TON] tonapi.io error (status {r.status}) — giving up")
+                        break
+
+        print("[TON] All broadcast attempts failed.")
+        return None
     except Exception as e:
         print(f"[TON] send_transaction error: {e}")
         return None
@@ -203,34 +254,29 @@ async def mint_nft(
     bag_id: str,
 ) -> Optional[str]:
     """
-    Mint a soulbound NFT by sending a transfer with metadata payload.
-    The NFT 'address' is the derived contract address.
-    Returns tx_hash or None.
+    Anchor the Soul Certificate on-chain as a self-transfer with a comment.
+    The transaction hash IS the Soul Certificate proof — verifiable on tonscan.
+    TON cells max 127 bytes — comment stays short.
     """
-    nft_address = _derive_nft_address(owner_address, personality_hash)
-    payload = json.dumps({
-        "op": "deploy_soul_nft",
-        "owner": owner_address,
-        "name": f"Eiva Soul — {owner_name}",
-        "hash": personality_hash[:16],
-        "bag": bag_id[:20],
-        "ts": int(time.time()),
-    }).encode("utf-8")
+    bot_address = get_wallet_address()
+    if not bot_address:
+        print("[TON] No wallet address available for mint")
+        return None
 
-    # Send 0.05 TON to the derived NFT address with metadata
+    # Short comment that fits in one TON cell (max ~127 bytes for ASCII)
+    comment = f"Eiva:Soul:{personality_hash[:20]}"
+    payload = comment.encode("utf-8")
+
+    print(f"[TON] Self-transfer to anchor Soul Certificate on-chain")
+    print(f"[TON] Recipient: {bot_address}")
+    print(f"[TON] Payload ({len(payload)} bytes): {comment}")
+
     tx_hash = await send_transaction(
-        to_address=nft_address,
-        amount_nano=50_000_000,  # 0.05 TON
+        to_address=bot_address,   # self-transfer → reliable, wallet is already funded
+        amount_nano=10_000_000,   # 0.01 TON
         payload=payload,
     )
     return tx_hash
-
-
-def _derive_nft_address(owner_address: str, personality_hash: str) -> str:
-    """Deterministic NFT item address from owner + personality hash."""
-    seed = f"eiva:soul_nft:v1:{owner_address}:{personality_hash}"
-    h = hashlib.sha256(seed.encode()).hexdigest()
-    return f"0:{h[:64]}"
 
 
 # ── High-level function (called from bot) ─────────────────────────────────────
@@ -254,6 +300,10 @@ async def create_soul_certificate(
     # Auto-detect address from mnemonic if not provided
     if not ton_address:
         ton_address = get_wallet_address()
+        print(f"[TON] Auto-detected wallet: {ton_address}")
+
+    print(f"[TON] Mnemonic configured: {bool(config.TON_MNEMONIC)}")
+    print(f"[TON] Wallet address: {ton_address}")
 
     # Step 1: Upload to storage
     bag_id = await upload_to_storage(personality)
@@ -261,6 +311,19 @@ async def create_soul_certificate(
     # Step 2: Mint NFT
     tx_hash = None
     if ton_address and config.TON_MNEMONIC:
+        # Check bot wallet balance first
+        bot_wallet = get_wallet_address()
+        if bot_wallet:
+            print(f"[TON] Checking balance of {bot_wallet}...")
+            balance = await get_balance(bot_wallet)
+            if balance is None:
+                print(f"[TON] ⚠️ Could not fetch balance (toncenter may be unreachable) — trying anyway")
+            else:
+                print(f"[TON] Bot wallet balance: {balance} nanoton = {balance/1e9:.3f} TON")
+                if balance < 10_000_000:
+                    print(f"[TON] ⚠️ Low balance! Send testnet TON to: {bot_wallet}")
+                    print(f"[TON] Get testnet TON: https://t.me/testgiver_ton_bot")
+        print(f"[TON] Starting mint for owner={ton_address[:20]}...")
         tx_hash = await mint_nft(
             owner_address=ton_address,
             owner_name=owner_name,
@@ -269,10 +332,12 @@ async def create_soul_certificate(
         )
 
     network = config.TON_NETWORK
+    bot_wallet = get_wallet_address() or ton_address
+    base = "https://testnet.tonscan.org" if network == "testnet" else "https://tonscan.org"
     explorer_url = None
     if tx_hash:
-        base = "https://testnet.tonscan.org" if network == "testnet" else "https://tonscan.org"
-        explorer_url = f"{base}/tx/{tx_hash}"
+        # Link to wallet's transaction list — the latest tx is the Soul Certificate anchor
+        explorer_url = f"{base}/address/{bot_wallet}"
 
     return {
         "wallet_address":   ton_address,
