@@ -1,3 +1,10 @@
+# ── PRIVATE DOCS — concept, vision, monetization (stay local only) ───────────
+_private/
+project-docs/
+CHANGELOG.md
+DEMO.md
+push_to_github.bat
+
 # ── SECRETS — never commit ────────────────────────────────────────────────────
 .env
 *.env

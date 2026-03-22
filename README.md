@@ -1,6 +1,6 @@
 # 🎭 Eiva — AI Digital Twin on TON
 
-> *Your personality, immortalized on the blockchain. Your voice, available to everyone you choose.*
+> *Your personality, preserved on the blockchain.*
 
 ![TON Testnet](https://img.shields.io/badge/TON-Testnet-blue?logo=ton)
 ![Status](https://img.shields.io/badge/Status-Active-success)
@@ -9,31 +9,17 @@
 
 🤖 Bot: [@eivatonbot](https://t.me/eivatonbot)
 🌐 Dashboard: [zhenek73.github.io/eiva](https://zhenek73.github.io/eiva/)
-🎬 **[DEMO Guide →](DEMO.md)** — Start here if you're a hackathon judge!
-📖 Whitepaper: [project-docs/WHITEPAPER.md](project-docs/WHITEPAPER.md)
-💰 Monetization: [project-docs/MONETIZATION.md](project-docs/MONETIZATION.md)
-📋 Changelog: [CHANGELOG.md](CHANGELOG.md)
-
----
-
-## ⚡ Judges Quick Start (3 min demo)
-
-👉 **New to Eiva?** Check out [**DEMO.md**](DEMO.md) for a complete walkthrough!
-
-Three things to try right now:
-1. **Chat with the bot**: [@eivatonbot](https://t.me/eivatonbot) → `/demo` → See sample personality in action
-2. **Create your own twin**: `/setup` → Upload a Telegram export → Chat as yourself!
-3. **Mint an NFT**: `/mint` → Generate a Soul Certificate on TON testnet (visible on [testnet.tonscan.org](https://testnet.tonscan.org))
 
 ---
 
 ## What it does
 
-1. **Upload** your Telegram chat export (JSON from Telegram Desktop)
-2. **Eiva parses** your messages and builds a vector memory (ChromaDB)
-3. **GPT-4o extracts** your personality: tone, vocabulary, topics, humor style
-4. **Digital twin** responds to anyone exactly like you would — RAG + LLM
-5. **Soul Certificate** mints on TON blockchain — permanent, verifiable proof of your identity
+Upload your Telegram chat export → Eiva builds a vector memory of your communication style → a digital twin responds like you → mint a Soul Certificate on the TON blockchain as proof.
+
+1. **Upload** Telegram chat export (JSON from Telegram Desktop)
+2. **AI extracts** your personality: tone, vocabulary, topics, humor
+3. **Digital twin** answers anyone exactly like you would
+4. **Soul Certificate** minted on TON — permanent, verifiable, on-chain
 
 ---
 
@@ -43,40 +29,20 @@ Three things to try right now:
 git clone https://github.com/zhenek73/eiva
 cd eiva/eiva-bot
 cp .env.example .env
-# Edit .env with your API keys (see .env.example)
+# Fill in your API keys in .env
 run.bat
 ```
 
-Then open Telegram → [@eivatonbot](https://t.me/eivatonbot) → `/setup`
-
----
-
-## Live Dashboard
-
-The web dashboard is live at **[zhenek73.github.io/eiva](https://zhenek73.github.io/eiva/)**
-
-Features:
-- **How it works**: 4-step visual guide with animations
-- **Wallet integration**: Connect TON Wallet → view Soul Certificates
-- **NFT gallery**: Browse your minted certificates on testnet
-- **Settings panel**: Configure your twin's personality response settings
-- **Tier pricing**: See Bronze / Silver / Gold / Exclusive pricing
-- **System status**: Real-time network status (bot, TON testnet, latest block)
-- **Open Graph support**: Share your dashboard on social media
+Open Telegram → [@eivatonbot](https://t.me/eivatonbot) → `/setup`
 
 ### Running Web Dashboard Locally
 
-You can run the web dashboard locally during development:
-
 ```bash
-# Windows
-run_web.bat
-
-# Linux/Mac
-./run_web.sh
+run_web.bat      # Windows
+./run_web.sh     # Linux/Mac
 ```
 
-Then open **http://localhost:8080** in your browser.
+Open **http://localhost:8080**
 
 ---
 
@@ -84,21 +50,19 @@ Then open **http://localhost:8080** in your browser.
 
 | Command | Description |
 |---|---|
-| `/start` | Welcome message + quick intro |
-| `/setup` | Upload Telegram JSON export → build your twin |
-| `/add_source` | Add another export to augment personality (tier-limited) |
-| `/settings` | Configure twin response settings (formal, emoji, humor, language) |
-| `/profile` | View your extracted personality profile |
-| `/status` | Check twin status (messages indexed, ready to chat) |
-| `/ask <message>` | Chat directly with your digital twin (can also just send messages) |
-| `/feedback <message>` | Send feedback (helps judges during hackathon!) |
-| `/mint` | Anchor Soul Certificate on TON blockchain |
-| `/avatar` | Generate AI avatar for your Soul Certificate |
-| `/wallet` | Link or view your TON wallet address |
-| `/reset` | Clear conversation history (keep long-term memory) |
-| `/twins` | Show all your deployed digital twins |
-| `/demo` | See sample personality profile (no setup needed) |
-| `/help` | List all commands with descriptions |
+| `/start` | Welcome + intro |
+| `/setup` | Upload Telegram JSON → build your twin |
+| `/add_source` | Add another chat export to deepen personality |
+| `/settings` | Configure twin behaviour (tone, emoji, language) |
+| `/profile` | View extracted personality |
+| `/status` | Check twin status |
+| `/ask <message>` | Chat with your twin directly |
+| `/mint` | Anchor Soul Certificate on TON |
+| `/avatar` | Generate AI avatar |
+| `/wallet` | Link TON wallet |
+| `/twins` | View your digital twins |
+| `/demo` | See sample twin (no setup needed) |
+| `/help` | All commands |
 
 ---
 
@@ -106,10 +70,11 @@ Then open **http://localhost:8080** in your browser.
 
 ```env
 TELEGRAM_BOT_TOKEN=       # From @BotFather
-OPENROUTER_API_KEY=       # From openrouter.ai (free tier works)
+OPENROUTER_API_KEY=       # From openrouter.ai
 TON_MNEMONIC=             # 24-word TON wallet mnemonic
-TON_NETWORK=testnet       # testnet or mainnet
-TON_API_KEY=              # Optional: toncenter.com API key for higher rate limits
+TON_NETWORK=testnet
+TON_API_KEY=              # Optional: toncenter.com
+GITHUB_TOKEN=             # Optional: for NFT metadata hosting
 ```
 
 ---
@@ -118,71 +83,26 @@ TON_API_KEY=              # Optional: toncenter.com API key for higher rate limi
 
 ```
 eiva-bot/
-├── bot.py              — Telegram bot main loop
-├── parser.py           — Telegram JSON export parser
-├── embeddings.py       — ChromaDB + text-embedding-3-small (RAG)
+├── bot.py              — Telegram bot
+├── parser.py           — Telegram JSON parser
+├── embeddings.py       — ChromaDB vector store (RAG)
 ├── personality.py      — GPT-4o personality extraction
-├── agent.py            — Digital twin chat (RAG + GPT-4o-mini)
-├── ton_identity.py     — TON wallet, Soul Certificate, blockchain
-├── nft_contract.py     — Soulbound NFT smart contract
-├── eiva-web/           — Web dashboard (HTML/JS/CSS) → deployed to /docs for GitHub Pages
-├── /docs/              — GitHub Pages source (synced from eiva-web/)
-├── project-docs/       — Whitepaper, monetization, architecture
-├── data/               — ChromaDB vector storage (local)
-└── metadata/           — Personality profiles & hashes (local)
+├── agent.py            — Digital twin chat engine
+├── ton_identity.py     — TON wallet + Soul Certificate
+├── nft_contract.py     — Soulbound NFT (TEP-85)
+├── eiva-web/           — Web dashboard source
+├── docs/               — GitHub Pages (synced from eiva-web/)
+├── data/               — ChromaDB storage (local only)
+└── metadata/           — Personality profiles (local only)
 ```
 
-**Stack:** Python 3.10+, python-telegram-bot, ChromaDB, OpenRouter, TON SDK, aiohttp
-**Frontend:** Vanilla JS, CSS Grid, TON Connect UI
-
----
-
-## Soul Certificate
-
-The Soul Certificate is an on-chain transaction anchoring your personality hash to the TON blockchain. It:
-- Proves your digital twin existed at a specific timestamp
-- Contains `Eiva:Soul:{personality_hash}` in the transaction comment
-- Is visible on [testnet.tonscan.org](https://testnet.tonscan.org) (testnet) or [tonscan.org](https://tonscan.org) (mainnet)
-- Serves as the **access token** for the planned NFT marketplace (see Monetization)
-
----
-
-## Business Model
-
-Three tiers (detailed in [project-docs/MONETIZATION.md](project-docs/MONETIZATION.md)):
-
-**🥉 Bronze** — Communication style only → fans / light access ($5–20)
-**🥈 Silver** — Full personality + memory → coaches, clients ($30–100)
-**🥇 Gold** — Deep twin + expanded memory → family, enterprise ($200–500)
-
-Creators mint Soul Certificates, fans buy access. Smart contract splits revenue 80/15/5 (creator / protocol / ecosystem).
-
----
-
-## Why TON?
-
-- Telegram distribution = zero acquisition cost
-- TON Wallet built into Telegram = frictionless fan purchases
-- Low gas fees = micropayment model viable
-- Active NFT marketplace on Getgems
-
----
-
-## Roadmap
-
-- [x] MVP: bot + RAG twin + personality extraction + Soul Certificate
-- [ ] AI-generated avatar (v1.1)
-- [ ] Real NFT collection contract with TEP-64 metadata (v1.1)
-- [ ] Access-control by NFT ownership (v1.2)
-- [ ] Multi-tier certificates with supply limits (v1.2)
-- [ ] Web admin panel + analytics (v1.3)
-- [ ] TON Mini App marketplace (v1.3)
+**Stack:** Python 3.10+, python-telegram-bot, ChromaDB, OpenRouter, tonsdk, tonutils
 
 ---
 
 ## Privacy
 
-Raw messages never leave your machine. Only embeddings (local) and a 100-message sample (for personality extraction via OpenRouter) are processed externally. On-chain: SHA-256 hash only.
+Raw messages stay on your machine. Only embeddings (local ChromaDB) and a short sample for personality extraction (via OpenRouter API) leave the device. On-chain: SHA-256 hash only — no messages, no personal data.
 
 ---
 
