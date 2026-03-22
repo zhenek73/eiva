@@ -900,20 +900,24 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
     elif query.data == "setting_lang":
         store = EmbeddingStore(str(user_id))
         settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
-        current_lang = settings.get("language", "auto")
+        current_lang = settings.get("language", "en")
 
-        # Cycle through languages
-        langs = ["auto", "English", "Russian"]
-        current_idx = langs.index(current_lang.title() if current_lang != "auto" else "auto")
-        next_idx = (current_idx + 1) % len(langs)
-        new_lang = langs[next_idx]
+        # Show language selection menu
+        lang_keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"),
+                InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"),
+            ],
+            [
+                InlineKeyboardButton("↩️ Back to Settings", callback_data="back_to_settings"),
+            ],
+        ])
 
-        settings["language"] = new_lang
-        store.save_meta("settings", settings)
-
-        # Update keyboard
-        keyboard = _build_settings_keyboard(settings)
-        await query.edit_message_reply_markup(reply_markup=keyboard)
+        await query.edit_message_text(
+            "🌐 *Select Language*\n\nChoose your preferred language for the bot:",
+            reply_markup=lang_keyboard,
+            parse_mode=ParseMode.MARKDOWN,
+        )
 
     elif query.data == "setting_save":
         store = EmbeddingStore(str(user_id))
@@ -927,6 +931,18 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
         )
 
     # ── Language selection callbacks ─────────────────────────────────────────
+    elif query.data == "back_to_settings":
+        store = EmbeddingStore(str(user_id))
+        settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+        keyboard = _build_settings_keyboard(settings)
+
+        await query.edit_message_text(
+            "⚙️ *Twin Settings*\n\n"
+            "Configure how your digital twin responds:",
+            reply_markup=keyboard,
+            parse_mode=ParseMode.MARKDOWN,
+        )
+
     elif query.data.startswith("lang_"):
         lang_code = query.data.replace("lang_", "")
         store = EmbeddingStore(str(user_id))
@@ -935,9 +951,19 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
 
         lang_name = "English" if lang_code == "en" else "Русский"
         await query.answer(f"Language changed to {lang_name}", show_alert=False)
+
+        # Show success and return to settings
+        settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+        settings["language"] = lang_code
+        store.save_meta("settings", settings)
+        keyboard = _build_settings_keyboard(settings)
+
         await query.edit_message_text(
-            f"✅ Language changed to {lang_name}!\n\n"
-            f"Your bot will now respond in {lang_name}."
+            f"✅ {lang_name}!\n\n"
+            f"Your bot will now respond in {lang_name}.\n\n"
+            "⚙️ *Twin Settings*:",
+            reply_markup=keyboard,
+            parse_mode=ParseMode.MARKDOWN,
         )
 
     # ── Mode callbacks ────────────────────────────────────────────────────────
