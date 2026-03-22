@@ -33,6 +33,10 @@
     </a>
     <div class="nav-links">
       <a href="#how" class="nav-link">How it works</a>
+      <div class="language-selector">
+        <button id="lang-en" class="lang-btn active">EN</button>
+        <button id="lang-ru" class="lang-btn">РУ</button>
+      </div>
       <a href="https://t.me/eivatonbot" target="_blank" class="btn btn-ton btn-sm">Open Bot</a>
     </div>
   </div>
@@ -41,10 +45,10 @@
 <!-- ── Hero ── -->
 <section class="hero" id="top">
   <div class="hero-badge">🏆 TON AI Hackathon 2026</div>
-  <h1>Your personality,<br/><em>on the blockchain</em></h1>
-  <p>Build an AI Digital Twin from your Telegram messages. Anchor it as a Soulbound NFT on TON. Let others talk to <em>you</em>.</p>
+  <h1 data-i18n="title">Your personality,<br/><em>on the blockchain</em></h1>
+  <p data-i18n="subtitle">Build an AI Digital Twin from your Telegram messages. Anchor it as a Soulbound NFT on TON. Let others talk to <em>you</em>.</p>
   <div class="hero-cta">
-    <button class="btn btn-ton" id="connectWalletHero">🔗 Connect TON Wallet</button>
+    <button class="btn btn-ton" id="connectWalletHero" data-i18n="connectWallet">🔗 Connect TON Wallet</button>
     <a href="https://t.me/eivatonbot" target="_blank" class="btn btn-ghost">✈️ Open in Telegram</a>
   </div>
 </section>
@@ -52,28 +56,28 @@
 <!-- ── How it works ── -->
 <section class="section" id="how">
   <div class="container">
-    <h2 class="section-title">How it works</h2>
+    <h2 class="section-title" data-i18n="howItWorks">How it works</h2>
     <p class="section-sub">Four steps from your Telegram history to a living, blockchain-anchored digital twin</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h3>Export Telegram</h3>
-        <p>Export your chat history as JSON from Telegram Desktop. Your data stays local.</p>
+        <h3 data-i18n="step1">Export Telegram</h3>
+        <p data-i18n="step1Desc">Export your chat history as JSON from Telegram Desktop. Your data stays local.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h3>AI Analyzes You</h3>
-        <p>GPT-4o extracts your personality: tone, humor, vocabulary, topics, style.</p>
+        <h3 data-i18n="step2">AI Analyzes You</h3>
+        <p data-i18n="step2Desc">GPT-4o extracts your personality: tone, humor, vocabulary, topics, style.</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3>Twin Goes Live</h3>
-        <p>Your digital twin answers messages just like you — powered by RAG + LLM.</p>
+        <h3 data-i18n="step3">Twin Goes Live</h3>
+        <p data-i18n="step3Desc">Your digital twin answers messages just like you — powered by RAG + LLM.</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <h3>NFT on TON</h3>
-        <p>Mint your Soul Certificate as a Soulbound NFT. Permanent proof of identity.</p>
+        <h3 data-i18n="step4">NFT on TON</h3>
+        <p data-i18n="step4Desc">Mint your Soul Certificate as a Soulbound NFT. Permanent proof of identity.</p>
       </div>
     </div>
   </div>
@@ -155,15 +159,15 @@
     <!-- Twin Settings -->
     <div class="card" style="margin-top:24px" id="settingsSection">
       <div class="card-title"><span class="dot" style="background:var(--violet)"></span> ⚙️ Twin Settings</div>
-      <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">Configure how your digital twin responds</p>
+      <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px" data-i18n="settings">Configure how your digital twin responds</p>
 
       <div class="settings-grid" style="display:grid;gap:16px">
         <!-- Twin Mode Toggle -->
         <div style="padding:12px;background:var(--bg2);border-radius:8px">
           <label style="display:block;font-weight:500;margin-bottom:8px">🎭 Twin Mode</label>
           <div style="display:flex;gap:8px">
-            <button id="mode_personal_btn" style="flex:1;padding:8px;background:var(--ton);color:white;border:none;border-radius:4px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">🏠 Personal</button>
-            <button id="mode_professional_btn" style="flex:1;padding:8px;background:var(--muted);color:white;border:none;border-radius:4px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">💼 Professional</button>
+            <button id="mode_personal_btn" style="flex:1;padding:8px;background:var(--ton);color:white;border:none;border-radius:4px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" data-i18n="personalMode">🏠 Personal</button>
+            <button id="mode_professional_btn" style="flex:1;padding:8px;background:var(--muted);color:white;border:none;border-radius:4px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" data-i18n="professionalMode">💼 Professional</button>
           </div>
           <div style="font-size:.85rem;color:var(--muted);margin-top:8px;text-align:center" id="mode_status">Warm & casual, or professional & measured</div>
         </div>
@@ -240,11 +244,11 @@
 
         <!-- Language Selector -->
         <div style="padding:12px;background:var(--bg2);border-radius:8px">
-          <label style="display:block;font-weight:500;margin-bottom:8px">🌐 Language</label>
+          <label style="display:block;font-weight:500;margin-bottom:8px" data-i18n="language">🌐 Language</label>
           <select id="language_select" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit">
             <option value="auto">Auto (detect from user)</option>
-            <option value="English">English</option>
-            <option value="Russian">Russian</option>
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
           </select>
         </div>
       </div>

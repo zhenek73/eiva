@@ -41,6 +41,7 @@ from embeddings import EmbeddingStore
 from personality import extract_personality, build_system_prompt
 from agent import EivaAgent
 from ton_identity import create_soul_certificate
+from locales import i18n
 
 logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -94,6 +95,12 @@ def _load_agent(user_id: int) -> EivaAgent | None:
 
 async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+
+    # Load user's language preference
+    store = EmbeddingStore(str(user.id))
+    user_lang = store.load_meta("language") or "en"
+    i18n.set_language(user_lang)
+
     already_setup = _is_setup(user.id)
 
     text = (
@@ -668,6 +675,23 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
 
 
+# ── /language ──────────────────────────────────────────────────────────────────
+
+async def cmd_language(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Allow user to select language preference."""
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"),
+            InlineKeyboardButton("🇷🇺 Русский", callback_data="lang_ru"),
+        ]
+    ])
+
+    await update.message.reply_text(
+        "🌐 Choose your language / Выберите язык:",
+        reply_markup=keyboard,
+    )
+
+
 # ── /ask (direct twin chat) ────────────────────────────────────────────────────
 
 async def cmd_feedback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -900,6 +924,20 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
             "Your personality response settings have been updated. "
             "I'll use these preferences from now on.",
             parse_mode=ParseMode.MARKDOWN,
+        )
+
+    # ── Language selection callbacks ─────────────────────────────────────────
+    elif query.data.startswith("lang_"):
+        lang_code = query.data.replace("lang_", "")
+        store = EmbeddingStore(str(user_id))
+        store.save_meta("language", lang_code)
+        i18n.set_language(lang_code)
+
+        lang_name = "English" if lang_code == "en" else "Русский"
+        await query.answer(f"Language changed to {lang_name}", show_alert=False)
+        await query.edit_message_text(
+            f"✅ Language changed to {lang_name}!\n\n"
+            f"Your bot will now respond in {lang_name}."
         )
 
     # ── Mode callbacks ────────────────────────────────────────────────────────
@@ -1345,6 +1383,7 @@ def main():
     app.add_handler(CommandHandler("add_source", cmd_add_source))
     app.add_handler(CommandHandler("settings", cmd_settings))
     app.add_handler(CommandHandler("help",     cmd_help))
+    app.add_handler(CommandHandler("language", cmd_language))
     app.add_handler(CommandHandler("demo",     cmd_demo))
     app.add_handler(CommandHandler("ask",      cmd_ask))
     app.add_handler(CommandHandler("feedback", cmd_feedback))
@@ -1354,7 +1393,7 @@ def main():
     app.add_handler(CommandHandler("twins",    cmd_twins))
     app.add_handler(CommandHandler("stats",    cmd_stats))
     # Callback handlers: setup, mint, settings, and mode
-    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|setting_|mode_)$"))
+    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|setting_|mode_|lang_)$"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

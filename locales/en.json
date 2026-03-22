@@ -1,0 +1,50 @@
+{
+  "commands": {
+    "start": "Welcome to Eiva — your AI digital twin on TON",
+    "setup": "Upload your Telegram export to build your twin",
+    "add_source": "Add another chat export to deepen your personality",
+    "settings": "Configure how your twin responds",
+    "profile": "View your personality profile",
+    "status": "Check your twin status",
+    "ask": "Chat with your digital twin",
+    "mint": "Mint your Soul Certificate on TON",
+    "avatar": "Generate an AI avatar for your twin",
+    "wallet": "Link your TON wallet",
+    "twins": "View your digital twins",
+    "mode": "Switch between Personal and Professional mode",
+    "demo": "See a sample personality",
+    "help": "View all commands",
+    "feedback": "Send feedback (helps judges!)",
+    "reset": "Clear conversation history"
+  },
+  "messages": {
+    "welcome": "Your personality, preserved on the blockchain.",
+    "setup_prompt": "Send your Telegram export JSON file",
+    "personality_extracted": "✅ Your personality extracted!",
+    "twin_ready": "Your digital twin is ready to chat.",
+    "soul_certificate_minted": "🎉 Soul Certificate created on TON testnet!",
+    "mode_switched": "Mode switched! Your twin will now respond {{mode}}.",
+    "personal_mode": "as a close friend",
+    "professional_mode": "as a trusted expert",
+    "awaiting_file": "Awaiting file upload...",
+    "error": "❌ Error occurred",
+    "success": "✅ Success!"
+  },
+  "settings": {
+    "title": "⚙️ Twin Settings",
+    "formal": "Formal mode",
+    "emoji": "Use emoji",
+    "humor": "Maintain humor",
+    "short_responses": "Short responses",
+    "language": "Language",
+    "auto": "Auto",
+    "save": "Save Settings",
+    "saved": "Settings saved!"
+  },
+  "modes": {
+    "personal": "🏠 Personal Mode",
+    "professional": "💼 Professional Mode",
+    "personal_desc": "Warm, casual, open — like talking to a close friend",
+    "professional_desc": "Knowledgeable, measured, professional — like a trusted expert"
+  }
+}
