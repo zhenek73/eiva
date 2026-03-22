@@ -11,6 +11,34 @@ from openai import OpenAI
 import config
 from embeddings import EmbeddingStore
 
+# ── Behavioral Instructions ────────────────────────────────────────────────────
+
+RECALL_INSTRUCTION = """
+When relevant, recall past statements naturally:
+- "I remember saying..."
+- "I once thought..."
+- "Back then I believed..."
+Do NOT overuse this. Only when it fits naturally in the conversation.
+"""
+
+CONTRADICTION_INSTRUCTION = """
+If past statements seem to contradict each other, reflect that naturally:
+- Show nuance and evolution of thinking
+- Don't try to be perfectly consistent
+- Humans change their minds — reflect that
+"""
+
+HUMAN_VOICE_INSTRUCTION = """
+Critical rules for sounding human:
+- Do NOT sound like ChatGPT or an assistant
+- Avoid generic, structured, or overly helpful phrasing
+- Speak in first person naturally
+- Be occasionally uncertain ("I'm not sure...", "maybe...", "I think...")
+- Use natural, imperfect language
+- Avoid bullet points and numbered lists unless the real person would use them
+- Mirror the person's actual vocabulary and sentence structure
+"""
+
 
 class ConversationHistory:
     """Sliding window of recent messages for in-context coherence."""
@@ -54,26 +82,53 @@ class EivaAgent:
 
         # 1. Retrieve similar memories
         similar = self.store.search(user_message, top_k=config.TOP_K_SIMILAR)
-        memory_block = self._format_memory(similar)
 
-        # 2. Build system message with injected memory and settings
-        system_with_memory = self.system_prompt
+        # Build memory block from retrieved items
+        memory_block = self._format_memory_block(similar)
 
-        # Add settings context
+        # Get personality profile
+        personality = self.store.load_meta("personality_profile") or ""
+
+        # Get mode (personal/professional)
+        mode = self.store.load_meta("mode") or "personal"
+        mode_instruction = (
+            "Be warm, casual, and open — like talking to a close friend."
+            if mode == "personal"
+            else "Be knowledgeable, measured, and professional — like a trusted expert."
+        )
+
+        # Get settings
         settings = self.store.load_meta("settings") or config.DEFAULT_SETTINGS
         settings_notes = self._build_settings_notes(settings)
+
+        # Build full system prompt
+        full_system = f"""You are a digital twin of a real person. Your goal is to sound like them — not like an AI.
+
+## Personality Profile
+{personality}
+
+## Communication Style
+{HUMAN_VOICE_INSTRUCTION}
+
+## Mode: {mode.upper()}
+{mode_instruction}
+
+## Memory Context
+{memory_block}
+
+## Behavioral Rules
+{RECALL_INSTRUCTION}
+{CONTRADICTION_INSTRUCTION}"""
+
         if settings_notes:
-            system_with_memory += f"\n\n## Response Settings\n{settings_notes}"
+            full_system += f"\n\n## Tone Settings\n{settings_notes}"
 
-        if memory_block:
-            system_with_memory += f"\n\n## Relevant things you said before\n{memory_block}"
-
-        # 3. Assemble messages list
-        messages = [{"role": "system", "content": system_with_memory}]
+        # 2. Assemble messages list
+        messages = [{"role": "system", "content": full_system}]
         messages += self.history.to_list()
         messages.append({"role": "user", "content": user_message})
 
-        # 4. Call LLM
+        # 3. Call LLM
         response = self.oai.chat.completions.create(
             model=config.LLM_MODEL,
             messages=messages,
@@ -82,7 +137,7 @@ class EivaAgent:
         )
         answer = response.choices[0].message.content.strip()
 
-        # 5. Update history
+        # 4. Update history
         self.history.add("user", user_message)
         self.history.add("assistant", answer)
 
@@ -95,7 +150,50 @@ class EivaAgent:
     # ── Helpers ───────────────────────────────────────────────────────────────
 
     @staticmethod
+    def _classify_memory_items(items: list[str]):
+        """Categorize retrieved memories into three buckets: memories, opinions, facts."""
+        memories = []
+        opinions = []
+        facts = []
+
+        for item in items:
+            text = item.lower()
+            # Opinions: personal views and beliefs
+            if any(x in text for x in ["я думаю", "мне кажется", "я считаю", "по-моему",
+                                        "i think", "i believe", "in my opinion", "i feel like"]):
+                opinions.append(item)
+            # Facts: biographical/factual statements
+            elif any(x in text for x in ["работал", "учился", "жил", "был",
+                                         "worked", "studied", "lived", "was", "have been", "used to"]):
+                facts.append(item)
+            # Everything else: general memories
+            else:
+                memories.append(item)
+
+        return memories, opinions, facts
+
+    @staticmethod
+    def _format_memory_block(similar_items: list[str]) -> str:
+        """Format memory items into categorized blocks."""
+        if not similar_items:
+            return "No relevant memories found."
+
+        memories, opinions, facts = EivaAgent._classify_memory_items(similar_items)
+
+        block = []
+
+        if memories:
+            block.append("### Memories\n" + "\n".join(f"- {m}" for m in memories[:5]))
+        if opinions:
+            block.append("### Opinions\n" + "\n".join(f"- {o}" for o in opinions[:4]))
+        if facts:
+            block.append("### Facts\n" + "\n".join(f"- {f}" for f in facts[:4]))
+
+        return "\n\n".join(block) if block else "No relevant memories found."
+
+    @staticmethod
     def _format_memory(similar_texts: list[str]) -> str:
+        """Legacy wrapper for backward compatibility."""
         if not similar_texts:
             return ""
         lines = [f"- {t}" for t in similar_texts]

@@ -369,14 +369,23 @@ async def cmd_profile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     traits = "\n".join(f"• {t}" for t in profile.get("unique_traits", [])[:5])
     topics = ", ".join(profile.get("topics_of_interest", [])[:6])
 
+    # Get current mode
+    mode = store.load_meta("mode") or "personal"
+    mode_emoji = "🏠" if mode == "personal" else "💼"
+
+    # Get memory stats from the stored memories
+    count = store.count()
+
     text = (
         f"🧬 *Your Digital Twin Profile*\n\n"
+        f"{mode_emoji} **Mode:** {mode.title()}\n\n"
         f"**Style:** {profile.get('communication_style', 'N/A')}\n\n"
         f"**Tone:** {profile.get('emotional_tone', 'N/A')}\n\n"
         f"**Vocabulary:** {profile.get('vocabulary', 'N/A')[:150]}\n\n"
         f"**Topics:** {topics}\n\n"
         f"**Unique traits:**\n{traits}\n\n"
-        f"**Humor:** {profile.get('humor', 'N/A')}"
+        f"**Humor:** {profile.get('humor', 'N/A')}\n\n"
+        f"**Memory:** {count} messages indexed"
     )
     await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
@@ -396,6 +405,43 @@ async def cmd_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         f"Ready: {'✅' if store.is_ready() else '❌'}\n"
         f"Agent loaded: {'✅' if user_id in agents else '⚠️ (will load on next message)'}",
         parse_mode=ParseMode.MARKDOWN,
+    )
+
+
+# ── /mode ──────────────────────────────────────────────────────────────────────
+
+async def cmd_mode(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Switch between Personal and Professional mode."""
+    user_id = update.effective_user.id
+    store   = EmbeddingStore(str(user_id))
+
+    if not store.is_ready():
+        await update.message.reply_text(
+            "❌ You need to run /setup first to create your digital twin.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        return
+
+    current_mode = store.load_meta("mode") or "personal"
+
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("🏠 Personal Mode", callback_data="mode_personal"),
+            InlineKeyboardButton("💼 Professional Mode", callback_data="mode_professional"),
+        ]
+    ])
+
+    mode_desc = {
+        "personal": "🏠 Personal: Warm, casual, and open — like talking to a close friend.",
+        "professional": "💼 Professional: Knowledgeable, measured, and professional — like a trusted expert.",
+    }
+
+    await update.message.reply_text(
+        f"🎭 *Twin Mode*\n\n"
+        f"Current mode: {mode_desc.get(current_mode, mode_desc['personal'])}\n\n"
+        f"Choose a new mode:",
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=keyboard,
     )
 
 
@@ -856,6 +902,22 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
             parse_mode=ParseMode.MARKDOWN,
         )
 
+    # ── Mode callbacks ────────────────────────────────────────────────────────
+    elif query.data in ("mode_personal", "mode_professional"):
+        store = EmbeddingStore(str(user_id))
+        new_mode = "personal" if query.data == "mode_personal" else "professional"
+        store.save_meta("mode", new_mode)
+
+        mode_emoji = "🏠" if new_mode == "personal" else "💼"
+        mode_desc = "warm, casual, and open — like talking to a close friend" if new_mode == "personal" else "knowledgeable, measured, and professional — like a trusted expert"
+
+        await query.edit_message_text(
+            f"✅ *Mode Changed!*\n\n"
+            f"{mode_emoji} Your twin is now in *{new_mode.title()}* mode.\n\n"
+            f"I'll be {mode_desc} from now on.",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+
 
 async def cmd_reset(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -1279,6 +1341,7 @@ def main():
     app.add_handler(CommandHandler("start",    cmd_start))
     app.add_handler(CommandHandler("profile",  cmd_profile))
     app.add_handler(CommandHandler("status",   cmd_status))
+    app.add_handler(CommandHandler("mode",     cmd_mode))
     app.add_handler(CommandHandler("add_source", cmd_add_source))
     app.add_handler(CommandHandler("settings", cmd_settings))
     app.add_handler(CommandHandler("help",     cmd_help))
@@ -1290,8 +1353,8 @@ def main():
     app.add_handler(CommandHandler("wallet",   cmd_wallet))
     app.add_handler(CommandHandler("twins",    cmd_twins))
     app.add_handler(CommandHandler("stats",    cmd_stats))
-    # Callback handlers: setup, mint, and settings
-    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|setting_)$"))
+    # Callback handlers: setup, mint, settings, and mode
+    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|setting_|mode_)$"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
