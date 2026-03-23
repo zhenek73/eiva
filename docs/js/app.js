@@ -1,83 +1,10 @@
 /**
  * Eiva Web — app.js
  * TON Connect integration, NFT gallery, upload flow
+ * Uses i18n.js for translations (imported via HTML)
  */
 
 'use strict';
-
-// ── Translations ─────────────────────────────────────────────────────────────
-const translations = {
-  en: {
-    title: "Your personality, on the blockchain",
-    subtitle: "Build an AI Digital Twin from your Telegram messages. Anchor it as a Soulbound NFT on TON. Let others talk to you.",
-    howItWorks: "How it works",
-    step1: "Export Telegram",
-    step1Desc: "Export your chat history as JSON from Telegram Desktop. Your data stays local.",
-    step2: "AI Analyzes You",
-    step2Desc: "GPT-4o extracts your personality: tone, humor, vocabulary, topics, style.",
-    step3: "Twin Goes Live",
-    step3Desc: "Your digital twin answers messages just like you — powered by RAG + LLM.",
-    step4: "NFT on TON",
-    step4Desc: "Mint your Soul Certificate as a Soulbound NFT. Permanent proof of identity.",
-    settings: "Configure how your digital twin responds",
-    personalMode: "🏠 Personal",
-    professionalMode: "💼 Professional",
-    connectWallet: "🔗 Connect TON Wallet",
-    uploadFile: "Drop result.json here",
-    language: "🌐 Language"
-  },
-  ru: {
-    title: "Твоя личность на блокчейне",
-    subtitle: "Создай AI цифровой двойник из сообщений Telegram. Закрепи его как Soulbound NFT на TON. Позволь другим разговаривать с тобой.",
-    howItWorks: "Как это работает",
-    step1: "Экспортируй Telegram",
-    step1Desc: "Экспортируй историю чатов в JSON из Telegram Desktop. Твои данные остаются локальными.",
-    step2: "AI анализирует тебя",
-    step2Desc: "GPT-4o извлекает твоя личность: тон, юмор, словарь, темы, стиль.",
-    step3: "Двойник работает",
-    step3Desc: "Твой цифровой двойник отвечает как ты — powered by RAG + LLM.",
-    step4: "NFT на TON",
-    step4Desc: "Минтируй свой Soul Certificate как Soulbound NFT. Постоянное доказательство личности.",
-    settings: "Настрой, как твой цифровой двойник отвечает",
-    personalMode: "🏠 Personal",
-    professionalMode: "💼 Professional",
-    connectWallet: "🔗 Подключить кошелёк TON",
-    uploadFile: "Перетащи result.json сюда",
-    language: "🌐 Язык"
-  }
-};
-
-let currentLanguage = localStorage.getItem("language") || "en";
-
-function setLanguage(lang) {
-  currentLanguage = lang;
-  localStorage.setItem("language", lang);
-  updatePageText();
-  document.querySelectorAll(".lang-btn").forEach(btn => btn.classList.remove("active"));
-  document.getElementById(`lang-${lang}`)?.classList.add("active");
-}
-
-function t(key) {
-  return translations[currentLanguage]?.[key] || translations.en?.[key] || key;
-}
-
-function updatePageText() {
-  // Update all elements with data-i18n attribute
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    const text = t(key);
-    if (text && !text.includes('<')) {
-      el.textContent = text;
-    }
-  });
-}
-
-// Initialize language buttons
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById("lang-en")?.addEventListener("click", () => setLanguage("en"));
-  document.getElementById("lang-ru")?.addEventListener("click", () => setLanguage("ru"));
-  updatePageText();
-});
 
 // ── Config ──────────────────────────────────────────────────────────────────
 const NETWORK   = 'testnet';   // change to 'mainnet' for production

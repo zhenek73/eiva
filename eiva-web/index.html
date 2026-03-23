@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eiva — AI Digital Twin on TON</title>
-  <meta name="description" content="Transform your Telegram history into a living AI that thinks, speaks, and responds just like you. Mint your Soul Certificate on TON blockchain." />
+  <meta name="description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Eiva — Your AI Digital Twin on TON" />
-  <meta property="og:description" content="Transform your Telegram history into a living AI that thinks, speaks, and responds just like you. Mint your Soul Certificate as a Soulbound NFT." />
+  <meta property="og:title" content="Eiva — Your AI Self — owned by you" />
+  <meta property="og:description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
   <meta property="og:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=0d0d1a" />
   <meta property="og:url" content="https://zhenek73.github.io/eiva/" />
   <meta property="og:type" content="website" />
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Eiva — Your AI Digital Twin on TON" />
-  <meta name="twitter:description" content="Transform your Telegram history into a living AI that responds just like you. Mint as a Soulbound NFT." />
+  <meta name="twitter:title" content="Eiva — Your AI Self — owned by you" />
+  <meta name="twitter:description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
   <meta name="twitter:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=0d0d1a" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
@@ -27,64 +27,103 @@
 <!-- ── Navbar ── -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo">
+    <a href="index.html" class="logo">
       <span class="logo-icon">👤</span>
       <span>Eiva</span>
     </a>
     <div class="nav-links">
-      <a href="#how" class="nav-link">How it works</a>
+      <a href="#how" class="nav-link" data-i18n="nav.howItWorks">How it works</a>
+      <a href="#demo" class="nav-link" data-i18n="nav.demo">Demo</a>
+      <a href="https://github.com/zhenek73/eiva" target="_blank" class="nav-link" data-i18n="nav.github">GitHub ↗</a>
       <div class="language-selector">
-        <button id="lang-en" class="lang-btn active">EN</button>
-        <button id="lang-ru" class="lang-btn">РУ</button>
+        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
       </div>
-      <a href="https://t.me/eivatonbot" target="_blank" class="btn btn-ton btn-sm">Open Bot</a>
+      <a href="app.html" class="btn btn-ton btn-sm" data-i18n="nav.cabinet">Open Cabinet →</a>
     </div>
   </div>
 </nav>
 
 <!-- ── Hero ── -->
 <section class="hero" id="top">
-  <div class="hero-badge">🏆 TON AI Hackathon 2026</div>
-  <h1 data-i18n="title">Your personality,<br/><em>on the blockchain</em></h1>
-  <p data-i18n="subtitle">Build an AI Digital Twin from your Telegram messages. Anchor it as a Soulbound NFT on TON. Let others talk to <em>you</em>.</p>
+  <div class="hero-badge" data-i18n="hero.tag">TON AI Hackathon 2026</div>
+  <h1 data-i18n="hero.title">Your AI Self — owned by you</h1>
+  <p data-i18n="hero.subtitle">Turn your Telegram history into a living AI. Verifiable on TON blockchain.</p>
   <div class="hero-cta">
-    <button class="btn btn-ton" id="connectWalletHero" data-i18n="connectWallet">🔗 Connect TON Wallet</button>
-    <a href="https://t.me/eivatonbot" target="_blank" class="btn btn-ghost">✈️ Open in Telegram</a>
+    <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-ton" data-i18n="hero.tryDemo">🤖 Try Demo in Telegram</a>
+    <a href="app.html" class="btn btn-ghost" data-i18n="hero.openCabinet">Open Your Cabinet →</a>
   </div>
 </section>
 
 <!-- ── How it works ── -->
 <section class="section" id="how">
   <div class="container">
-    <h2 class="section-title" data-i18n="howItWorks">How it works</h2>
+    <h2 class="section-title" data-i18n="how.title">How It Works</h2>
     <p class="section-sub">Four steps from your Telegram history to a living, blockchain-anchored digital twin</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h3 data-i18n="step1">Export Telegram</h3>
-        <p data-i18n="step1Desc">Export your chat history as JSON from Telegram Desktop. Your data stays local.</p>
+        <h3 data-i18n="how.step1">Upload</h3>
+        <p data-i18n="how.step1desc">Your Telegram chat export</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h3 data-i18n="step2">AI Analyzes You</h3>
-        <p data-i18n="step2Desc">GPT-4o extracts your personality: tone, humor, vocabulary, topics, style.</p>
+        <h3 data-i18n="how.step2">AI Extracts</h3>
+        <p data-i18n="how.step2desc">Your personality & memory</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3 data-i18n="step3">Twin Goes Live</h3>
-        <p data-i18n="step3Desc">Your digital twin answers messages just like you — powered by RAG + LLM.</p>
+        <h3 data-i18n="how.step3">Twin Responds</h3>
+        <p data-i18n="how.step3desc">In your authentic voice</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <h3 data-i18n="step4">NFT on TON</h3>
-        <p data-i18n="step4Desc">Mint your Soul Certificate as a Soulbound NFT. Permanent proof of identity.</p>
+        <h3 data-i18n="how.step4">Mint NFT</h3>
+        <p data-i18n="how.step4desc">Own your identity on TON</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── Dashboard / App ── -->
-<section id="app">
+<!-- ── Why TON ── -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title" data-i18n="why.title">Why TON?</h2>
+    <div class="steps" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+      <div class="step">
+        <div style="font-size: 2rem; margin-bottom: 12px;">✈️</div>
+        <p data-i18n="why.point1">Telegram distribution — zero acquisition cost</p>
+      </div>
+      <div class="step">
+        <div style="font-size: 2rem; margin-bottom: 12px;">🔗</div>
+        <p data-i18n="why.point2">TON Wallet built into Telegram — frictionless</p>
+      </div>
+      <div class="step">
+        <div style="font-size: 2rem; margin-bottom: 12px;">⚡</div>
+        <p data-i18n="why.point3">Low gas fees — identity operations are cheap</p>
+      </div>
+      <div class="step">
+        <div style="font-size: 2rem; margin-bottom: 12px;">👑</div>
+        <p data-i18n="why.point4">True ownership — no company can revoke your NFT</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container" style="text-align: center;">
+    <p data-i18n="footer.built">Built for TON AI Hackathon 2026</p>
+    <div style="margin-top: 16px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; font-size: 14px;">
+      <a href="https://github.com/zhenek73/eiva" target="_blank" data-i18n="footer.github">GitHub</a>
+      <a href="https://t.me/eivatonbot" target="_blank" data-i18n="footer.bot">Telegram Bot</a>
+      <a href="app.html" data-i18n="footer.cabinet">Open Cabinet</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Keep old app section hidden for now (can be removed) -->
+<section id="app" style="display: none;
   <div class="container">
 
     <!-- Telegram bot banner (shown when not in Mini App) -->
@@ -98,15 +137,31 @@
     </div>
 
     <!-- Demo Section: Pavel Durov -->
-    <section class="demo-section">
+    <section class="demo-section" id="demo">
       <div class="demo-header">
         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117"
              class="demo-avatar" alt="Pavel Durov AI Twin">
         <div>
-          <h2>🎭 Live Demo: Pavel Durov AI Twin</h2>
-          <p>Built from @durov Telegram channel + Lex Fridman interview transcript</p>
-          <span class="badge">2 sources</span>
+          <h2 data-i18n="demo.title">🎭 Live Demo — Pavel Durov AI Twin</h2>
+          <p data-i18n="demo.subtitle">Built from @durov Telegram channel + Lex Fridman interview</p>
+          <span class="badge" data-i18n="demo.sources">2 sources</span>
           <span class="badge badge-ton">Soul Certificate ✓</span>
+        </div>
+      </div>
+
+      <!-- Demo Stats -->
+      <div class="demo-stats">
+        <div class="stat">
+          <span class="stat-value">20</span>
+          <span class="stat-label" data-i18n="demo.messages">20 posts indexed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">87%</span>
+          <span class="stat-label" data-i18n="demo.confidence">87% confidence</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">2</span>
+          <span class="stat-label" data-i18n="demo.sources">2 sources</span>
         </div>
       </div>
 
@@ -127,24 +182,10 @@
         </div>
       </div>
 
-      <div class="demo-stats">
-        <div class="stat">
-          <span class="stat-value">20</span>
-          <span class="stat-label">Posts indexed</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">87%</span>
-          <span class="stat-label">Personality confidence</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">2</span>
-          <span class="stat-label">Sources</span>
-        </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+        <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-ton" data-i18n="demo.talkBtn">💬 Talk to Durov in Telegram</a>
+        <button id="mint-durov-btn" class="btn btn-violet" onclick="mintDurovNFT()" data-i18n="demo.mintBtn">🎫 Mint Durov Soul Certificate (free)</button>
       </div>
-
-      <button class="btn-primary" onclick="tryDemoTwin()" style="width:100%;padding:12px;background:var(--ton);color:white;border:none;border-radius:8px;font-weight:500;cursor:pointer;font-size:15px;margin-top:16px">
-        💬 Try asking Pavel Durov anything
-      </button>
     </section>
 
     <div class="app-grid">
@@ -636,16 +677,31 @@
   </div>
 </div>
 
-<!-- ── TON Connect Manifest ── -->
+<!-- Scripts -->
+<script src="js/i18n.js"></script>
 <script>
-// Inline manifest so no separate file needed (works on GitHub Pages)
-window.TONCONNECT_MANIFEST = {
-  url: 'https://zhenek73.github.io/eiva/',
-  name: 'Eiva — AI Digital Twin',
-  iconUrl: 'https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=256&backgroundColor=0d0d1a',
-};
-</script>
+// Mint Durov NFT demo function
+function mintDurovNFT() {
+  const btn = document.getElementById('mint-durov-btn');
+  if (btn) {
+    btn.textContent = t('demo.mintingMsg');
+    btn.disabled = true;
+  }
+  // Redirect to bot which handles actual minting
+  setTimeout(() => {
+    window.open('https://t.me/eivatonbot?start=mint_durov', '_blank');
+    if (btn) {
+      btn.textContent = t('demo.mintBtn');
+      btn.disabled = false;
+    }
+  }, 1500);
+}
 
+// Try demo in Telegram
+function tryDemoTwin() {
+  window.open('https://t.me/eivatonbot?start=demo', '_blank');
+}
+</script>
 <script src="js/app.js"></script>
 </body>
 </html>

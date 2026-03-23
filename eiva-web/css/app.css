@@ -1,0 +1,632 @@
+/**
+ * Eiva App/Cabinet Page Styles
+ * Extends style.css with cabinet-specific layouts
+ */
+
+/* ── Cabinet Container ── */
+#app { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+
+/* ── Navbar (back link) ── */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-back {
+  color: var(--ton);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-back:hover { color: var(--text); }
+
+.nav-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+
+#wallet-btn {
+  padding: 6px 12px;
+  background: rgba(0, 152, 234, 0.1);
+  border: 1px solid var(--ton);
+  color: var(--ton);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#wallet-btn:hover {
+  background: rgba(0, 152, 234, 0.2);
+}
+
+/* ── Connect Prompt ── */
+#not-connected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+}
+
+.connect-prompt {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  max-width: 420px;
+  text-align: center;
+}
+
+.connect-prompt h2 {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.connect-prompt p {
+  color: var(--muted);
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+
+.connect-prompt .caption {
+  display: block;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── Cabinet Content ── */
+#cabinet {
+  padding: 20px 0;
+}
+
+#cabinet.hidden {
+  display: none;
+}
+
+/* ── Cabinet Header ── */
+.cabinet-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cab-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--ton);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+#cab-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+#cab-wallet {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: monospace;
+  margin-top: 4px;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(0, 255, 200, 0.1);
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--ton);
+  margin-top: 8px;
+}
+
+.badge.hidden {
+  display: none;
+}
+
+/* ── Cabinet Tabs ── */
+.cabinet-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background: rgba(0, 152, 234, 0.1);
+  color: var(--ton);
+}
+
+/* ── Tab Content ── */
+.tab-content {
+  animation: fadeIn 0.3s ease;
+  min-height: 200px;
+}
+
+.tab-content.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Twin Stats Cards ── */
+.twin-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--ton);
+  display: block;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── Traits List ── */
+.traits-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.trait {
+  display: inline-block;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: var(--violet);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+/* ── Twin Actions ── */
+.twin-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background: var(--ton);
+  color: #fff;
+  flex: 1;
+  justify-content: center;
+  min-width: 160px;
+}
+
+.btn-primary:hover {
+  background: var(--ton2);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  flex: 1;
+  justify-content: center;
+  min-width: 160px;
+}
+
+.btn-secondary:hover {
+  background: var(--bg2);
+  border-color: var(--ton);
+}
+
+/* ── Warning Box (Hallucinations) ── */
+.warning-box {
+  background: rgba(255, 200, 0, 0.08);
+  border: 1px solid rgba(255, 200, 0, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.warning-box h4 {
+  color: var(--text);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.warning-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.warning-box li {
+  padding: 4px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ── Toggle Rows ── */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.toggle-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.toggle-row input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Text Area ── */
+#custom-instructions {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 12px;
+  font-size: 13px;
+  resize: vertical;
+  margin: 8px 0 12px;
+  font-family: inherit;
+  min-height: 120px;
+}
+
+#custom-instructions:focus {
+  outline: none;
+  border-color: rgba(0, 152, 234, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* ── Preset Examples ── */
+.preset-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.preset-examples p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.preset-examples button {
+  padding: 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.preset-examples button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--ton);
+  color: var(--text);
+}
+
+/* ── NFT Card ── */
+.nft-card {
+  background: linear-gradient(135deg, rgba(0, 50, 40, 0.5), rgba(0, 20, 60, 0.5));
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+}
+
+.nft-card-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nft-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--ton);
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.nft-card-header h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.nft-card-body {
+  margin: 20px 0;
+}
+
+.nft-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+}
+
+.nft-detail .label {
+  color: var(--muted);
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.nft-card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* ── Confidence Chart ── */
+.confidence-overall {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0 24px;
+}
+
+.confidence-bar-container {
+  flex: 1;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.confidence-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ton), var(--violet));
+  border-radius: 6px;
+  transition: width 1s ease;
+  width: 0;
+}
+
+.confidence-breakdown {
+  margin: 16px 0;
+}
+
+.conf-item {
+  display: grid;
+  grid-template-columns: 160px 1fr 80px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.conf-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.conf-bar-wrap {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.conf-bar {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.conf-bar.high { background: var(--ton); }
+.conf-bar.medium { background: #ffcc00; }
+.conf-bar.low { background: #ff6644; }
+
+.conf-tag {
+  font-size: 11px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.conf-tag.high { color: var(--ton); }
+.conf-tag.medium { color: #ffcc00; }
+.conf-tag.low { color: #ff6644; }
+
+.conf-recommendation {
+  background: rgba(0, 152, 234, 0.08);
+  border: 1px solid rgba(0, 152, 234, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-top: 16px;
+  color: var(--muted);
+}
+
+.conf-recommendation code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+/* ── Privacy Tab ── */
+.privacy-always-on {
+  background: rgba(0, 200, 100, 0.08);
+  border: 1px solid rgba(0, 200, 100, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+}
+
+.privacy-badge {
+  display: inline-block;
+  background: rgba(0, 200, 100, 0.15);
+  color: #00c864;
+  border: 1px solid rgba(0, 200, 100, 0.3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.privacy-always-on h4 {
+  color: var(--text);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.privacy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.privacy-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.privacy-item.blocked {
+  background: rgba(255, 60, 60, 0.08);
+  border: 1px solid rgba(255, 60, 60, 0.2);
+  color: var(--muted);
+}
+
+.privacy-icon { font-size: 14px; }
+
+/* ── Privacy Status ── */
+.privacy-status {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 24px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+.status-row:last-child { border-bottom: none; }
+
+.status-on {
+  color: #00c864;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.status-off {
+  color: #ff4444;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/* ── Caption ── */
+.caption {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .twin-stats { grid-template-columns: 1fr; }
+  .conf-item { grid-template-columns: 100px 1fr 60px; }
+  .twin-actions { flex-direction: column; }
+  .btn-primary, .btn-secondary { width: 100%; }
+  .nft-card-actions { flex-direction: column; }
+  .nft-card-actions a { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .cabinet-header { flex-direction: column; text-align: center; }
+  .cab-avatar { margin-bottom: 8px; }
+  .cabinet-tabs { flex-direction: column; }
+  .tab { width: 100%; }
+  .privacy-grid { grid-template-columns: 1fr; }
+}

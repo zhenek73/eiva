@@ -46,5 +46,131 @@
     "professional": "💼 Professional Mode",
     "personal_desc": "Warm, casual, open — like talking to a close friend",
     "professional_desc": "Knowledgeable, measured, professional — like a trusted expert"
+  },
+  "hero": {
+    "tag": "TON AI Hackathon 2026",
+    "title": "Your AI Self — owned by you",
+    "subtitle": "Turn your Telegram history into a living AI. Verifiable on TON blockchain.",
+    "tryDemo": "🤖 Try Demo in Telegram",
+    "openCabinet": "Open Your Cabinet →"
+  },
+  "nav": {
+    "howItWorks": "How it works",
+    "demo": "Demo",
+    "github": "GitHub ↗",
+    "cabinet": "Open Cabinet →"
+  },
+  "how": {
+    "title": "How It Works",
+    "step1": "Upload",
+    "step1desc": "Your Telegram chat export",
+    "step2": "AI Extracts",
+    "step2desc": "Your personality & memory",
+    "step3": "Twin Responds",
+    "step3desc": "In your authentic voice",
+    "step4": "Mint NFT",
+    "step4desc": "Own your identity on TON"
+  },
+  "demo": {
+    "title": "🎭 Live Demo — Pavel Durov AI Twin",
+    "subtitle": "Built from @durov Telegram channel + Lex Fridman interview",
+    "sources": "2 sources",
+    "confidence": "87% confidence",
+    "messages": "20 posts indexed",
+    "network": "Testnet ✓",
+    "talkBtn": "💬 Talk to Durov in Telegram",
+    "mintBtn": "🎫 Mint Durov Soul Certificate (free)",
+    "mintingMsg": "Minting on TON Testnet..."
+  },
+  "why": {
+    "title": "Why TON?",
+    "point1": "Telegram distribution — zero acquisition cost",
+    "point2": "TON Wallet built into Telegram — frictionless",
+    "point3": "Low gas fees — identity operations are cheap",
+    "point4": "True ownership — no company can revoke your NFT"
+  },
+  "cabinet": {
+    "connectTitle": "Connect your TON Wallet",
+    "connectDesc": "To access your personal cabinet, connect your TON wallet.",
+    "demoMode": "Or explore the demo (no wallet needed)",
+    "cabinet": "My Cabinet"
+  },
+  "tabs": {
+    "twin": "👤 My Twin",
+    "hallucinations": "🤖 Hallucinations",
+    "nft": "🎫 Soul Certificate",
+    "confidence": "📊 Confidence",
+    "privacy": "🔒 Privacy"
+  },
+  "twin": {
+    "title": "Your Digital Twin",
+    "messages": "Messages indexed",
+    "sources": "Sources",
+    "mode": "Mode",
+    "personality": "Personality Traits"
+  },
+  "hall": {
+    "title": "🤖 AI Hallucination Control",
+    "desc": "All AI models hallucinate. Here's how to manage it.",
+    "whatItDoes": "Your twin might:",
+    "risk1": "⚠️ Invent memories that never happened",
+    "risk2": "⚠️ Confuse dates and timelines",
+    "risk3": "⚠️ Talk about events not in your messages",
+    "risk4": "⚠️ Be overly confident about uncertain things",
+    "presets": "Preset Controls:",
+    "showUncertainty": "Show uncertainty (\"I think...\" vs \"I remember...\")",
+    "refuseLow": "Refuse to answer if low confidence",
+    "noInvent": "Never invent memories",
+    "customTitle": "Custom Instructions:",
+    "customDesc": "Tell your twin what to avoid or emphasize.",
+    "customPlaceholder": "Examples:\n- Don't talk about my work\n- Always respond in Russian\n- Don't share opinions about politics",
+    "quickPresets": "Quick presets:",
+    "preset1": "No fake dates",
+    "preset2": "Privacy protection",
+    "preset3": "Honest uncertainty",
+    "save": "💾 Save Settings"
+  },
+  "nft": {
+    "title": "🎫 Soul Certificate",
+    "type": "Type",
+    "network": "Network",
+    "sources": "Sources",
+    "minted": "Minted",
+    "viewTonscan": "View on Tonscan →",
+    "mint": "Mint yours →"
+  },
+  "conf": {
+    "title": "📊 Personality Confidence",
+    "desc": "How well does your twin know you?",
+    "style": "Communication style",
+    "humor": "Sense of humor",
+    "opinions": "Opinions & beliefs",
+    "experiences": "Personal experiences",
+    "relationships": "Relationships",
+    "tip": "Add more sources with /add_source to improve accuracy"
+  },
+  "priv": {
+    "title": "🔒 Privacy Protection",
+    "desc": "Your twin never shares your sensitive data.",
+    "alwaysOn": "🛡️ Always ON — Cannot be disabled",
+    "neverShare": "Your twin will NEVER share:",
+    "passwords": "Passwords & PINs",
+    "emails": "Email addresses",
+    "phones": "Phone numbers",
+    "address": "Home / work address",
+    "cards": "Card / bank numbers",
+    "docs": "Passport / ID data",
+    "keys": "API keys & tokens",
+    "medical": "Medical information",
+    "piiFilter": "🛡️ PII Filter",
+    "aiLock": "🔒 AI Privacy Lock",
+    "localStorage": "💾 Local Storage",
+    "noUpload": "☁️ Raw Message Upload"
+  },
+  "footer": {
+    "built": "Built for TON AI Hackathon 2026",
+    "github": "GitHub",
+    "bot": "Telegram Bot",
+    "cabinet": "Open Cabinet"
   }
 }

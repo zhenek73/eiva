@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="tabs.twin">Eiva — Cabinet</title>
+  <meta name="description" content="Your personal Eiva AI Twin Cabinet. Manage settings, view your Soul Certificate, and control AI behavior.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-back">← Back to Eiva</a>
+    <span class="nav-title" data-i18n="cabinet.cabinet">My Cabinet</span>
+    <div id="wallet-btn" onclick="window.open('https://t.me/eivatonbot', '_blank')">🔗 @eivatonbot</div>
+  </div>
+</nav>
+
+<!-- ── NOT CONNECTED STATE ── -->
+<div id="not-connected">
+  <div class="connect-prompt">
+    <h2 data-i18n="cabinet.connectTitle">Connect your TON Wallet</h2>
+    <p data-i18n="cabinet.connectDesc">To access your personal cabinet, connect your TON wallet.</p>
+    <button id="connect-wallet-btn" class="btn-primary">🔗 Connect Wallet</button>
+    <p class="caption" data-i18n="cabinet.demoMode">Or explore without wallet:</p>
+    <button onclick="loadDemoMode()" class="btn-secondary">👁 View Durov Demo Cabinet</button>
+  </div>
+</div>
+
+<!-- ── CABINET (shown after connect OR in demo mode) ── -->
+<div id="cabinet" class="hidden">
+  <div id="app">
+    <div class="cabinet-header">
+      <img id="cab-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user&backgroundColor=0d1117" class="cab-avatar" alt="Twin Avatar">
+      <div>
+        <h2 id="cab-name">My Twin</h2>
+        <p id="cab-wallet" class="mono caption"></p>
+        <span id="demo-badge" class="badge hidden">Demo Mode — Pavel Durov</span>
+      </div>
+    </div>
+
+    <!-- ── TABS ── -->
+    <div class="cabinet-tabs">
+      <button class="tab active" onclick="showTab('twin')" data-i18n="tabs.twin">👤 My Twin</button>
+      <button class="tab" onclick="showTab('hallucinations')" data-i18n="tabs.hallucinations">🤖 Hallucinations</button>
+      <button class="tab" onclick="showTab('nft')" data-i18n="tabs.nft">🎫 Soul Certificate</button>
+      <button class="tab" onclick="showTab('confidence')" data-i18n="tabs.confidence">📊 Confidence</button>
+      <button class="tab" onclick="showTab('privacy')" data-i18n="tabs.privacy">🔒 Privacy</button>
+    </div>
+
+    <!-- ── TAB: My Twin ── -->
+    <div id="tab-twin" class="tab-content active">
+      <h3 data-i18n="twin.title">Your Digital Twin</h3>
+      <div class="twin-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="twin-messages">20</div>
+          <div class="stat-label" data-i18n="twin.messages">Messages indexed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="twin-sources">2</div>
+          <div class="stat-label" data-i18n="twin.sources">Sources</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="twin-mode">Personal</div>
+          <div class="stat-label" data-i18n="twin.mode">Mode</div>
+        </div>
+      </div>
+
+      <h4 data-i18n="twin.personality">Personality Traits</h4>
+      <div class="traits-list" id="traits-list">
+        <span class="trait">principled</span>
+        <span class="trait">disciplined</span>
+        <span class="trait">visionary</span>
+        <span class="trait">philosophical</span>
+        <span class="trait">blunt</span>
+      </div>
+
+      <div class="twin-actions">
+        <a href="https://t.me/eivatonbot" class="btn-primary" target="_blank">💬 Open in Telegram →</a>
+        <button class="btn-secondary" onclick="showTab('nft')">🎫 View Soul Certificate</button>
+      </div>
+    </div>
+
+    <!-- ── TAB: Hallucinations ── -->
+    <div id="tab-hallucinations" class="tab-content hidden">
+      <h3 data-i18n="hall.title">🤖 AI Hallucination Control</h3>
+      <p class="caption" data-i18n="hall.desc">All AI models hallucinate. Here's how to manage it for your twin.</p>
+
+      <div class="warning-box">
+        <h4 data-i18n="hall.whatItDoes">Your twin might:</h4>
+        <ul>
+          <li data-i18n="hall.risk1">⚠️ Invent memories that never happened</li>
+          <li data-i18n="hall.risk2">⚠️ Confuse dates and timelines</li>
+          <li data-i18n="hall.risk3">⚠️ Talk about events not in your messages</li>
+          <li data-i18n="hall.risk4">⚠️ Be overly confident about uncertain things</li>
+        </ul>
+      </div>
+
+      <h4 data-i18n="hall.presets">Preset Controls:</h4>
+      <label class="toggle-row">
+        <span data-i18n="hall.showUncertainty">Show uncertainty ("I think..." vs "I remember...")</span>
+        <input type="checkbox" id="ctrl-uncertainty" checked>
+      </label>
+      <label class="toggle-row">
+        <span data-i18n="hall.refuseLow">Refuse to answer if low confidence</span>
+        <input type="checkbox" id="ctrl-refuse">
+      </label>
+      <label class="toggle-row">
+        <span data-i18n="hall.noInvent">Never invent memories</span>
+        <input type="checkbox" id="ctrl-no-invent" checked>
+      </label>
+
+      <h4 data-i18n="hall.customTitle">Custom Instructions:</h4>
+      <p class="caption" data-i18n="hall.customDesc">Tell your twin what to avoid, what to emphasize, or how to handle specific topics.</p>
+      <textarea id="custom-instructions" rows="5" data-i18n-placeholder="hall.customPlaceholder" placeholder="Examples:
+- Don't talk about my work at [company]
+- Always respond in Russian
+- Don't share opinions about politics"></textarea>
+
+      <div class="preset-examples">
+        <p data-i18n="hall.quickPresets">Quick presets:</p>
+        <button onclick="addPreset('Don\\'t make up specific dates or events.')" data-i18n="hall.preset1">No fake dates</button>
+        <button onclick="addPreset('For sensitive personal topics, deflect naturally.')" data-i18n="hall.preset2">Privacy protection</button>
+        <button onclick="addPreset('If uncertain, say so rather than guessing.')" data-i18n="hall.preset3">Honest uncertainty</button>
+      </div>
+
+      <button class="btn-primary" onclick="saveHallucinationSettings()" data-i18n="hall.save">💾 Save Settings</button>
+    </div>
+
+    <!-- ── TAB: Soul Certificate ── -->
+    <div id="tab-nft" class="tab-content hidden">
+      <h3 data-i18n="nft.title">🎫 Soul Certificate</h3>
+      <div class="nft-card">
+        <div class="nft-card-header">
+          <img id="nft-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117" class="nft-avatar" alt="Twin Avatar">
+          <div>
+            <h3 id="nft-name">Pavel Durov</h3>
+            <p class="mono caption" id="nft-address">EQDemo...Certificate</p>
+          </div>
+        </div>
+        <div class="nft-card-body">
+          <div class="nft-detail">
+            <span class="label" data-i18n="nft.type">Type</span>
+            <span>Soulbound (TEP-85)</span>
+          </div>
+          <div class="nft-detail">
+            <span class="label" data-i18n="nft.network">Network</span>
+            <span>TON Testnet</span>
+          </div>
+          <div class="nft-detail">
+            <span class="label" data-i18n="nft.sources">Sources</span>
+            <span>@durov channel + Lex Fridman interview</span>
+          </div>
+          <div class="nft-detail">
+            <span class="label" data-i18n="nft.minted">Minted</span>
+            <span id="nft-date">Demo 2024</span>
+          </div>
+        </div>
+        <div class="nft-card-actions">
+          <a href="https://testnet.tonscan.org" target="_blank" class="btn-secondary" data-i18n="nft.viewTonscan">View on Tonscan →</a>
+          <a href="https://t.me/eivatonbot?start=mint" class="btn-primary" data-i18n="nft.mint">Mint yours →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: Confidence ── -->
+    <div id="tab-confidence" class="tab-content hidden">
+      <h3 data-i18n="conf.title">📊 Personality Confidence</h3>
+      <p class="caption" data-i18n="conf.desc">How well does your twin know you?</p>
+
+      <div class="confidence-overall">
+        <div class="confidence-bar-container">
+          <div class="confidence-bar" id="overall-bar" style="width: 0%"></div>
+        </div>
+        <span id="overall-pct">87%</span>
+      </div>
+
+      <div class="confidence-breakdown">
+        <div class="conf-item">
+          <span class="conf-label" data-i18n="conf.style">Communication style</span>
+          <div class="conf-bar-wrap"><div class="conf-bar high" style="width: 92%"></div></div>
+          <span class="conf-tag high">HIGH ✅</span>
+        </div>
+        <div class="conf-item">
+          <span class="conf-label" data-i18n="conf.humor">Sense of humor</span>
+          <div class="conf-bar-wrap"><div class="conf-bar high" style="width: 78%"></div></div>
+          <span class="conf-tag high">HIGH ✅</span>
+        </div>
+        <div class="conf-item">
+          <span class="conf-label" data-i18n="conf.opinions">Opinions & beliefs</span>
+          <div class="conf-bar-wrap"><div class="conf-bar high" style="width: 88%"></div></div>
+          <span class="conf-tag high">HIGH ✅</span>
+        </div>
+        <div class="conf-item">
+          <span class="conf-label" data-i18n="conf.experiences">Personal experiences</span>
+          <div class="conf-bar-wrap"><div class="conf-bar medium" style="width: 55%"></div></div>
+          <span class="conf-tag medium">MEDIUM ✓</span>
+        </div>
+        <div class="conf-item">
+          <span class="conf-label" data-i18n="conf.relationships">Relationships</span>
+          <div class="conf-bar-wrap"><div class="conf-bar low" style="width: 30%"></div></div>
+          <span class="conf-tag low">LOW ⚠️</span>
+        </div>
+      </div>
+
+      <div class="conf-recommendation">
+        💡 <span data-i18n="conf.tip">Add more sources with <code>/add_source</code> to improve accuracy</span>
+      </div>
+    </div>
+
+    <!-- ── TAB: Privacy ── -->
+    <div id="tab-privacy" class="tab-content hidden">
+      <h3 data-i18n="priv.title">🔒 Privacy Protection</h3>
+      <p class="caption" data-i18n="priv.desc">Your twin never shares your sensitive data — even if someone asks directly.</p>
+
+      <div class="privacy-always-on">
+        <div class="privacy-badge" data-i18n="priv.alwaysOn">🛡️ Always ON — Cannot be disabled</div>
+        <h4 data-i18n="priv.neverShare">Your twin will NEVER share:</h4>
+        <div class="privacy-grid">
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.passwords">Passwords & PINs</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.emails">Email addresses</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.phones">Phone numbers</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.address">Home / work address</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.cards">Card / bank numbers</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.docs">Passport / ID data</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.keys">API keys & tokens</span></div>
+          <div class="privacy-item blocked"><span class="privacy-icon">🚫</span><span data-i18n="priv.medical">Medical information</span></div>
+        </div>
+      </div>
+
+      <div class="privacy-status">
+        <div class="status-row"><span data-i18n="priv.piiFilter">🛡️ PII Filter</span><span class="status-on">ACTIVE</span></div>
+        <div class="status-row"><span data-i18n="priv.aiLock">🔒 AI Privacy Lock</span><span class="status-on">ACTIVE</span></div>
+        <div class="status-row"><span data-i18n="priv.localStorage">💾 Local Storage</span><span class="status-on">ENABLED</span></div>
+        <div class="status-row"><span data-i18n="priv.noUpload">☁️ Raw Message Upload</span><span class="status-off">NEVER</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/cabinet.js"></script>
+</body>
+</html>
