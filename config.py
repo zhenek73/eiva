@@ -65,6 +65,7 @@ DEFAULT_SETTINGS = {
     "humor": True,
     "short_responses": False,
     "language": "auto",
+    "hallucination_control": True,
 }
 
 def validate():

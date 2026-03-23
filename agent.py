@@ -13,6 +13,31 @@ from embeddings import EmbeddingStore
 
 # ── Behavioral Instructions ────────────────────────────────────────────────────
 
+HALLUCINATION_WARNING = """
+IMPORTANT: AI models hallucinate. This is normal.
+
+Your twin might:
+- Invent memories that never happened
+- Confuse dates and timelines
+- Talk about events not mentioned in source messages
+- Be overly confident about uncertain things
+
+This is not a bug — it's how LLMs work. We manage it by:
+1. Using RAG (Retrieval-Augmented Generation) to ground responses
+2. Showing uncertainty: "I think..." vs "I remember..."
+3. Refusing to answer when confidence is low
+4. Requiring multiple sources for strong claims
+"""
+
+HALLUCINATION_CONTROL_INSTRUCTION = """
+When generating responses:
+- If you don't have explicit memory, say "I'm not sure..." or "I don't recall..."
+- Don't invent details, dates, or events
+- Show confidence levels: "I definitely remember..." vs "I vaguely recall..."
+- If user asks about something not in source data, acknowledge the gap
+- When uncertain, ask clarifying questions instead of guessing
+"""
+
 RECALL_INSTRUCTION = """
 When relevant, recall past statements naturally:
 - "I remember saying..."
@@ -83,6 +108,9 @@ class EivaAgent:
         # 1. Retrieve similar memories
         similar = self.store.search(user_message, top_k=config.TOP_K_SIMILAR)
 
+        # Calculate confidence based on memory retrieval
+        confidence_level, confidence_score = self._calculate_confidence(similar)
+
         # Build memory block from retrieved items
         memory_block = self._format_memory_block(similar)
 
@@ -120,6 +148,11 @@ class EivaAgent:
 {RECALL_INSTRUCTION}
 {CONTRADICTION_INSTRUCTION}"""
 
+        # Load hallucination control settings
+        hallucination_control = settings.get("hallucination_control", True)
+        if hallucination_control:
+            full_system += f"\n\n## Hallucination Control\n{HALLUCINATION_CONTROL_INSTRUCTION}"
+
         if settings_notes:
             full_system += f"\n\n## Tone Settings\n{settings_notes}"
 
@@ -148,6 +181,22 @@ class EivaAgent:
         self.history.clear()
 
     # ── Helpers ───────────────────────────────────────────────────────────────
+
+    def _calculate_confidence(self, similar_items: list) -> tuple[str, float]:
+        """
+        Score confidence based on how many sources mention a topic.
+        Returns: (confidence_label, confidence_score)
+        < 2 items: LOW ⚠️
+        2-4 items: MEDIUM ✓
+        > 4 items: HIGH ✅
+        """
+        count = len(similar_items)
+        if count < 2:
+            return "LOW ⚠️", 0.3
+        elif count < 5:
+            return "MEDIUM ✓", 0.7
+        else:
+            return "HIGH ✅", 0.95
 
     @staticmethod
     def _classify_memory_items(items: list[str]):

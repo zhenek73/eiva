@@ -383,16 +383,55 @@ async def cmd_profile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     # Get memory stats from the stored memories
     count = store.count()
 
+    # Calculate overall confidence based on message count
+    # Minimum is 50, maximum is 500 for full confidence
+    min_for_confidence = 50
+    max_for_confidence = 500
+    confidence_pct = min(100, max(0, int((count - min_for_confidence) / (max_for_confidence - min_for_confidence) * 100)))
+
+    # Build confidence bar
+    filled = int(confidence_pct / 10)
+    empty = 10 - filled
+    confidence_bar = "█" * filled + "░" * empty
+
+    # Determine confidence areas based on message count
+    high_confidence = []
+    low_confidence = []
+
+    if count >= 100:
+        high_confidence = ["Communication style", "Sense of humor", "Topics of interest"]
+        low_confidence = ["Deep opinions", "Personal beliefs"]
+    elif count >= 50:
+        high_confidence = ["Topics of interest"]
+        low_confidence = ["Deep opinions", "Personal beliefs", "Relationships"]
+    else:
+        low_confidence = ["Most traits (need 50+ messages)", "Deep opinions", "Personal beliefs", "Relationships"]
+
+    high_conf_text = "\n".join(f"✅ {item}" for item in high_confidence) if high_confidence else ""
+    low_conf_text = "\n".join(f"⚠️ {item}" for item in low_confidence) if low_confidence else ""
+
     text = (
-        f"🧬 *Your Digital Twin Profile*\n\n"
+        f"👤 *Your Personality Profile*\n\n"
+        f"📊 Overall Confidence: {confidence_bar} {confidence_pct}%\n"
+        f"(Data from {count} messages)\n\n"
+    )
+
+    if high_conf_text:
+        text += f"High Confidence Areas:\n{high_conf_text}\n\n"
+
+    if low_conf_text:
+        text += f"Low Confidence Areas:\n{low_conf_text}\n\n"
+
+    text += (
+        f"💡 Tip: Add another Telegram export with /add_source to improve accuracy!\n\n"
+        f"---\n\n"
         f"{mode_emoji} **Mode:** {mode.title()}\n\n"
         f"**Style:** {profile.get('communication_style', 'N/A')}\n\n"
         f"**Tone:** {profile.get('emotional_tone', 'N/A')}\n\n"
         f"**Vocabulary:** {profile.get('vocabulary', 'N/A')[:150]}\n\n"
         f"**Topics:** {topics}\n\n"
         f"**Unique traits:**\n{traits}\n\n"
-        f"**Humor:** {profile.get('humor', 'N/A')}\n\n"
-        f"**Memory:** {count} messages indexed"
+        f"**Humor:** {profile.get('humor', 'N/A')}"
     )
     await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
@@ -522,9 +561,21 @@ async def cmd_settings(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     # Build keyboard with toggle buttons
     keyboard = _build_settings_keyboard(settings)
 
+    hallucination_status = "ON" if settings.get("hallucination_control", True) else "OFF"
+    hallucination_desc = (
+        "This tells your twin to:\n"
+        "- Show uncertainty (\"I think...\" vs \"I remember...\")\n"
+        "- Refuse to answer if confidence is too low\n"
+        "- Not invent memories\n"
+        "- Ask clarifying questions\n\n"
+        "Turn OFF if you want more creative/confident responses."
+    )
+
     await update.message.reply_text(
         "⚙️ *Personality Settings*\n\n"
-        "Configure how your digital twin responds:\n",
+        "Configure how your digital twin responds:\n\n"
+        f"🤖 AI Hallucination Control — {hallucination_status}\n\n"
+        f"{hallucination_desc}",
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard,
     )
@@ -558,11 +609,19 @@ def _build_settings_keyboard(settings: dict) -> InlineKeyboardMarkup:
         ),
     ])
 
-    # Third row: short_responses, language
+    # Third row: short_responses
     buttons.append([
         InlineKeyboardButton(
             f"{'✅' if settings.get('short_responses') else '❌'} Short responses",
             callback_data="setting_toggle:short_responses"
+        ),
+    ])
+
+    # Hallucination control row
+    buttons.append([
+        InlineKeyboardButton(
+            f"{'🤖' if settings.get('hallucination_control') else '❌'} AI Hallucination Control",
+            callback_data="setting_toggle:hallucination_control"
         ),
     ])
 

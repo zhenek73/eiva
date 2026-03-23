@@ -46,6 +46,42 @@ Open **http://localhost:8080**
 
 ---
 
+## The Honest Truth About AI Clones
+
+### The Problem
+Every AI has a fundamental limitation: **hallucinations**.
+
+Your AI twin might:
+- Invent memories that never happened
+- Confuse dates and timelines
+- Talk about things not in your messages
+- Be overly confident about uncertain things
+
+This isn't a bug—it's how all LLMs work. Even Claude, GPT-4, and others hallucinate.
+
+### How We Handle It
+Instead of hiding the problem, we manage it:
+
+1. **Structured Memory** — We categorize memories (Opinions/Facts/Memories), not just list them
+2. **Multi-Source Learning** — More data sources = better accuracy (use `/add_source`)
+3. **Confidence Scoring** — Your profile shows what we're sure about vs what's uncertain
+4. **Hallucination Control** — You can toggle settings to make your twin more or less cautious
+
+### Realistic Expectations
+Your AI twin will sound like you in most situations.
+But it won't be perfect. And that's OK.
+
+The more data you give it (multiple sources), the better it gets.
+Check `/profile` to see where you need more data.
+
+### Why This Matters
+Most AI projects hide their limitations.
+We're honest about them.
+
+Because an AI twin that knows its limits is more trustworthy than one that pretends to be perfect.
+
+---
+
 ## Commands
 
 | Command | Description |
