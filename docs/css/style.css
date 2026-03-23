@@ -412,3 +412,387 @@
 
     /* Telegram Mini App adjustments */
     .tg-webapp body { padding-top: env(safe-area-inset-top); }
+
+    /* ── Demo Section ── */
+    .demo-section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,255,200,0.2);
+      border-radius: 16px;
+      padding: 32px;
+      margin: 40px 0;
+    }
+
+    .demo-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .demo-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid #00ffc8;
+      flex-shrink: 0;
+    }
+
+    .demo-header h2 {
+      margin: 0 0 4px 0;
+      font-size: 1.4rem;
+    }
+
+    .demo-header p {
+      margin: 0 0 8px 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background: rgba(0,255,200,0.1);
+      border: 1px solid rgba(0,255,200,0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #00ffc8;
+      margin-right: 8px;
+    }
+
+    .badge-ton {
+      background: rgba(0,100,255,0.1);
+      border-color: rgba(0,100,255,0.4);
+      color: #4488ff;
+    }
+
+    /* ── Demo Dialog ── */
+    .demo-dialog {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .dialog-msg {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .dialog-msg.user {
+      background: rgba(0,255,200,0.1);
+      border: 1px solid rgba(0,255,200,0.2);
+      margin-left: auto;
+      color: #e0e0e0;
+    }
+
+    .dialog-msg.twin {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #c0c0c0;
+    }
+
+    /* ── Demo Stats ── */
+    .demo-stats {
+      display: flex;
+      gap: 32px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 28px;
+      font-weight: bold;
+      color: #00ffc8;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* ── Cabinet ── */
+    .cabinet {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .cabinet.hidden {
+      display: none;
+    }
+
+    .cabinet-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: rgba(0,255,200,0.1);
+      color: #00ffc8;
+    }
+
+    .tab:hover {
+      color: #aaa;
+    }
+
+    .tab-content {
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.hidden {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ── Hallucination Control ── */
+    .hallucination-info {
+      background: rgba(255,200,0,0.05);
+      border: 1px solid rgba(255,200,0,0.2);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .preset-controls {
+      margin: 16px 0;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
+    }
+
+    .toggle-row:hover {
+      background: rgba(255,255,255,0.02);
+      padding-left: 8px;
+      padding-right: 8px;
+      margin: 0 -8px;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    #custom-instructions {
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      padding: 12px;
+      font-size: 13px;
+      resize: vertical;
+      margin: 8px 0 12px;
+      font-family: inherit;
+    }
+
+    #custom-instructions:focus {
+      outline: none;
+      border-color: rgba(0,255,200,0.4);
+      background: rgba(0,0,0,0.5);
+    }
+
+    .preset-examples button:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+
+    /* ── NFT Card ── */
+    .nft-card {
+      background: linear-gradient(135deg, rgba(0,50,40,0.5), rgba(0,20,60,0.5));
+      border: 1px solid rgba(0,255,200,0.3);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+    }
+
+    .nft-card-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .nft-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid #00ffc8;
+      flex-shrink: 0;
+    }
+
+    .nft-card-body {
+      margin: 20px 0;
+    }
+
+    .nft-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 14px;
+    }
+
+    .nft-detail .label {
+      color: #666;
+    }
+
+    .mono {
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* ── Confidence Chart ── */
+    .confidence-overall {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 16px 0 24px;
+    }
+
+    .confidence-bar-container {
+      flex: 1;
+      height: 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .confidence-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00ffc8, #0088ff);
+      border-radius: 6px;
+      transition: width 1s ease;
+    }
+
+    .confidence-breakdown {
+      margin: 16px 0;
+    }
+
+    .conf-item {
+      display: grid;
+      grid-template-columns: 160px 1fr 80px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .conf-label {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .conf-bar-wrap {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .conf-bar {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    .conf-bar.high {
+      background: #00ffc8;
+    }
+
+    .conf-bar.medium {
+      background: #ffcc00;
+    }
+
+    .conf-bar.low {
+      background: #ff6644;
+    }
+
+    .conf-tag {
+      font-size: 11px;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .conf-tag.high {
+      color: #00ffc8;
+    }
+
+    .conf-tag.medium {
+      color: #ffcc00;
+    }
+
+    .conf-tag.low {
+      color: #ff6644;
+    }
+
+    .conf-recommendation {
+      background: rgba(0,255,200,0.05);
+      border: 1px solid rgba(0,255,200,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+
+    /* ── Responsive for Cabinet ── */
+    @media (max-width: 768px) {
+      .conf-item {
+        grid-template-columns: 120px 1fr 60px;
+      }
+
+      .demo-stats {
+        gap: 16px;
+      }
+
+      .demo-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .demo-header h2,
+      .demo-header p {
+        margin-bottom: 8px;
+      }
+
+      .dialog-msg {
+        max-width: 100%;
+      }
+
+      .cabinet-tabs {
+        flex-wrap: wrap;
+      }
+    }

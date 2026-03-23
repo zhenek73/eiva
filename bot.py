@@ -634,6 +634,14 @@ def _build_settings_keyboard(settings: dict) -> InlineKeyboardMarkup:
         ),
     ])
 
+    # Custom Instructions button
+    buttons.append([
+        InlineKeyboardButton(
+            "✏️ Custom Instructions",
+            callback_data="setting_custom_instructions"
+        ),
+    ])
+
     # Save button
     buttons.append([
         InlineKeyboardButton("💾 Save Settings", callback_data="setting_save"),
@@ -1025,6 +1033,21 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
             parse_mode=ParseMode.MARKDOWN,
         )
 
+    # ── Custom Instructions callback ──────────────────────────────────────────
+    elif query.data == "setting_custom_instructions":
+        await query.edit_message_text(
+            "✏️ *Custom Instructions*\n\n"
+            "Send me a message with your custom instructions for your twin.\n\n"
+            "Examples:\n"
+            "• Don't talk about my job\n"
+            "• Always respond in Russian\n"
+            "• Keep responses short\n"
+            "• If asked about family, be vague\n\n"
+            "Type your instructions in your next message:",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        user_state[user_id] = "custom_instructions"
+
     # ── Mode callbacks ────────────────────────────────────────────────────────
     elif query.data in ("mode_personal", "mode_professional"):
         store = EmbeddingStore(str(user_id))
@@ -1300,6 +1323,17 @@ async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Route every plain text message to the digital twin agent."""
     user_id = update.effective_user.id
     text    = update.message.text.strip()
+
+    # ── Handle custom instructions input ────────────────────────────────────
+    if user_state.get(user_id) == "custom_instructions":
+        store = EmbeddingStore(str(user_id))
+        store.save_meta("custom_instructions", text)
+        user_state.pop(user_id, None)
+        await update.message.reply_text(
+            "✅ Custom instructions saved!\n\n"
+            "Your twin will follow these rules from now on."
+        )
+        return
 
     # ── Intercept wallet address input ──────────────────────────────────────
     if ctx.user_data.get("awaiting_wallet"):

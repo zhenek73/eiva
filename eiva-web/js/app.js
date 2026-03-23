@@ -167,6 +167,8 @@ function showWalletUI(connected, rawAddr = '') {
     const seed = friendly.slice(-8);
     document.getElementById('walletAvatar').src =
       `https://api.dicebear.com/9.x/pixel-art/png?seed=${seed}&size=64&backgroundColor=13132a`;
+    // Show personal cabinet
+    onWalletConnected(friendly);
   }
   document.getElementById('statNetwork').textContent = NETWORK;
 }
@@ -492,6 +494,65 @@ function initSettings() {
     saveBtn.addEventListener('click', () => {
       saveSettings(settings);
     });
+  }
+}
+
+// ── Cabinet Tab Management ──────────────────────────────────────────────────
+function showTab(name) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+  // Remove active from all tab buttons
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  // Show selected tab
+  const tabContent = document.getElementById('tab-' + name);
+  if (tabContent) {
+    tabContent.classList.remove('hidden');
+  }
+  // Mark button as active
+  event.target.classList.add('active');
+}
+
+function addPreset(text) {
+  const ta = document.getElementById('custom-instructions');
+  if (ta) {
+    ta.value = (ta.value ? ta.value + '\n' : '') + text;
+  }
+}
+
+function saveHallucinationSettings() {
+  const settings = {
+    show_uncertainty: document.getElementById('ctrl-uncertainty').checked,
+    refuse_low_confidence: document.getElementById('ctrl-refuse').checked,
+    no_invent_memories: document.getElementById('ctrl-no-invent').checked,
+    ask_clarifying: document.getElementById('ctrl-clarify').checked,
+    custom_instructions: document.getElementById('custom-instructions').value
+  };
+  localStorage.setItem('hallucination_settings', JSON.stringify(settings));
+
+  // Show save confirmation
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = '✅ Saved!';
+  setTimeout(() => { btn.textContent = originalText; }, 2000);
+}
+
+function tryDemoTwin() {
+  window.open('https://t.me/eivatonbot?start=demo', '_blank');
+}
+
+function onWalletConnected(address) {
+  const cabinet = document.getElementById('cabinet');
+  if (cabinet) {
+    cabinet.classList.remove('hidden');
+    // Animate confidence bar
+    setTimeout(() => {
+      const overallBar = document.getElementById('overall-bar');
+      const overallPct = document.getElementById('overall-pct');
+      if (overallBar && overallPct) {
+        overallBar.style.width = '62%';
+        overallPct.textContent = '62%';
+      }
+    }, 500);
   }
 }
 

@@ -129,6 +129,9 @@ class EivaAgent:
         settings = self.store.load_meta("settings") or config.DEFAULT_SETTINGS
         settings_notes = self._build_settings_notes(settings)
 
+        # Get custom instructions
+        custom_instructions = self.store.load_meta("custom_instructions")
+
         # Build full system prompt
         full_system = f"""You are a digital twin of a real person. Your goal is to sound like them — not like an AI.
 
@@ -155,6 +158,10 @@ class EivaAgent:
 
         if settings_notes:
             full_system += f"\n\n## Tone Settings\n{settings_notes}"
+
+        # Add custom instructions from owner
+        if custom_instructions:
+            full_system += f"\n\n## Custom Instructions from Owner\n{custom_instructions}"
 
         # 2. Assemble messages list
         messages = [{"role": "system", "content": full_system}]

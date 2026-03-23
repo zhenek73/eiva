@@ -97,6 +97,56 @@
       <a href="https://t.me/eivatonbot" target="_blank" class="btn btn-ton btn-sm">Open @eivatonbot</a>
     </div>
 
+    <!-- Demo Section: Pavel Durov -->
+    <section class="demo-section">
+      <div class="demo-header">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117"
+             class="demo-avatar" alt="Pavel Durov AI Twin">
+        <div>
+          <h2>🎭 Live Demo: Pavel Durov AI Twin</h2>
+          <p>Built from @durov Telegram channel + Lex Fridman interview transcript</p>
+          <span class="badge">2 sources</span>
+          <span class="badge badge-ton">Soul Certificate ✓</span>
+        </div>
+      </div>
+
+      <!-- Example dialog -->
+      <div class="demo-dialog">
+        <div class="dialog-msg user">What do you think about AI and freedom?</div>
+        <div class="dialog-msg twin">
+          I think AI will fundamentally change humanity. But I'm more worried about who controls it
+          than about what it can do. Centralized AI is just another form of centralized power.
+          The same way we built Telegram to resist centralized control of communication,
+          we need decentralized AI that no single entity controls.
+        </div>
+        <div class="dialog-msg user">Would you ever shut down Telegram under government pressure?</div>
+        <div class="dialog-msg twin">
+          We are prepared to leave markets that aren't compatible with our principles,
+          because we are not doing this for money. Telegram never shared a single private message
+          with anyone. If authorities demand that, I would rather shut Telegram down in that country.
+        </div>
+      </div>
+
+      <div class="demo-stats">
+        <div class="stat">
+          <span class="stat-value">20</span>
+          <span class="stat-label">Posts indexed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">87%</span>
+          <span class="stat-label">Personality confidence</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">2</span>
+          <span class="stat-label">Sources</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="tryDemoTwin()" style="width:100%;padding:12px;background:var(--ton);color:white;border:none;border-radius:8px;font-weight:500;cursor:pointer;font-size:15px;margin-top:16px">
+        💬 Try asking Pavel Durov anything
+      </button>
+    </section>
+
     <div class="app-grid">
 
       <!-- Wallet Card -->
@@ -257,6 +307,160 @@
         💾 Save Settings
       </button>
       <div id="settingsSaveStatus" style="margin-top:8px;text-align:center;color:var(--muted);font-size:.9rem;display:none"></div>
+    </div>
+
+    <!-- Personal Cabinet (shown after wallet auth) -->
+    <div id="cabinet" class="cabinet hidden">
+      <h2 style="margin-bottom:24px">👤 My Digital Twin Cabinet</h2>
+
+      <!-- Tab navigation -->
+      <div class="cabinet-tabs">
+        <button class="tab active" onclick="showTab('twin')">👤 My Twin</button>
+        <button class="tab" onclick="showTab('hallucinations')">🤖 Hallucinations</button>
+        <button class="tab" onclick="showTab('nft')">🎫 Soul Certificate</button>
+        <button class="tab" onclick="showTab('confidence')">📊 Confidence</button>
+      </div>
+
+      <!-- Tab: My Twin -->
+      <div id="tab-twin" class="tab-content active">
+        <p style="color:var(--muted);margin-bottom:16px">Your twin is set up via the Telegram bot.</p>
+        <a href="https://t.me/eivatonbot" class="btn btn-ton" target="_blank" style="display:inline-flex">Open in Telegram →</a>
+      </div>
+
+      <!-- Tab: Hallucinations Control -->
+      <div id="tab-hallucinations" class="tab-content hidden">
+        <h3 style="margin-bottom:8px">🤖 AI Hallucination Control</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">All AI models hallucinate. Here's how to manage it for your twin.</p>
+
+        <div class="hallucination-info">
+          <h4 style="margin-bottom:12px">What your twin might do:</h4>
+          <ul style="margin-left:20px;color:var(--muted);font-size:.95rem">
+            <li>⚠️ Invent memories that never happened</li>
+            <li>⚠️ Confuse dates and timelines</li>
+            <li>⚠️ Talk about events not in your messages</li>
+            <li>⚠️ Be overly confident about uncertain things</li>
+          </ul>
+        </div>
+
+        <h4 style="margin-top:20px;margin-bottom:12px">Preset Controls:</h4>
+        <div class="preset-controls">
+          <label class="toggle-row">
+            <span>Show uncertainty ("I think..." vs "I remember...")</span>
+            <input type="checkbox" id="ctrl-uncertainty" checked>
+          </label>
+          <label class="toggle-row">
+            <span>Refuse to answer if low confidence</span>
+            <input type="checkbox" id="ctrl-refuse">
+          </label>
+          <label class="toggle-row">
+            <span>Never invent memories</span>
+            <input type="checkbox" id="ctrl-no-invent" checked>
+          </label>
+          <label class="toggle-row">
+            <span>Ask clarifying questions when unsure</span>
+            <input type="checkbox" id="ctrl-clarify" checked>
+          </label>
+        </div>
+
+        <h4 style="margin-top:20px;margin-bottom:8px">Custom Instructions:</h4>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:12px">Tell your twin what to avoid, what to emphasize, or how to handle specific topics.</p>
+        <textarea id="custom-instructions" placeholder="Examples:
+- Don't talk about my work at [company name]
+- Always respond in Russian
+- Don't share opinions about politics
+- If asked about my family, keep it brief
+- My memory about dates before 2020 might be wrong" rows="6" style="width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;resize:vertical;margin-bottom:12px"></textarea>
+
+        <div class="preset-examples" style="margin-bottom:16px">
+          <p style="font-size:.9rem;color:var(--muted);margin-bottom:8px">Quick presets:</p>
+          <button onclick="addPreset('Don\\'t make up specific dates or events. If uncertain, say so.')" style="margin:4px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px">No fake dates</button>
+          <button onclick="addPreset('For sensitive personal topics, deflect naturally without revealing details.')" style="margin:4px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px">Privacy protection</button>
+          <button onclick="addPreset('If someone asks about my current location or schedule, always say you\\'re not sure.')" style="margin:4px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px">Location privacy</button>
+        </div>
+
+        <button class="btn btn-ton" onclick="saveHallucinationSettings()" style="width:100%;padding:12px">💾 Save to Bot</button>
+        <p style="color:var(--muted);font-size:.9rem;margin-top:8px;text-align:center">Settings will sync to your Telegram bot automatically.</p>
+      </div>
+
+      <!-- Tab: Soul Certificate NFT -->
+      <div id="tab-nft" class="tab-content hidden">
+        <div class="nft-card">
+          <div class="nft-card-header">
+            <img id="nft-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user123" class="nft-avatar" alt="Soul Certificate">
+            <div>
+              <h3 id="nft-name" style="margin:0;margin-bottom:4px">Soul Certificate</h3>
+              <p id="nft-address" class="mono" style="color:var(--muted);font-size:.85rem;margin:0">Not minted yet</p>
+            </div>
+          </div>
+          <div class="nft-card-body">
+            <div class="nft-detail">
+              <span class="label">Type</span>
+              <span>Soulbound (TEP-85)</span>
+            </div>
+            <div class="nft-detail">
+              <span class="label">Network</span>
+              <span>TON Testnet</span>
+            </div>
+            <div class="nft-detail">
+              <span class="label">Minted</span>
+              <span id="nft-date">—</span>
+            </div>
+            <div class="nft-detail">
+              <span class="label">Hash</span>
+              <span id="nft-hash" class="mono">—</span>
+            </div>
+          </div>
+          <div class="nft-card-actions" style="display:flex;gap:12px;margin-top:20px">
+            <button class="btn btn-ghost" onclick="window.open('https://testnet.tonscan.org', '_blank')" style="flex:1">View on Tonscan →</button>
+            <a href="https://t.me/eivatonbot?start=mint" class="btn btn-ton" style="flex:1;text-align:center">Mint via Bot →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Confidence Chart -->
+      <div id="tab-confidence" class="tab-content hidden">
+        <h3 style="margin-bottom:8px">📊 Personality Confidence</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">How well does your twin know you? Based on indexed data.</p>
+
+        <div class="confidence-overall">
+          <div class="confidence-bar-container">
+            <div class="confidence-bar" id="overall-bar" style="width: 0%"></div>
+          </div>
+          <span id="overall-pct" style="min-width:50px;text-align:right;font-weight:600">0%</span>
+        </div>
+
+        <div class="confidence-breakdown">
+          <div class="conf-item">
+            <span class="conf-label">Communication style</span>
+            <div class="conf-bar-wrap"><div class="conf-bar high" style="width:85%"></div></div>
+            <span class="conf-tag high">HIGH ✅</span>
+          </div>
+          <div class="conf-item">
+            <span class="conf-label">Sense of humor</span>
+            <div class="conf-bar-wrap"><div class="conf-bar high" style="width:72%"></div></div>
+            <span class="conf-tag high">HIGH ✅</span>
+          </div>
+          <div class="conf-item">
+            <span class="conf-label">Opinions & beliefs</span>
+            <div class="conf-bar-wrap"><div class="conf-bar medium" style="width:55%"></div></div>
+            <span class="conf-tag medium">MEDIUM ✓</span>
+          </div>
+          <div class="conf-item">
+            <span class="conf-label">Personal experiences</span>
+            <div class="conf-bar-wrap"><div class="conf-bar low" style="width:30%"></div></div>
+            <span class="conf-tag low">LOW ⚠️</span>
+          </div>
+          <div class="conf-item">
+            <span class="conf-label">Relationships</span>
+            <div class="conf-bar-wrap"><div class="conf-bar low" style="width:20%"></div></div>
+            <span class="conf-tag low">LOW ⚠️</span>
+          </div>
+        </div>
+
+        <div class="conf-recommendation">
+          💡 <strong>Tip:</strong> Add 1-2 more Telegram exports with <code>/add_source</code> to improve accuracy.
+        </div>
+      </div>
     </div>
 
   </div>
