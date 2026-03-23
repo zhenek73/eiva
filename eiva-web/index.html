@@ -5,22 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eiva — AI Digital Twin on TON</title>
   <meta name="description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
-  <!-- Open Graph Meta Tags -->
+  <!-- Open Graph -->
   <meta property="og:title" content="Eiva — Your AI Self — owned by you" />
   <meta property="og:description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
   <meta property="og:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=0d0d1a" />
   <meta property="og:url" content="https://zhenek73.github.io/eiva/" />
   <meta property="og:type" content="website" />
-  <!-- Twitter Card Meta Tags -->
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eiva — Your AI Self — owned by you" />
   <meta name="twitter:description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
   <meta name="twitter:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=0d0d1a" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
-
-  <!-- TON Connect UI SDK -->
-  <script src="https://unpkg.com/@tonconnect/ui@2.0.7/dist/tonconnect-ui.min.js"></script>
 </head>
 <body>
 
@@ -59,7 +56,7 @@
 <section class="section" id="how">
   <div class="container">
     <h2 class="section-title" data-i18n="how.title">How It Works</h2>
-    <p class="section-sub">Four steps from your Telegram history to a living, blockchain-anchored digital twin</p>
+    <p class="section-sub" data-i18n="how.subtitle">Four steps from your Telegram history to a living, blockchain-anchored digital twin</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
@@ -80,6 +77,67 @@
         <div class="step-num">4</div>
         <h3 data-i18n="how.step4">Mint NFT</h3>
         <p data-i18n="how.step4desc">Own your identity on TON</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Demo: Pavel Durov AI Twin ── -->
+<section class="section" id="demo" style="background: var(--bg2);">
+  <div class="container">
+    <div class="demo-section">
+      <div class="demo-header">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117"
+             class="demo-avatar" alt="Pavel Durov AI Twin">
+        <div>
+          <h2 data-i18n="demo.title">🎭 Live Demo — Pavel Durov AI Twin</h2>
+          <p data-i18n="demo.subtitle">Built from @durov Telegram channel + Lex Fridman interview</p>
+          <span class="badge" data-i18n="demo.sources">2 sources</span>
+          <span class="badge badge-ton">Soul Certificate ✓</span>
+        </div>
+      </div>
+
+      <!-- Demo Stats -->
+      <div class="demo-stats">
+        <div class="stat">
+          <span class="stat-value">20</span>
+          <span class="stat-label" data-i18n="demo.messages">20 posts indexed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">87%</span>
+          <span class="stat-label" data-i18n="demo.confidence">87% confidence</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">2</span>
+          <span class="stat-label" data-i18n="demo.sources">2 sources</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">TON</span>
+          <span class="stat-label" data-i18n="demo.network">Testnet ✓</span>
+        </div>
+      </div>
+
+      <!-- Example dialog -->
+      <p class="caption" style="margin-bottom:10px" data-i18n="demo.dialogLabel">Example conversation:</p>
+      <div class="demo-dialog">
+        <div class="dialog-msg user">What do you think about AI and freedom?</div>
+        <div class="dialog-msg twin">
+          I think AI will fundamentally change humanity. But I'm more worried about who controls it
+          than about what it can do. Centralized AI is just another form of centralized power.
+          The same way we built Telegram to resist centralized control of communication,
+          we need decentralized AI that no single entity controls.
+        </div>
+        <div class="dialog-msg user">Would you ever shut down Telegram under government pressure?</div>
+        <div class="dialog-msg twin">
+          We are prepared to leave markets that aren't compatible with our principles,
+          because we are not doing this for money. Telegram never shared a single private message
+          with anyone. If authorities demand that, I would rather shut Telegram down in that country.
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+        <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-ton" data-i18n="demo.talkBtn">💬 Talk to Durov in Telegram</a>
+        <button id="mint-durov-btn" class="btn btn-violet" onclick="mintDurovNFT()" data-i18n="demo.mintBtn">🎫 Mint Durov Soul Certificate (free)</button>
       </div>
     </div>
   </div>
@@ -122,572 +180,14 @@
   </div>
 </footer>
 
-<!-- Keep old app section hidden for now (can be removed) -->
-<section id="app" style="display: none;
-  <div class="container">
-
-    <!-- Telegram bot banner (shown when not in Mini App) -->
-    <div class="tg-banner" id="tgBanner">
-      <div class="tg-icon">✈️</div>
-      <div>
-        <strong>Set up your Digital Twin in Telegram</strong>
-        <p>Use <a href="https://t.me/eivatonbot" target="_blank">@eivatonbot</a> to upload your Telegram export and create your twin. Then connect your wallet here to see your Soul Certificates.</p>
-      </div>
-      <a href="https://t.me/eivatonbot" target="_blank" class="btn btn-ton btn-sm">Open @eivatonbot</a>
-    </div>
-
-    <!-- Demo Section: Pavel Durov -->
-    <section class="demo-section" id="demo">
-      <div class="demo-header">
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117"
-             class="demo-avatar" alt="Pavel Durov AI Twin">
-        <div>
-          <h2 data-i18n="demo.title">🎭 Live Demo — Pavel Durov AI Twin</h2>
-          <p data-i18n="demo.subtitle">Built from @durov Telegram channel + Lex Fridman interview</p>
-          <span class="badge" data-i18n="demo.sources">2 sources</span>
-          <span class="badge badge-ton">Soul Certificate ✓</span>
-        </div>
-      </div>
-
-      <!-- Demo Stats -->
-      <div class="demo-stats">
-        <div class="stat">
-          <span class="stat-value">20</span>
-          <span class="stat-label" data-i18n="demo.messages">20 posts indexed</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">87%</span>
-          <span class="stat-label" data-i18n="demo.confidence">87% confidence</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">2</span>
-          <span class="stat-label" data-i18n="demo.sources">2 sources</span>
-        </div>
-      </div>
-
-      <!-- Example dialog -->
-      <div class="demo-dialog">
-        <div class="dialog-msg user">What do you think about AI and freedom?</div>
-        <div class="dialog-msg twin">
-          I think AI will fundamentally change humanity. But I'm more worried about who controls it
-          than about what it can do. Centralized AI is just another form of centralized power.
-          The same way we built Telegram to resist centralized control of communication,
-          we need decentralized AI that no single entity controls.
-        </div>
-        <div class="dialog-msg user">Would you ever shut down Telegram under government pressure?</div>
-        <div class="dialog-msg twin">
-          We are prepared to leave markets that aren't compatible with our principles,
-          because we are not doing this for money. Telegram never shared a single private message
-          with anyone. If authorities demand that, I would rather shut Telegram down in that country.
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
-        <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-ton" data-i18n="demo.talkBtn">💬 Talk to Durov in Telegram</a>
-        <button id="mint-durov-btn" class="btn btn-violet" onclick="mintDurovNFT()" data-i18n="demo.mintBtn">🎫 Mint Durov Soul Certificate (free)</button>
-      </div>
-    </section>
-
-    <div class="app-grid">
-
-      <!-- Wallet Card -->
-      <div class="card">
-        <div class="card-title"><span class="dot"></span> TON Wallet</div>
-        <div id="walletDisconnected">
-          <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px;">Connect your TON wallet to view your Soul Certificates and manage your digital twin.</p>
-          <button class="btn btn-ton" id="connectWalletBtn" style="width:100%">🔗 Connect Wallet</button>
-        </div>
-        <div id="walletConnected" style="display:none">
-          <div class="wallet-info">
-            <img class="wallet-avatar" id="walletAvatar" src="" alt="wallet" />
-            <div>
-              <div class="wallet-addr" id="walletAddr">—</div>
-              <div class="wallet-balance" id="walletBalance">Loading balance...</div>
-            </div>
-            <button class="btn btn-ghost btn-sm" id="disconnectBtn" style="margin-left:auto">Disconnect</button>
-          </div>
-          <div class="stats">
-            <div class="stat"><span class="stat-val" id="statNFTs">0</span><span class="stat-lbl">Soul Certs</span></div>
-            <div class="stat"><span class="stat-val" id="statNetwork">testnet</span><span class="stat-lbl">Network</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Upload Card -->
-      <div class="card">
-        <div class="card-title"><span class="dot" style="background:var(--violet)"></span> Setup Twin</div>
-        <p style="color:var(--muted);font-size:.9rem;margin-bottom:0">The easiest way is via <a href="https://t.me/eivatonbot" style="color:var(--ton)">@eivatonbot</a>. Or upload your export JSON here to prepare it for the bot.</p>
-        <div class="upload-area" id="uploadArea">
-          <div class="upload-icon">📂</div>
-          <strong>Drop result.json here</strong>
-          <p>Telegram Desktop → Settings → Advanced → Export Telegram Data → JSON</p>
-          <input type="file" id="fileInput" accept=".json" />
-        </div>
-        <div id="uploadStatus" class="status-msg"></div>
-        <button class="btn btn-violet" id="uploadBtn" style="width:100%;margin-top:12px;display:none">
-          🚀 Continue in Telegram Bot
-        </button>
-      </div>
-
-    </div>
-
-    <!-- Soul Certificates -->
-    <div class="card" style="margin-top:24px" id="nftSection">
-      <div class="card-title"><span class="dot" style="background:var(--violet)"></span> 🔗 Your Identity on TON</div>
-      <div id="nftEmpty" style="color:var(--muted);font-size:.9rem;padding:20px 0;text-align:center">
-        <div style="font-size:2.5rem;margin-bottom:8px">🔮</div>
-        Your identity, owned by you on TON blockchain.<br/>
-        <br/>
-        Use <a href="https://t.me/eivatonbot" style="color:var(--ton)">@eivatonbot</a> → /mint to create your Soul Certificate NFT.<br/>
-        <span style="font-size:.8rem;color:var(--muted)">Permanent proof of your digital twin on-chain.</span>
-      </div>
-      <div class="nft-grid" id="nftGrid" style="display:none"></div>
-      <div id="nftLoading" style="display:none;text-align:center;padding:20px;color:var(--muted)">
-        <span class="spinner"></span> Loading your Soul Certificates...
-      </div>
-    </div>
-
-    <!-- Twin Settings -->
-    <div class="card" style="margin-top:24px" id="settingsSection">
-      <div class="card-title"><span class="dot" style="background:var(--violet)"></span> ⚙️ Twin Settings</div>
-      <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px" data-i18n="settings">Configure how your digital twin responds</p>
-
-      <div class="settings-grid" style="display:grid;gap:16px">
-        <!-- Twin Mode Toggle -->
-        <div style="padding:12px;background:var(--bg2);border-radius:8px">
-          <label style="display:block;font-weight:500;margin-bottom:8px">🎭 Twin Mode</label>
-          <div style="display:flex;gap:8px">
-            <button id="mode_personal_btn" style="flex:1;padding:8px;background:var(--ton);color:white;border:none;border-radius:4px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" data-i18n="personalMode">🏠 Personal</button>
-            <button id="mode_professional_btn" style="flex:1;padding:8px;background:var(--muted);color:white;border:none;border-radius:4px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" data-i18n="professionalMode">💼 Professional</button>
-          </div>
-          <div style="font-size:.85rem;color:var(--muted);margin-top:8px;text-align:center" id="mode_status">Warm & casual, or professional & measured</div>
-        </div>
-
-        <!-- Signature Phrases Toggle -->
-        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
-          <div>
-            <div style="font-weight:500">Signature phrases</div>
-            <div style="font-size:.85rem;color:var(--muted)">Use your characteristic expressions</div>
-          </div>
-          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
-            <input type="checkbox" id="toggle_signature_phrases" style="opacity:0;width:0;height:0" />
-            <label for="toggle_signature_phrases" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
-              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Formal Mode Toggle -->
-        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
-          <div>
-            <div style="font-weight:500">Formal mode</div>
-            <div style="font-size:.85rem;color:var(--muted)">Professional tone for business contexts</div>
-          </div>
-          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
-            <input type="checkbox" id="toggle_formal_mode" style="opacity:0;width:0;height:0" />
-            <label for="toggle_formal_mode" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
-              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Emoji Toggle -->
-        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
-          <div>
-            <div style="font-weight:500">Emoji in replies</div>
-            <div style="font-size:.85rem;color:var(--muted)">Include emojis naturally</div>
-          </div>
-          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
-            <input type="checkbox" id="toggle_emoji" style="opacity:0;width:0;height:0" />
-            <label for="toggle_emoji" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
-              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Humor Toggle -->
-        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
-          <div>
-            <div style="font-weight:500">Humor</div>
-            <div style="font-size:.85rem;color:var(--muted)">Maintain your sense of humor</div>
-          </div>
-          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
-            <input type="checkbox" id="toggle_humor" style="opacity:0;width:0;height:0" />
-            <label for="toggle_humor" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
-              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Short Responses Toggle -->
-        <div class="setting-item" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border-radius:8px">
-          <div>
-            <div style="font-weight:500">Short responses</div>
-            <div style="font-size:.85rem;color:var(--muted)">Brief answers (1-3 sentences)</div>
-          </div>
-          <div class="toggle" style="position:relative;display:inline-block;width:48px;height:24px">
-            <input type="checkbox" id="toggle_short_responses" style="opacity:0;width:0;height:0" />
-            <label for="toggle_short_responses" style="cursor:pointer;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--muted);border-radius:24px;transition:background .3s;display:flex;align-items:center;padding:0 2px">
-              <div style="width:20px;height:20px;background:white;border-radius:50%;transition:transform .3s"></div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Language Selector -->
-        <div style="padding:12px;background:var(--bg2);border-radius:8px">
-          <label style="display:block;font-weight:500;margin-bottom:8px" data-i18n="language">🌐 Language</label>
-          <select id="language_select" style="width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit">
-            <option value="auto">Auto (detect from user)</option>
-            <option value="en">English</option>
-            <option value="ru">Русский</option>
-          </select>
-        </div>
-      </div>
-
-      <button id="saveSettingsBtn" style="width:100%;margin-top:16px;padding:12px;background:var(--violet);color:white;border:none;border-radius:8px;font-weight:500;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-        💾 Save Settings
-      </button>
-      <div id="settingsSaveStatus" style="margin-top:8px;text-align:center;color:var(--muted);font-size:.9rem;display:none"></div>
-    </div>
-
-    <!-- Personal Cabinet (shown after wallet auth) -->
-    <div id="cabinet" class="cabinet hidden">
-      <h2 style="margin-bottom:24px">👤 My Digital Twin Cabinet</h2>
-
-      <!-- Tab navigation -->
-      <div class="cabinet-tabs">
-        <button class="tab active" onclick="showTab('twin')">👤 My Twin</button>
-        <button class="tab" onclick="showTab('hallucinations')">🤖 Hallucinations</button>
-        <button class="tab" onclick="showTab('nft')">🎫 Soul Certificate</button>
-        <button class="tab" onclick="showTab('confidence')">📊 Confidence</button>
-        <button class="tab" onclick="showTab('privacy')">🔒 Privacy</button>
-      </div>
-
-      <!-- Tab: My Twin -->
-      <div id="tab-twin" class="tab-content active">
-        <p style="color:var(--muted);margin-bottom:16px">Your twin is set up via the Telegram bot.</p>
-        <a href="https://t.me/eivatonbot" class="btn btn-ton" target="_blank" style="display:inline-flex">Open in Telegram →</a>
-      </div>
-
-      <!-- Tab: Hallucinations Control -->
-      <div id="tab-hallucinations" class="tab-content hidden">
-        <h3 style="margin-bottom:8px">🤖 AI Hallucination Control</h3>
-        <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">All AI models hallucinate. Here's how to manage it for your twin.</p>
-
-        <div class="hallucination-info">
-          <h4 style="margin-bottom:12px">What your twin might do:</h4>
-          <ul style="margin-left:20px;color:var(--muted);font-size:.95rem">
-            <li>⚠️ Invent memories that never happened</li>
-            <li>⚠️ Confuse dates and timelines</li>
-            <li>⚠️ Talk about events not in your messages</li>
-            <li>⚠️ Be overly confident about uncertain things</li>
-          </ul>
-        </div>
-
-        <h4 style="margin-top:20px;margin-bottom:12px">Preset Controls:</h4>
-        <div class="preset-controls">
-          <label class="toggle-row">
-            <span>Show uncertainty ("I think..." vs "I remember...")</span>
-            <input type="checkbox" id="ctrl-uncertainty" checked>
-          </label>
-          <label class="toggle-row">
-            <span>Refuse to answer if low confidence</span>
-            <input type="checkbox" id="ctrl-refuse">
-          </label>
-          <label class="toggle-row">
-            <span>Never invent memories</span>
-            <input type="checkbox" id="ctrl-no-invent" checked>
-          </label>
-          <label class="toggle-row">
-            <span>Ask clarifying questions when unsure</span>
-            <input type="checkbox" id="ctrl-clarify" checked>
-          </label>
-        </div>
-
-        <h4 style="margin-top:20px;margin-bottom:8px">Custom Instructions:</h4>
-        <p style="color:var(--muted);font-size:.9rem;margin-bottom:12px">Tell your twin what to avoid, what to emphasize, or how to handle specific topics.</p>
-        <textarea id="custom-instructions" placeholder="Examples:
-- Don't talk about my work at [company name]
-- Always respond in Russian
-- Don't share opinions about politics
-- If asked about my family, keep it brief
-- My memory about dates before 2020 might be wrong" rows="6" style="width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;resize:vertical;margin-bottom:12px"></textarea>
-
-        <div class="preset-examples" style="margin-bottom:16px">
-          <p style="font-size:.9rem;color:var(--muted);margin-bottom:8px">Quick presets:</p>
-          <button onclick="addPreset('Don\\'t make up specific dates or events. If uncertain, say so.')" style="margin:4px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px">No fake dates</button>
-          <button onclick="addPreset('For sensitive personal topics, deflect naturally without revealing details.')" style="margin:4px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px">Privacy protection</button>
-          <button onclick="addPreset('If someone asks about my current location or schedule, always say you\\'re not sure.')" style="margin:4px;padding:6px 12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:6px;cursor:pointer;font-size:12px">Location privacy</button>
-        </div>
-
-        <button class="btn btn-ton" onclick="saveHallucinationSettings()" style="width:100%;padding:12px">💾 Save to Bot</button>
-        <p style="color:var(--muted);font-size:.9rem;margin-top:8px;text-align:center">Settings will sync to your Telegram bot automatically.</p>
-      </div>
-
-      <!-- Tab: Soul Certificate NFT -->
-      <div id="tab-nft" class="tab-content hidden">
-        <div class="nft-card">
-          <div class="nft-card-header">
-            <img id="nft-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user123" class="nft-avatar" alt="Soul Certificate">
-            <div>
-              <h3 id="nft-name" style="margin:0;margin-bottom:4px">Soul Certificate</h3>
-              <p id="nft-address" class="mono" style="color:var(--muted);font-size:.85rem;margin:0">Not minted yet</p>
-            </div>
-          </div>
-          <div class="nft-card-body">
-            <div class="nft-detail">
-              <span class="label">Type</span>
-              <span>Soulbound (TEP-85)</span>
-            </div>
-            <div class="nft-detail">
-              <span class="label">Network</span>
-              <span>TON Testnet</span>
-            </div>
-            <div class="nft-detail">
-              <span class="label">Minted</span>
-              <span id="nft-date">—</span>
-            </div>
-            <div class="nft-detail">
-              <span class="label">Hash</span>
-              <span id="nft-hash" class="mono">—</span>
-            </div>
-          </div>
-          <div class="nft-card-actions" style="display:flex;gap:12px;margin-top:20px">
-            <button class="btn btn-ghost" onclick="window.open('https://testnet.tonscan.org', '_blank')" style="flex:1">View on Tonscan →</button>
-            <a href="https://t.me/eivatonbot?start=mint" class="btn btn-ton" style="flex:1;text-align:center">Mint via Bot →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab: Confidence Chart -->
-      <div id="tab-confidence" class="tab-content hidden">
-        <h3 style="margin-bottom:8px">📊 Personality Confidence</h3>
-        <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">How well does your twin know you? Based on indexed data.</p>
-
-        <div class="confidence-overall">
-          <div class="confidence-bar-container">
-            <div class="confidence-bar" id="overall-bar" style="width: 0%"></div>
-          </div>
-          <span id="overall-pct" style="min-width:50px;text-align:right;font-weight:600">0%</span>
-        </div>
-
-        <div class="confidence-breakdown">
-          <div class="conf-item">
-            <span class="conf-label">Communication style</span>
-            <div class="conf-bar-wrap"><div class="conf-bar high" style="width:85%"></div></div>
-            <span class="conf-tag high">HIGH ✅</span>
-          </div>
-          <div class="conf-item">
-            <span class="conf-label">Sense of humor</span>
-            <div class="conf-bar-wrap"><div class="conf-bar high" style="width:72%"></div></div>
-            <span class="conf-tag high">HIGH ✅</span>
-          </div>
-          <div class="conf-item">
-            <span class="conf-label">Opinions & beliefs</span>
-            <div class="conf-bar-wrap"><div class="conf-bar medium" style="width:55%"></div></div>
-            <span class="conf-tag medium">MEDIUM ✓</span>
-          </div>
-          <div class="conf-item">
-            <span class="conf-label">Personal experiences</span>
-            <div class="conf-bar-wrap"><div class="conf-bar low" style="width:30%"></div></div>
-            <span class="conf-tag low">LOW ⚠️</span>
-          </div>
-          <div class="conf-item">
-            <span class="conf-label">Relationships</span>
-            <div class="conf-bar-wrap"><div class="conf-bar low" style="width:20%"></div></div>
-            <span class="conf-tag low">LOW ⚠️</span>
-          </div>
-        </div>
-
-        <div class="conf-recommendation">
-          💡 <strong>Tip:</strong> Add 1-2 more Telegram exports with <code>/add_source</code> to improve accuracy.
-        </div>
-      </div>
-
-      <!-- Tab: Privacy -->
-      <div id="tab-privacy" class="tab-content hidden">
-        <h3>🔒 Privacy Protection</h3>
-        <p class="caption">Your twin never shares your sensitive data — even if someone asks directly.</p>
-
-        <div class="privacy-always-on">
-          <div class="privacy-badge">🛡️ Always ON — Cannot be disabled</div>
-          <h4>Your twin will NEVER share:</h4>
-          <div class="privacy-grid">
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Passwords & PINs</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Email addresses</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Phone numbers</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Home / work address</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Card / bank numbers</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Passport / ID data</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>API keys & tokens</span>
-            </div>
-            <div class="privacy-item blocked">
-              <span class="privacy-icon">🚫</span>
-              <span>Medical information</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="privacy-how">
-          <h4>How we protect your data:</h4>
-          <div class="privacy-layer">
-            <div class="layer-badge">Layer 1</div>
-            <div>
-              <strong>Parser Filter</strong>
-              <p>Before indexing, messages containing emails, phone numbers, passwords, card numbers are automatically removed. They never enter the AI's memory.</p>
-            </div>
-          </div>
-          <div class="privacy-layer">
-            <div class="layer-badge">Layer 2</div>
-            <div>
-              <strong>AI Instruction Lock</strong>
-              <p>A hardcoded system prompt rule (non-overridable) tells the AI to refuse any request for sensitive personal data, regardless of how the question is phrased.</p>
-            </div>
-          </div>
-          <div class="privacy-layer">
-            <div class="layer-badge">Layer 3</div>
-            <div>
-              <strong>Local Storage Only</strong>
-              <p>Your messages stay on your machine. Only embeddings (numeric vectors) are stored. Raw text is processed locally and never sent to external servers in bulk.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="privacy-custom">
-          <h4>Additional Topics to Protect:</h4>
-          <p class="caption">Add topics you want your twin to avoid entirely.</p>
-          <div class="privacy-tags" id="privacy-tags">
-            <span class="tag-item">Work projects <button onclick="removeTag(this)">×</button></span>
-            <span class="tag-item">Family details <button onclick="removeTag(this)">×</button></span>
-          </div>
-          <div class="tag-input-row">
-            <input type="text" id="new-tag" placeholder="Add topic to protect..." />
-            <button onclick="addPrivacyTag()">+ Add</button>
-          </div>
-        </div>
-
-        <div class="privacy-status">
-          <div class="status-row">
-            <span>🛡️ PII Filter</span>
-            <span class="status-on">ACTIVE</span>
-          </div>
-          <div class="status-row">
-            <span>🔒 AI Privacy Lock</span>
-            <span class="status-on">ACTIVE</span>
-          </div>
-          <div class="status-row">
-            <span>💾 Local Storage</span>
-            <span class="status-on">ENABLED</span>
-          </div>
-          <div class="status-row">
-            <span>☁️ Raw Message Upload</span>
-            <span class="status-off">NEVER</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ── System Status ── -->
-<section class="section" style="background:var(--bg3);padding:40px 20px">
-  <div class="container">
-    <div class="status-section">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:1.2rem">🔗</span>
-        <span style="font-weight:600;color:var(--text)">Network Status</span>
-      </div>
-      <div class="status-items">
-        <div class="status-item">
-          <span class="status-dot" id="botStatus"></span>
-          <span class="status-item-label">Bot: <span id="botStatusText">Online</span></span>
-        </div>
-        <div class="status-item">
-          <span class="status-dot" id="tonStatus"></span>
-          <span class="status-item-label">TON Testnet: <span id="tonStatusText">Syncing</span></span>
-        </div>
-        <div class="status-item">
-          <span class="status-dot" id="blockStatus"></span>
-          <span class="status-item-label">Last Block: <span id="blockStatusText">—</span></span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── Footer ── -->
-<footer>
-  <div class="container">
-    <p style="margin-bottom:12px">
-      <strong>Eiva</strong> — AI Digital Twin Protocol on TON
-    </p>
-    <p>
-      <a href="https://t.me/eivatonbot" target="_blank">@eivatonbot</a> ·
-      <a href="https://github.com/zhenek73/eiva" target="_blank">GitHub</a> ·
-      <a href="https://testnet.tonscan.org" target="_blank">TON Testnet Explorer</a>
-    </p>
-    <p style="margin-top:12px;font-size:.8rem">TON AI Hackathon 2026 · Built with ❤️ on TON</p>
-  </div>
-</footer>
-
-<!-- ── NFT Detail Modal ── -->
-<div class="modal-overlay" id="nftModal">
-  <div class="modal">
-    <button class="modal-close" id="modalClose">✕</button>
-    <h2 id="modalName">Soul Certificate</h2>
-    <img id="modalImg" src="" alt="NFT" />
-    <div class="modal-attr">
-      <strong>NFT Address</strong>
-      <a id="modalAddr" href="#" target="_blank">—</a>
-    </div>
-    <div class="modal-attr">
-      <strong>Metadata</strong>
-      <a id="modalMeta" href="#" target="_blank">—</a>
-    </div>
-    <div class="modal-attr" id="modalDescWrap">
-      <strong>Description</strong>
-      <span id="modalDesc">—</span>
-    </div>
-    <div class="modal-attr" id="modalHashWrap">
-      <strong>Personality Hash</strong>
-      <code id="modalHash" style="font-size:12px;color:var(--ton)">—</code>
-    </div>
-    <div class="modal-links" id="modalLinks"></div>
-  </div>
-</div>
-
-<!-- Scripts -->
 <script src="js/i18n.js"></script>
 <script>
-// Mint Durov NFT demo function
 function mintDurovNFT() {
   const btn = document.getElementById('mint-durov-btn');
   if (btn) {
     btn.textContent = t('demo.mintingMsg');
     btn.disabled = true;
   }
-  // Redirect to bot which handles actual minting
   setTimeout(() => {
     window.open('https://t.me/eivatonbot?start=mint_durov', '_blank');
     if (btn) {
@@ -696,12 +196,6 @@ function mintDurovNFT() {
     }
   }, 1500);
 }
-
-// Try demo in Telegram
-function tryDemoTwin() {
-  window.open('https://t.me/eivatonbot?start=demo', '_blank');
-}
 </script>
-<script src="js/app.js"></script>
 </body>
 </html>

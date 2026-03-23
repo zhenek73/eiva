@@ -14,7 +14,7 @@
 <!-- ── Navbar ── -->
 <nav>
   <div class="nav-inner">
-    <a href="index.html" class="nav-back">← Back to Eiva</a>
+    <a href="index.html" class="nav-back" data-i18n="nav.back">← Back to Eiva</a>
     <span class="nav-title" data-i18n="cabinet.cabinet">My Cabinet</span>
     <div id="wallet-btn" onclick="window.open('https://t.me/eivatonbot', '_blank')">🔗 @eivatonbot</div>
   </div>
@@ -25,9 +25,9 @@
   <div class="connect-prompt">
     <h2 data-i18n="cabinet.connectTitle">Connect your TON Wallet</h2>
     <p data-i18n="cabinet.connectDesc">To access your personal cabinet, connect your TON wallet.</p>
-    <button id="connect-wallet-btn" class="btn-primary">🔗 Connect Wallet</button>
+    <button id="connect-wallet-btn" class="btn-primary" data-i18n="cabinet.connectBtn">🔗 Connect Wallet</button>
     <p class="caption" data-i18n="cabinet.demoMode">Or explore without wallet:</p>
-    <button onclick="loadDemoMode()" class="btn-secondary">👁 View Durov Demo Cabinet</button>
+    <button onclick="loadDemoMode()" class="btn-secondary" data-i18n="cabinet.viewDemo">👁 View Durov Demo Cabinet</button>
   </div>
 </div>
 
@@ -39,7 +39,7 @@
       <div>
         <h2 id="cab-name">My Twin</h2>
         <p id="cab-wallet" class="mono caption"></p>
-        <span id="demo-badge" class="badge hidden">Demo Mode — Pavel Durov</span>
+        <span id="demo-badge" class="badge hidden" data-i18n="cabinet.demoBadge">Demo Mode — Pavel Durov</span>
       </div>
     </div>
 
@@ -80,8 +80,8 @@
       </div>
 
       <div class="twin-actions">
-        <a href="https://t.me/eivatonbot" class="btn-primary" target="_blank">💬 Open in Telegram →</a>
-        <button class="btn-secondary" onclick="showTab('nft')">🎫 View Soul Certificate</button>
+        <a href="https://t.me/eivatonbot" class="btn-primary" target="_blank" data-i18n="twin.openTelegram">💬 Open in Telegram →</a>
+        <button class="btn-secondary" onclick="showTab('nft')" data-i18n="twin.viewCert">🎫 View Soul Certificate</button>
       </div>
     </div>
 
@@ -233,10 +233,10 @@
       </div>
 
       <div class="privacy-status">
-        <div class="status-row"><span data-i18n="priv.piiFilter">🛡️ PII Filter</span><span class="status-on">ACTIVE</span></div>
-        <div class="status-row"><span data-i18n="priv.aiLock">🔒 AI Privacy Lock</span><span class="status-on">ACTIVE</span></div>
-        <div class="status-row"><span data-i18n="priv.localStorage">💾 Local Storage</span><span class="status-on">ENABLED</span></div>
-        <div class="status-row"><span data-i18n="priv.noUpload">☁️ Raw Message Upload</span><span class="status-off">NEVER</span></div>
+        <div class="status-row"><span data-i18n="priv.piiFilter">🛡️ PII Filter</span><span class="status-on" data-i18n="status.active">ACTIVE</span></div>
+        <div class="status-row"><span data-i18n="priv.aiLock">🔒 AI Privacy Lock</span><span class="status-on" data-i18n="status.active">ACTIVE</span></div>
+        <div class="status-row"><span data-i18n="priv.localStorage">💾 Local Storage</span><span class="status-on" data-i18n="status.enabled">ENABLED</span></div>
+        <div class="status-row"><span data-i18n="priv.noUpload">☁️ Raw Message Upload</span><span class="status-off" data-i18n="status.never">NEVER</span></div>
       </div>
     </div>
   </div>

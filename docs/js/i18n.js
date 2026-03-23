@@ -126,7 +126,35 @@ const TRANSLATIONS = {
     "footer.built": "Built for TON AI Hackathon 2026",
     "footer.github": "GitHub",
     "footer.bot": "Telegram Bot",
-    "footer.cabinet": "Open Cabinet"
+    "footer.cabinet": "Open Cabinet",
+
+    // How it works subtitle
+    "how.subtitle": "Four steps from your Telegram history to a living, blockchain-anchored digital twin",
+
+    // Nav back
+    "nav.back": "← Back to Eiva",
+
+    // Cabinet nav & connect screen
+    "cabinet.cabinet": "My Cabinet",
+    "cabinet.connectBtn": "🔗 Connect Wallet",
+    "cabinet.viewDemo": "👁 View Durov Demo Cabinet",
+    "cabinet.demoBadge": "Demo Mode — Pavel Durov",
+
+    // Twin tab actions
+    "twin.openTelegram": "💬 Open in Telegram →",
+    "twin.viewCert": "🎫 View Soul Certificate",
+    "twin.modePersonal": "Personal",
+    "twin.modeProfessional": "Professional",
+
+    // Status labels
+    "status.active": "ACTIVE",
+    "status.enabled": "ENABLED",
+    "status.never": "NEVER",
+
+    // Demo dialog labels
+    "demo.dialogLabel": "Example conversation:",
+    "demo.userLabel": "You:",
+    "demo.twinLabel": "Durov twin:"
   },
 
   ru: {
@@ -251,7 +279,35 @@ const TRANSLATIONS = {
     "footer.built": "Создано для TON AI Хакатон 2026",
     "footer.github": "GitHub",
     "footer.bot": "Telegram Бот",
-    "footer.cabinet": "Открыть кабинет"
+    "footer.cabinet": "Открыть кабинет",
+
+    // How it works subtitle
+    "how.subtitle": "Четыре шага от истории чатов до живого цифрового двойника на блокчейне",
+
+    // Nav back
+    "nav.back": "← Назад",
+
+    // Cabinet nav & connect screen
+    "cabinet.cabinet": "Мой кабинет",
+    "cabinet.connectBtn": "🔗 Подключить кошелёк",
+    "cabinet.viewDemo": "👁 Демо кабинет Дурова",
+    "cabinet.demoBadge": "Демо — Павел Дуров",
+
+    // Twin tab actions
+    "twin.openTelegram": "💬 Открыть в Telegram →",
+    "twin.viewCert": "🎫 Soul Certificate",
+    "twin.modePersonal": "Личный",
+    "twin.modeProfessional": "Профессиональный",
+
+    // Status labels
+    "status.active": "АКТИВЕН",
+    "status.enabled": "ВКЛЮЧЕНО",
+    "status.never": "НИКОГДА",
+
+    // Demo dialog labels
+    "demo.dialogLabel": "Пример разговора:",
+    "demo.userLabel": "Вы:",
+    "demo.twinLabel": "Двойник Дурова:"
   }
 };
 
