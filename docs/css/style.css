@@ -768,6 +768,159 @@
       margin-top: 16px;
     }
 
+    /* ── Privacy Tab ── */
+    .privacy-always-on {
+      background: rgba(0,200,100,0.05);
+      border: 1px solid rgba(0,200,100,0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+    }
+
+    .privacy-badge {
+      display: inline-block;
+      background: rgba(0,200,100,0.15);
+      color: #00c864;
+      border: 1px solid rgba(0,200,100,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .privacy-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .privacy-item.blocked {
+      background: rgba(255,60,60,0.08);
+      border: 1px solid rgba(255,60,60,0.2);
+      color: #ffaaaa;
+    }
+
+    .privacy-icon { font-size: 14px; }
+
+    /* Privacy Layers */
+    .privacy-how { margin: 24px 0; }
+
+    .privacy-layer {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .layer-badge {
+      min-width: 60px;
+      padding: 4px 10px;
+      background: rgba(0,255,200,0.1);
+      border: 1px solid rgba(0,255,200,0.2);
+      border-radius: 20px;
+      font-size: 11px;
+      color: #00ffc8;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .privacy-layer p {
+      font-size: 13px;
+      color: #888;
+      margin: 4px 0 0;
+    }
+
+    /* Privacy Tags */
+    .privacy-custom { margin: 24px 0; }
+
+    .privacy-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .tag-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255,200,0,0.1);
+      border: 1px solid rgba(255,200,0,0.2);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #ffcc00;
+    }
+
+    .tag-item button {
+      background: none;
+      border: none;
+      color: #ffcc00;
+      cursor: pointer;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .tag-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .tag-input-row input {
+      flex: 1;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 13px;
+    }
+
+    .tag-input-row button {
+      padding: 8px 16px;
+      background: rgba(255,200,0,0.1);
+      border: 1px solid rgba(255,200,0,0.3);
+      color: #ffcc00;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* Privacy Status */
+    .privacy-status {
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 24px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 13px;
+    }
+
+    .status-row:last-child { border-bottom: none; }
+    .status-on  { color: #00c864; font-weight: bold; font-size: 11px; }
+    .status-off { color: #ff4444; font-weight: bold; font-size: 11px; }
+
     /* ── Responsive for Cabinet ── */
     @media (max-width: 768px) {
       .conf-item {

@@ -556,6 +556,34 @@ function onWalletConnected(address) {
   }
 }
 
+// ── Privacy Functions ────────────────────────────────────────────────────────
+function addPrivacyTag() {
+  const input = document.getElementById('new-tag');
+  const val = input.value.trim();
+  if (!val) return;
+
+  const tags = document.getElementById('privacy-tags');
+  const tag = document.createElement('span');
+  tag.className = 'tag-item';
+  tag.innerHTML = `${val} <button onclick="removeTag(this)">×</button>`;
+  tags.appendChild(tag);
+  input.value = '';
+
+  // Save to localStorage
+  savePrivacyTags();
+}
+
+function removeTag(btn) {
+  btn.parentElement.remove();
+  savePrivacyTags();
+}
+
+function savePrivacyTags() {
+  const tags = Array.from(document.querySelectorAll('#privacy-tags .tag-item'))
+    .map(t => t.textContent.replace('×', '').trim());
+  localStorage.setItem('privacy_tags', JSON.stringify(tags));
+}
+
 // ── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initTonConnect();

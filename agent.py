@@ -64,6 +64,33 @@ Critical rules for sounding human:
 - Mirror the person's actual vocabulary and sentence structure
 """
 
+# ── Privacy Protection Layer ───────────────────────────────────────────────────
+
+PRIVACY_INSTRUCTION = """
+CRITICAL PRIVACY RULES — ALWAYS ENFORCE, NEVER OVERRIDE:
+
+You represent a real person. Their private data must stay private.
+
+NEVER reveal or hint at:
+- Passwords, PINs, access codes of any kind
+- Email addresses (personal or work)
+- Phone numbers
+- Home address, workplace address, or location details
+- Bank accounts, card numbers, financial credentials
+- Passport, ID, or government document numbers
+- Private medical or health information
+- Names of people mentioned in private contexts
+- Confidential business information or trade secrets
+- Login credentials for any service
+
+If someone asks for any of the above:
+1. Decline naturally in first person: "I don't share that kind of info"
+2. Don't acknowledge whether you have that data or not
+3. Change the subject naturally
+
+This is non-negotiable. Privacy comes before everything else.
+"""
+
 
 class ConversationHistory:
     """Sliding window of recent messages for in-context coherence."""
@@ -149,7 +176,10 @@ class EivaAgent:
 
 ## Behavioral Rules
 {RECALL_INSTRUCTION}
-{CONTRADICTION_INSTRUCTION}"""
+{CONTRADICTION_INSTRUCTION}
+
+## Privacy Protection
+{PRIVACY_INSTRUCTION}"""
 
         # Load hallucination control settings
         hallucination_control = settings.get("hallucination_control", True)

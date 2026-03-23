@@ -50,6 +50,41 @@ def _is_meaningful(text: str) -> bool:
     return True
 
 
+# PII patterns — never index these
+_PII_PATTERNS = [
+    re.compile(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b"),   # email
+    re.compile(r"\b(?:\+7|8|7)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}\b"),  # RU phone
+    re.compile(r"\+\d{7,15}"),                                                 # international phone
+    re.compile(r"\b(?:пароль|password|passwd|pwd)\s*[:=]\s*\S+", re.I),       # password: xxx
+    re.compile(r"\b(?:токен|token|api[_\s]?key|secret)\s*[:=]\s*\S+", re.I), # tokens/keys
+    re.compile(r"\b\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b"),           # card number
+    re.compile(r"\b\d{3}[\s\-]?\d{2}[\s\-]?\d{4}\b"),                        # SSN-like
+    re.compile(r"\b(?:cvv|cvc|cvc2)\s*[:=]?\s*\d{3,4}\b", re.I),             # CVV
+    re.compile(r"\bpassport\s*(?:no|number|#)?\s*[:=]?\s*[A-Z0-9]{6,10}\b", re.I),  # passport
+]
+
+_PII_KEYWORDS = [
+    "мой пароль", "my password", "введи пароль", "enter password",
+    "секретный ключ", "secret key", "приватный ключ", "private key",
+    "номер карты", "card number", "cvv", "cvc",
+    "серия паспорта", "passport series",
+    "инн", "снилс", "iban",
+]
+
+
+def _contains_pii(text: str) -> bool:
+    """Return True if text appears to contain sensitive personal data."""
+    lower = text.lower()
+    # Check keyword hints
+    if any(kw in lower for kw in _PII_KEYWORDS):
+        return True
+    # Check regex patterns
+    for pattern in _PII_PATTERNS:
+        if pattern.search(text):
+            return True
+    return False
+
+
 def parse_export(json_path: str | Path, owner_name: str) -> list[Message]:
     """
     Parse one Telegram JSON export file.
@@ -79,6 +114,8 @@ def parse_export(json_path: str | Path, owner_name: str) -> list[Message]:
         text = _extract_text(msg.get("text", ""))
         if not _is_meaningful(text):
             continue
+        if _contains_pii(text):
+            continue  # Never index sensitive personal data
 
         messages.append(Message(
             id=msg.get("id", 0),

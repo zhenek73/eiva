@@ -136,9 +136,23 @@ eiva-bot/
 
 ---
 
-## Privacy
+## Privacy & Data Protection
 
-Raw messages stay on your machine. Only embeddings (local ChromaDB) and a short sample for personality extraction (via OpenRouter API) leave the device. On-chain: SHA-256 hash only — no messages, no personal data.
+Your data has three layers of protection:
+
+**Layer 1 — Parser Filter (before indexing)**
+Messages containing emails, phone numbers, passwords, card numbers, API keys, and passport data are automatically filtered out before entering the AI's memory. They never get indexed.
+
+**Layer 2 — AI Instruction Lock (non-overridable)**
+A hardcoded system prompt rule tells your twin to refuse any request for sensitive personal data — regardless of how the question is phrased. This cannot be turned off.
+
+**Layer 3 — Local Storage**
+Your raw messages never leave your machine. Only embeddings (numeric vectors) are stored in ChromaDB locally. The only external call is a short sample sent to OpenRouter for personality extraction — no bulk message upload.
+
+**What your twin will NEVER share:**
+passwords · emails · phone numbers · home address · bank/card data · passport/ID · API keys · medical info
+
+**On-chain:** Only a SHA-256 hash of your personality profile is stored on TON — no personal content.
 
 ---
 

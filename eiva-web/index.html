@@ -319,6 +319,7 @@
         <button class="tab" onclick="showTab('hallucinations')">🤖 Hallucinations</button>
         <button class="tab" onclick="showTab('nft')">🎫 Soul Certificate</button>
         <button class="tab" onclick="showTab('confidence')">📊 Confidence</button>
+        <button class="tab" onclick="showTab('privacy')">🔒 Privacy</button>
       </div>
 
       <!-- Tab: My Twin -->
@@ -459,6 +460,108 @@
 
         <div class="conf-recommendation">
           💡 <strong>Tip:</strong> Add 1-2 more Telegram exports with <code>/add_source</code> to improve accuracy.
+        </div>
+      </div>
+
+      <!-- Tab: Privacy -->
+      <div id="tab-privacy" class="tab-content hidden">
+        <h3>🔒 Privacy Protection</h3>
+        <p class="caption">Your twin never shares your sensitive data — even if someone asks directly.</p>
+
+        <div class="privacy-always-on">
+          <div class="privacy-badge">🛡️ Always ON — Cannot be disabled</div>
+          <h4>Your twin will NEVER share:</h4>
+          <div class="privacy-grid">
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Passwords & PINs</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Email addresses</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Phone numbers</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Home / work address</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Card / bank numbers</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Passport / ID data</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>API keys & tokens</span>
+            </div>
+            <div class="privacy-item blocked">
+              <span class="privacy-icon">🚫</span>
+              <span>Medical information</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="privacy-how">
+          <h4>How we protect your data:</h4>
+          <div class="privacy-layer">
+            <div class="layer-badge">Layer 1</div>
+            <div>
+              <strong>Parser Filter</strong>
+              <p>Before indexing, messages containing emails, phone numbers, passwords, card numbers are automatically removed. They never enter the AI's memory.</p>
+            </div>
+          </div>
+          <div class="privacy-layer">
+            <div class="layer-badge">Layer 2</div>
+            <div>
+              <strong>AI Instruction Lock</strong>
+              <p>A hardcoded system prompt rule (non-overridable) tells the AI to refuse any request for sensitive personal data, regardless of how the question is phrased.</p>
+            </div>
+          </div>
+          <div class="privacy-layer">
+            <div class="layer-badge">Layer 3</div>
+            <div>
+              <strong>Local Storage Only</strong>
+              <p>Your messages stay on your machine. Only embeddings (numeric vectors) are stored. Raw text is processed locally and never sent to external servers in bulk.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="privacy-custom">
+          <h4>Additional Topics to Protect:</h4>
+          <p class="caption">Add topics you want your twin to avoid entirely.</p>
+          <div class="privacy-tags" id="privacy-tags">
+            <span class="tag-item">Work projects <button onclick="removeTag(this)">×</button></span>
+            <span class="tag-item">Family details <button onclick="removeTag(this)">×</button></span>
+          </div>
+          <div class="tag-input-row">
+            <input type="text" id="new-tag" placeholder="Add topic to protect..." />
+            <button onclick="addPrivacyTag()">+ Add</button>
+          </div>
+        </div>
+
+        <div class="privacy-status">
+          <div class="status-row">
+            <span>🛡️ PII Filter</span>
+            <span class="status-on">ACTIVE</span>
+          </div>
+          <div class="status-row">
+            <span>🔒 AI Privacy Lock</span>
+            <span class="status-on">ACTIVE</span>
+          </div>
+          <div class="status-row">
+            <span>💾 Local Storage</span>
+            <span class="status-on">ENABLED</span>
+          </div>
+          <div class="status-row">
+            <span>☁️ Raw Message Upload</span>
+            <span class="status-off">NEVER</span>
+          </div>
         </div>
       </div>
     </div>

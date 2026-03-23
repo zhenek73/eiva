@@ -14,6 +14,8 @@ The more you feed it, the better it gets.
 
 Your AI self — owned by you on TON.
 
+And your data stays yours — private, local, protected.
+
 ---
 
 ## 2 Minutes
@@ -49,6 +51,16 @@ You own it completely on TON blockchain.
 
 This isn't about creating a digital zombie.
 It's about creating a persistent, honest digital extension of yourself.
+
+**4. Privacy by Design**
+Most AI products send your data to their servers.
+We don't.
+
+Your messages stay on your machine.
+A PII filter removes passwords, emails, phone numbers before indexing.
+The AI has a hardcoded rule: never share sensitive data, no matter how you ask.
+
+Your twin is your digital self — not a data leak.
 
 ---
 
