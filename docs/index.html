@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eiva — AI Digital Twin on TON</title>
   <meta name="description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
-  <!-- Open Graph -->
   <meta property="og:title" content="Eiva — Your AI Self — owned by you" />
   <meta property="og:description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
-  <meta property="og:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=0d0d1a" />
+  <meta property="og:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=020409" />
   <meta property="og:url" content="https://zhenek73.github.io/eiva/" />
   <meta property="og:type" content="website" />
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Eiva — Your AI Self — owned by you" />
   <meta name="twitter:description" content="Turn your Telegram history into a living AI. Verifiable on TON blockchain." />
-  <meta name="twitter:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=0d0d1a" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>" />
+  <meta name="twitter:image" content="https://api.dicebear.com/9.x/pixel-art/png?seed=eiva&size=512&backgroundColor=020409" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -25,8 +23,8 @@
 <nav>
   <div class="nav-inner">
     <a href="index.html" class="logo">
-      <span class="logo-icon">👤</span>
-      <span>Eiva</span>
+      <div class="logo-glyph">⬡</div>
+      <span class="logo-text">Eiva</span>
     </a>
     <div class="nav-links">
       <a href="#how" class="nav-link" data-i18n="nav.howItWorks">How it works</a>
@@ -36,44 +34,56 @@
         <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
         <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
       </div>
-      <a href="app.html" class="btn btn-ton btn-sm" data-i18n="nav.cabinet">Open Cabinet →</a>
+      <a href="app.html" class="btn btn-primary btn-sm" data-i18n="nav.cabinet">Open Cabinet →</a>
     </div>
   </div>
 </nav>
 
 <!-- ── Hero ── -->
 <section class="hero" id="top">
-  <div class="hero-badge" data-i18n="hero.tag">TON AI Hackathon 2026</div>
-  <h1 data-i18n="hero.title">Your AI Self — owned by you</h1>
-  <p data-i18n="hero.subtitle">Turn your Telegram history into a living AI. Verifiable on TON blockchain.</p>
-  <div class="hero-cta">
-    <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-ton" data-i18n="hero.tryDemo">🤖 Try Demo in Telegram</a>
-    <a href="app.html" class="btn btn-ghost" data-i18n="hero.openCabinet">Open Your Cabinet →</a>
+  <!-- Neural network particles background -->
+  <div id="particles-js"></div>
+  <!-- Glow orb -->
+  <div class="hero-orb"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span data-i18n="hero.tag">TON AI Hackathon 2026</span>
+    </div>
+    <h1 data-i18n="hero.title">Your AI Self — owned by you</h1>
+    <p class="hero-sub" data-i18n="hero.subtitle">Turn your Telegram history into a living AI. Verifiable on TON blockchain.</p>
+    <div class="hero-cta">
+      <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-cyan" data-i18n="hero.tryDemo">🤖 Try Demo in Telegram</a>
+      <a href="app.html" class="btn btn-ghost" data-i18n="hero.openCabinet">Open Your Cabinet →</a>
+    </div>
   </div>
+  <div class="hero-cubes"></div>
 </section>
 
 <!-- ── How it works ── -->
-<section class="section" id="how">
+<section class="section section-alt" id="how">
   <div class="container">
+    <div class="section-eyebrow" data-i18n="how.eyebrow">Process</div>
     <h2 class="section-title" data-i18n="how.title">How It Works</h2>
     <p class="section-sub" data-i18n="how.subtitle">Four steps from your Telegram history to a living, blockchain-anchored digital twin</p>
-    <div class="steps">
-      <div class="step">
+    <div class="steps steps-flow">
+      <div class="step" data-aos="fade-up" data-aos-delay="0">
         <div class="step-num">1</div>
         <h3 data-i18n="how.step1">Upload</h3>
         <p data-i18n="how.step1desc">Your Telegram chat export</p>
       </div>
-      <div class="step">
+      <div class="step" data-aos="fade-up" data-aos-delay="100">
         <div class="step-num">2</div>
         <h3 data-i18n="how.step2">AI Extracts</h3>
-        <p data-i18n="how.step2desc">Your personality & memory</p>
+        <p data-i18n="how.step2desc">Your personality &amp; memory</p>
       </div>
-      <div class="step">
+      <div class="step" data-aos="fade-up" data-aos-delay="200">
         <div class="step-num">3</div>
         <h3 data-i18n="how.step3">Twin Responds</h3>
         <p data-i18n="how.step3desc">In your authentic voice</p>
       </div>
-      <div class="step">
+      <div class="step" data-aos="fade-up" data-aos-delay="300">
         <div class="step-num">4</div>
         <h3 data-i18n="how.step4">Mint NFT</h3>
         <p data-i18n="how.step4desc">Own your identity on TON</p>
@@ -83,12 +93,19 @@
 </section>
 
 <!-- ── Demo: Pavel Durov AI Twin ── -->
-<section class="section" id="demo" style="background: var(--bg2);">
+<section class="section" id="demo">
   <div class="container">
-    <div class="demo-section">
+    <div class="section-eyebrow" data-i18n="demo.eyebrow">Live Demo</div>
+    <h2 class="section-title" data-i18n="demo.titleSection">See it in action</h2>
+
+    <div class="demo-section" data-aos="fade-up">
       <div class="demo-header">
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117"
-             class="demo-avatar" alt="Pavel Durov AI Twin">
+        <div class="demo-avatar-wrap">
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=020409"
+               class="demo-avatar" alt="Pavel Durov AI Twin">
+          <div class="demo-avatar-ring"></div>
+          <div class="demo-avatar-dot"></div>
+        </div>
         <div>
           <h2 data-i18n="demo.title">🎭 Live Demo — Pavel Durov AI Twin</h2>
           <p data-i18n="demo.subtitle">Built from @durov Telegram channel + Lex Fridman interview</p>
@@ -97,19 +114,19 @@
         </div>
       </div>
 
-      <!-- Demo Stats -->
+      <!-- Stats -->
       <div class="demo-stats">
         <div class="stat">
-          <span class="stat-value">20</span>
-          <span class="stat-label" data-i18n="demo.messages">20 posts indexed</span>
+          <span class="stat-value" id="stat-posts">20</span>
+          <span class="stat-label" data-i18n="demo.messages">posts indexed</span>
         </div>
         <div class="stat">
-          <span class="stat-value">87%</span>
-          <span class="stat-label" data-i18n="demo.confidence">87% confidence</span>
+          <span class="stat-value" id="stat-conf">87%</span>
+          <span class="stat-label" data-i18n="demo.confidence">confidence</span>
         </div>
         <div class="stat">
-          <span class="stat-value">2</span>
-          <span class="stat-label" data-i18n="demo.sources">2 sources</span>
+          <span class="stat-value" id="stat-src">2</span>
+          <span class="stat-label" data-i18n="demo.sources">sources</span>
         </div>
         <div class="stat">
           <span class="stat-value">TON</span>
@@ -117,11 +134,12 @@
         </div>
       </div>
 
-      <!-- Example dialog -->
-      <p class="caption" style="margin-bottom:10px" data-i18n="demo.dialogLabel">Example conversation:</p>
+      <!-- Dialog -->
+      <p class="caption" style="margin-bottom: 10px" data-i18n="demo.dialogLabel">Example conversation:</p>
       <div class="demo-dialog">
         <div class="dialog-msg user">What do you think about AI and freedom?</div>
         <div class="dialog-msg twin">
+          <div class="twin-label">Durov Twin</div>
           I think AI will fundamentally change humanity. But I'm more worried about who controls it
           than about what it can do. Centralized AI is just another form of centralized power.
           The same way we built Telegram to resist centralized control of communication,
@@ -129,14 +147,15 @@
         </div>
         <div class="dialog-msg user">Would you ever shut down Telegram under government pressure?</div>
         <div class="dialog-msg twin">
+          <div class="twin-label">Durov Twin</div>
           We are prepared to leave markets that aren't compatible with our principles,
           because we are not doing this for money. Telegram never shared a single private message
           with anyone. If authorities demand that, I would rather shut Telegram down in that country.
         </div>
       </div>
 
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
-        <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-ton" data-i18n="demo.talkBtn">💬 Talk to Durov in Telegram</a>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;">
+        <a href="https://t.me/eivatonbot?start=demo" target="_blank" class="btn btn-primary" data-i18n="demo.talkBtn">💬 Talk to Durov in Telegram</a>
         <button id="mint-durov-btn" class="btn btn-violet" onclick="mintDurovNFT()" data-i18n="demo.mintBtn">🎫 Mint Durov Soul Certificate (free)</button>
       </div>
     </div>
@@ -144,24 +163,29 @@
 </section>
 
 <!-- ── Why TON ── -->
-<section class="section">
+<section class="section section-alt">
   <div class="container">
+    <div class="section-eyebrow" data-i18n="why.eyebrow">Technology</div>
     <h2 class="section-title" data-i18n="why.title">Why TON?</h2>
-    <div class="steps" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
-      <div class="step">
-        <div style="font-size: 2rem; margin-bottom: 12px;">✈️</div>
+    <div class="features-grid">
+      <div class="feature-card" data-aos="zoom-in" data-aos-delay="0">
+        <span class="feature-icon">✈️</span>
+        <h3 data-i18n="why.h1">Telegram Native</h3>
         <p data-i18n="why.point1">Telegram distribution — zero acquisition cost</p>
       </div>
-      <div class="step">
-        <div style="font-size: 2rem; margin-bottom: 12px;">🔗</div>
+      <div class="feature-card" data-aos="zoom-in" data-aos-delay="80">
+        <span class="feature-icon">🔗</span>
+        <h3 data-i18n="why.h2">Built-in Wallet</h3>
         <p data-i18n="why.point2">TON Wallet built into Telegram — frictionless</p>
       </div>
-      <div class="step">
-        <div style="font-size: 2rem; margin-bottom: 12px;">⚡</div>
+      <div class="feature-card" data-aos="zoom-in" data-aos-delay="160">
+        <span class="feature-icon">⚡</span>
+        <h3 data-i18n="why.h3">Low Gas Fees</h3>
         <p data-i18n="why.point3">Low gas fees — identity operations are cheap</p>
       </div>
-      <div class="step">
-        <div style="font-size: 2rem; margin-bottom: 12px;">👑</div>
+      <div class="feature-card" data-aos="zoom-in" data-aos-delay="240">
+        <span class="feature-icon">👑</span>
+        <h3 data-i18n="why.h4">True Ownership</h3>
         <p data-i18n="why.point4">True ownership — no company can revoke your NFT</p>
       </div>
     </div>
@@ -170,9 +194,9 @@
 
 <!-- ── Footer ── -->
 <footer>
-  <div class="container" style="text-align: center;">
+  <div class="container">
     <p data-i18n="footer.built">Built for TON AI Hackathon 2026</p>
-    <div style="margin-top: 16px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; font-size: 14px;">
+    <div class="footer-links">
       <a href="https://github.com/zhenek73/eiva" target="_blank" data-i18n="footer.github">GitHub</a>
       <a href="https://t.me/eivatonbot" target="_blank" data-i18n="footer.bot">Telegram Bot</a>
       <a href="app.html" data-i18n="footer.cabinet">Open Cabinet</a>
@@ -180,8 +204,73 @@
   </div>
 </footer>
 
+<!-- Particles.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 <script src="js/i18n.js"></script>
+
 <script>
+/* ── Particles Neural Network ── */
+particlesJS('particles-js', {
+  particles: {
+    number: { value: 70, density: { enable: true, value_area: 900 } },
+    color: { value: ['#00e5ff', '#0098ea', '#8b5cf6'] },
+    shape: { type: 'circle' },
+    opacity: { value: 0.4, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.1 } },
+    size: { value: 2, random: true },
+    line_linked: {
+      enable: true, distance: 160,
+      color: '#00e5ff', opacity: 0.12, width: 1
+    },
+    move: {
+      enable: true, speed: 0.6, direction: 'none',
+      random: true, straight: false, out_mode: 'out',
+      attract: { enable: false }
+    }
+  },
+  interactivity: {
+    detect_on: 'canvas',
+    events: {
+      onhover: { enable: true, mode: 'grab' },
+      onclick: { enable: true, mode: 'push' },
+      resize: true
+    },
+    modes: {
+      grab: { distance: 180, line_linked: { opacity: 0.5 } },
+      push: { particles_nb: 3 }
+    }
+  },
+  retina_detect: true
+});
+
+/* ── AOS scroll animations (lightweight built-in) ── */
+function initAOS() {
+  const items = document.querySelectorAll('[data-aos]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const delay = parseInt(e.target.dataset.aosDelay || 0);
+        setTimeout(() => e.target.classList.add('aos-animate'), delay);
+      }
+    });
+  }, { threshold: 0.15 });
+  items.forEach(el => observer.observe(el));
+}
+
+/* ── Counter animation for stats ── */
+function animateCounter(el, target, duration) {
+  const isPercent = String(target).includes('%');
+  const num = parseInt(target);
+  const start = performance.now();
+  function update(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * num) + (isPercent ? '%' : '');
+    if (t < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+/* ── Mint function ── */
 function mintDurovNFT() {
   const btn = document.getElementById('mint-durov-btn');
   if (btn) {
@@ -196,6 +285,24 @@ function mintDurovNFT() {
     }
   }, 1500);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAOS();
+
+  // Animate stats when they come into view
+  const statsSection = document.querySelector('.demo-stats');
+  if (statsSection) {
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        animateCounter(document.getElementById('stat-posts'), 20, 800);
+        animateCounter(document.getElementById('stat-conf'), '87%', 1200);
+        animateCounter(document.getElementById('stat-src'), 2, 600);
+        io.disconnect();
+      }
+    }, { threshold: 0.5 });
+    io.observe(statsSection);
+  }
+});
 </script>
 </body>
 </html>

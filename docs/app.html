@@ -8,6 +8,15 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/app.css">
+  <style>
+    /* Subtle animated background for cabinet */
+    body::after {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(ellipse 50% 40% at 10% 30%, rgba(0,229,255,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 50% at 90% 70%, rgba(139,92,246,0.04) 0%, transparent 60%);
+    }
+  </style>
 </head>
 <body>
 
@@ -23,6 +32,7 @@
 <!-- ── NOT CONNECTED STATE ── -->
 <div id="not-connected">
   <div class="connect-prompt">
+    <span class="connect-icon">⬡</span>
     <h2 data-i18n="cabinet.connectTitle">Connect your TON Wallet</h2>
     <p data-i18n="cabinet.connectDesc">To access your personal cabinet, connect your TON wallet.</p>
     <button id="connect-wallet-btn" class="btn-primary" data-i18n="cabinet.connectBtn">🔗 Connect Wallet</button>

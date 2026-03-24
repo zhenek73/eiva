@@ -130,6 +130,18 @@ const TRANSLATIONS = {
 
     // How it works subtitle
     "how.subtitle": "Four steps from your Telegram history to a living, blockchain-anchored digital twin",
+    "how.eyebrow": "Process",
+
+    // Demo section
+    "demo.eyebrow": "Live Demo",
+    "demo.titleSection": "See it in action",
+
+    // Why TON headings
+    "why.eyebrow": "Technology",
+    "why.h1": "Telegram Native",
+    "why.h2": "Built-in Wallet",
+    "why.h3": "Low Gas Fees",
+    "why.h4": "True Ownership",
 
     // Nav back
     "nav.back": "← Back to Eiva",
@@ -283,6 +295,18 @@ const TRANSLATIONS = {
 
     // How it works subtitle
     "how.subtitle": "Четыре шага от истории чатов до живого цифрового двойника на блокчейне",
+    "how.eyebrow": "Процесс",
+
+    // Demo section
+    "demo.eyebrow": "Демо",
+    "demo.titleSection": "Посмотри как это работает",
+
+    // Why TON headings
+    "why.eyebrow": "Технология",
+    "why.h1": "Нативно в Telegram",
+    "why.h2": "Встроенный кошелёк",
+    "why.h3": "Низкие комиссии",
+    "why.h4": "Настоящее владение",
 
     // Nav back
     "nav.back": "← Назад",
