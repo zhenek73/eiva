@@ -13,7 +13,7 @@ from pydantic import BaseModel
 import uvicorn
 
 import config as Config
-from parser import TelegramParser
+import parser as telegram_parser
 from personality import PersonalityExtractor
 from embeddings import EmbeddingsStore
 from agent import DigitalTwinAgent
@@ -148,8 +148,8 @@ async def upload_export(
         temp_path.write_bytes(contents)
 
         # Parse messages
-        parser = TelegramParser()
-        messages, owner_name = parser.parse(str(temp_path))
+        owner_name = telegram_parser.detect_owner_name(str(temp_path)) or "Unknown"
+        messages = telegram_parser.parse_export(str(temp_path), owner_name)
         if not messages:
             raise HTTPException(status_code=422, detail="No messages found in export")
 
