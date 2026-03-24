@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 
-from config import Config
+import config as Config
 from parser import TelegramParser
 from personality import PersonalityExtractor
 from embeddings import EmbeddingsStore
