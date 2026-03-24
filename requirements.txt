@@ -6,3 +6,7 @@ python-dotenv>=1.0.0
 tonsdk>=1.0.14
 tonutils>=2.0.4
 pytoniq-core>=0.1.36
+# Web API
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
