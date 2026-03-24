@@ -1,0 +1,51 @@
+name: Deploy to TimeWeb VPS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      # Trigger only when backend code changes (not docs/web)
+      - 'eiva-bot/**.py'
+      - 'eiva-bot/requirements.txt'
+      - 'eiva-bot/locales/**'
+      - 'eiva-bot/deploy/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+          script: |
+            cd /var/www/eiva-bot
+            git pull origin main
+            cd eiva-bot
+            source venv/bin/activate
+            pip install -r requirements.txt -q
+            pip install fastapi "uvicorn[standard]" python-multipart -q
+            deactivate
+            systemctl restart eiva-api
+            systemctl restart eiva-bot
+            sleep 2
+            systemctl is-active eiva-api && echo "API: OK" || echo "API: FAILED"
+            systemctl is-active eiva-bot && echo "Bot: OK" || echo "Bot: FAILED"
+
+      - name: Notify success
+        if: success()
+        run: echo "✅ Deployed to TimeWeb VPS successfully"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Deployment failed — check VPS logs"
