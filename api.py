@@ -12,11 +12,11 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 
-import config as Config
+import config
 import parser as telegram_parser
-from personality import PersonalityExtractor
-from embeddings import EmbeddingsStore
-from agent import DigitalTwinAgent
+from personality import extract_personality, build_system_prompt
+from embeddings import EmbeddingStore
+from agent import EivaAgent
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,17 +41,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# ── Singleton services ──
-embeddings_store: Optional[EmbeddingsStore] = None
-personality_extractor: Optional[PersonalityExtractor] = None
-
-@app.on_event("startup")
-async def startup():
-    global embeddings_store, personality_extractor
-    embeddings_store = EmbeddingsStore()
-    personality_extractor = PersonalityExtractor()
-    logger.info("Eiva API started")
 
 
 # ─────────────────────────────────────────
@@ -135,7 +124,7 @@ async def upload_export(
 
         # Validate JSON
         try:
-            data = json.loads(contents.decode("utf-8"))
+            json.loads(contents.decode("utf-8"))
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid JSON file")
 
@@ -153,16 +142,18 @@ async def upload_export(
         if not messages:
             raise HTTPException(status_code=422, detail="No messages found in export")
 
-        # Extract personality (async GPT call)
-        profile = await asyncio.to_thread(
-            personality_extractor.extract, messages, owner_name
-        )
+        # Extract personality (blocking GPT call → run in thread)
+        profile = await asyncio.to_thread(extract_personality, messages, user_id)
 
-        # Store in ChromaDB
-        collection_name = f"user_{user_id}"
-        await asyncio.to_thread(
-            embeddings_store.store_messages, messages, profile, collection_name, tier_or_msg
-        )
+        # Build system prompt and store in ChromaDB
+        system_prompt = build_system_prompt(profile, owner_name)
+        store = EmbeddingStore(user_id)
+        added = await asyncio.to_thread(store.add_messages, messages)
+        store.save_meta("owner_name", owner_name)
+        store.save_meta("personality", profile)
+        store.save_meta("personality_profile", json.dumps(profile, ensure_ascii=False))
+        store.save_meta("system_prompt", system_prompt)
+        store.save_meta("tier", tier_or_msg)
 
         # Cleanup temp
         temp_path.unlink(missing_ok=True)
@@ -170,8 +161,8 @@ async def upload_export(
         return UploadResponse(
             success=True,
             message=f"Twin created for {owner_name}",
-            profile_summary=profile.get("personality_summary", ""),
-            messages_indexed=len(messages),
+            profile_summary=profile.get("communication_style", ""),
+            messages_indexed=added,
         )
 
     except HTTPException:
@@ -186,21 +177,39 @@ async def chat(req: ChatRequest):
     """Send message to digital twin and get response"""
     try:
         if req.demo_mode:
-            collection_name = "demo_durov"
+            user_id = "demo_durov"
             twin_name = "Pavel Durov"
         else:
-            collection_name = f"user_{_user_id_from_wallet(req.wallet_address)}"
+            user_id = _user_id_from_wallet(req.wallet_address)
             twin_name = "Your Twin"
 
-        agent = DigitalTwinAgent(embeddings_store, collection_name)
-        reply, confidence = await asyncio.to_thread(agent.reply, req.message)
+        store = EmbeddingStore(user_id)
+        if not store.is_ready():
+            raise HTTPException(status_code=404, detail="Twin not found. Upload your Telegram export first.")
 
-        return ChatResponse(
-            reply=reply,
-            confidence=confidence,
-            twin_name=twin_name,
-        )
+        # Load system prompt (built during upload)
+        system_prompt = store.load_meta("system_prompt") or ""
+        owner_name = store.load_meta("owner_name") or twin_name
+        twin_name = owner_name if owner_name != "Unknown" else twin_name
 
+        # Determine confidence from memory retrieval count
+        similar = store.search(req.message, top_k=config.TOP_K_SIMILAR)
+        count = len(similar)
+        if count < 2:
+            confidence = "LOW ⚠️"
+        elif count < 5:
+            confidence = "MEDIUM ✓"
+        else:
+            confidence = "HIGH ✅"
+
+        # Generate reply
+        agent = EivaAgent(user_id, system_prompt)
+        reply = await asyncio.to_thread(agent.reply, req.message)
+
+        return ChatResponse(reply=reply, confidence=confidence, twin_name=twin_name)
+
+    except HTTPException:
+        raise
     except Exception as e:
         logger.exception("Chat error")
         raise HTTPException(status_code=500, detail=str(e))
@@ -211,22 +220,24 @@ async def get_profile(x_wallet_address: str = Header(...)):
     """Get digital twin profile for wallet"""
     try:
         user_id = _user_id_from_wallet(x_wallet_address)
-        collection_name = f"user_{user_id}"
+        store = EmbeddingStore(user_id)
 
-        metadata = embeddings_store.get_collection_metadata(collection_name)
-        if not metadata:
+        if not store.is_ready():
             raise HTTPException(status_code=404, detail="Twin not found. Upload your Telegram export first.")
 
+        profile = store.load_meta("personality") or {}
+        owner_name = store.load_meta("owner_name") or "Unknown"
+
         return ProfileResponse(
-            twin_name=metadata.get("owner_name", "Unknown"),
-            personality_summary=metadata.get("personality_summary", ""),
-            communication_style=metadata.get("communication_style", ""),
-            topics=metadata.get("topics", []),
-            messages_indexed=metadata.get("source_count", 0),
-            sources=len(metadata.get("sources", [])),
-            tier=metadata.get("tier", "bronze"),
-            mode=metadata.get("mode", "personal"),
-            nft_address=metadata.get("nft_address"),
+            twin_name=owner_name,
+            personality_summary=profile.get("emotional_tone", ""),
+            communication_style=profile.get("communication_style", ""),
+            topics=profile.get("topics_of_interest", []),
+            messages_indexed=store.count(),
+            sources=store.get_source_count(),
+            tier=store.get_tier(),
+            mode=store.load_meta("mode") or "personal",
+            nft_address=store.load_meta("nft_address"),
         )
 
     except HTTPException:
@@ -239,36 +250,46 @@ async def get_profile(x_wallet_address: str = Header(...)):
 @app.get("/api/demo/profile")
 async def get_demo_profile():
     """Get Durov demo profile"""
-    try:
-        metadata = embeddings_store.get_collection_metadata("demo_durov")
-        if not metadata:
-            return {
-                "twin_name": "Pavel Durov",
-                "personality_summary": "Tech visionary, privacy advocate, founder of Telegram and VK",
-                "communication_style": "Direct, philosophical, minimalist. Speaks about freedom, technology, discipline.",
-                "topics": ["privacy", "freedom", "AI", "blockchain", "Telegram", "discipline"],
-                "messages_indexed": 20,
-                "sources": 2,
-                "tier": "silver",
-                "mode": "personal",
-            }
-        return metadata
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    store = EmbeddingStore("demo_durov")
+    if store.is_ready():
+        profile = store.load_meta("personality") or {}
+        return {
+            "twin_name": store.load_meta("owner_name") or "Pavel Durov",
+            "personality_summary": profile.get("emotional_tone", "Tech visionary, privacy advocate"),
+            "communication_style": profile.get("communication_style", "Direct, philosophical, minimalist."),
+            "topics": profile.get("topics_of_interest", ["privacy", "freedom", "AI", "blockchain"]),
+            "messages_indexed": store.count(),
+            "sources": store.get_source_count(),
+            "tier": "silver",
+            "mode": "personal",
+        }
+    # Fallback static demo data
+    return {
+        "twin_name": "Pavel Durov",
+        "personality_summary": "Tech visionary, privacy advocate, founder of Telegram and VK",
+        "communication_style": "Direct, philosophical, minimalist. Speaks about freedom, technology, discipline.",
+        "topics": ["privacy", "freedom", "AI", "blockchain", "Telegram", "discipline"],
+        "messages_indexed": 20,
+        "sources": 2,
+        "tier": "silver",
+        "mode": "personal",
+    }
 
 
 @app.get("/api/stats")
 async def get_stats():
     """Platform stats"""
     try:
-        collections = embeddings_store.list_collections()
+        import chromadb
+        client = chromadb.PersistentClient(path=str(config.CHROMA_DIR))
+        collections = [c.name for c in client.list_collections()]
         user_count = len([c for c in collections if c.startswith("user_")])
         return {
             "total_twins": user_count,
             "demo_available": "demo_durov" in collections,
             "network": os.getenv("TON_NETWORK", "testnet"),
         }
-    except Exception as e:
+    except Exception:
         return {"total_twins": 0, "demo_available": False, "network": "testnet"}
 
 
