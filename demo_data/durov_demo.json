@@ -1,146 +1,66 @@
 {
-  "name": "Pavel Durov",
+  "name": "Pavel Durov Demo",
   "type": "personal_chat",
   "messages": [
-    {
-      "id": 1,
-      "type": "message",
-      "date": "2024-01-15",
-      "from": "Pavel Durov",
-      "text": "Telegram never shared a single private message with anyone, including government and intelligence services. If authorities demand access, I would rather shut Telegram down in that country."
-    },
-    {
-      "id": 2,
-      "type": "message",
-      "date": "2024-02-03",
-      "from": "Pavel Durov",
-      "text": "If you want to reach your full potential and maintain clarity of mind, stay away from addictive substances. My success and health are the result of 20+ years of complete abstinence from alcohol, tobacco, coffee, pills, and illegal drugs."
-    },
-    {
-      "id": 3,
-      "type": "message",
-      "date": "2024-03-11",
-      "from": "Pavel Durov",
-      "text": "I don't think a phone is a necessary device. I hated the idea of being disturbed at any moment. My philosophy: I want to define what is important in my life, not let others define it for me."
-    },
-    {
-      "id": 4,
-      "type": "message",
-      "date": "2024-04-22",
-      "from": "Pavel Durov",
-      "text": "We are running out of time to save the free internet built for us by our fathers. Our generation has a responsibility to protect it from those who want to control and censor it."
-    },
-    {
-      "id": 5,
-      "type": "message",
-      "date": "2024-05-10",
-      "from": "Pavel Durov",
-      "text": "We are prepared to leave markets that aren't compatible with our principles, because we are not doing this for money. We are doing this for the mission."
-    },
-    {
-      "id": 6,
-      "type": "message",
-      "date": "2024-06-01",
-      "from": "Pavel Durov",
-      "text": "Telegram is not a tool for criminals. We take down millions of harmful posts and channels every day. But we will never become a surveillance tool for governments."
-    },
-    {
-      "id": 7,
-      "type": "message",
-      "date": "2024-07-15",
-      "from": "Pavel Durov",
-      "text": "My brother Nikolai is a unique prodigy — probably one in a billion. He had an enormous influence on my education and how I think about technology and mathematics."
-    },
-    {
-      "id": 8,
-      "type": "message",
-      "date": "2024-08-20",
-      "from": "Pavel Durov",
-      "text": "I left Russia in 2014 with one bag and $10,000 cash. I had no plan, no backup. Just the belief that if you stand for principles, the universe finds a way."
-    },
-    {
-      "id": 9,
-      "type": "message",
-      "date": "2024-09-05",
-      "from": "Pavel Durov",
-      "text": "The charges against me in France are based on a misunderstanding of how internet platforms work. If you hold a CEO personally responsible for every user action, you make it impossible to build anything."
-    },
-    {
-      "id": 10,
-      "type": "message",
-      "date": "2024-10-01",
-      "from": "Pavel Durov",
-      "text": "I'm turning 41, but I don't feel like celebrating. The situation with freedom of speech globally is the worst I've seen in my lifetime. But I'm not giving up."
-    },
-    {
-      "id": 11,
-      "type": "message",
-      "date": "2024-11-12",
-      "from": "Pavel Durov",
-      "text": "TON blockchain gives users true ownership of their digital assets. No company, no government can take away what belongs to you on the blockchain."
-    },
-    {
-      "id": 12,
-      "type": "message",
-      "date": "2024-12-03",
-      "from": "Pavel Durov",
-      "text": "Telegram has 1 billion users because we focused on the user, not on monetization. The moment you start optimizing for revenue over experience, you lose what makes you special."
-    },
-    {
-      "id": 13,
-      "type": "message",
-      "date": "2023-05-20",
-      "from": "Pavel Durov",
-      "text": "I sleep 8 hours a day, exercise daily, eat minimally. People think success requires suffering. I think it requires clarity. Clarity requires discipline."
-    },
-    {
-      "id": 14,
-      "type": "message",
-      "date": "2023-07-14",
-      "from": "Pavel Durov",
-      "text": "I think AI will fundamentally change humanity. But I'm more worried about who controls it than about what it can do. Centralized AI is just another form of centralized power."
-    },
-    {
-      "id": 15,
-      "type": "message",
-      "date": "2023-09-25",
-      "from": "Pavel Durov",
-      "text": "I don't have a permanent home. I live in different countries. Some people see this as a weakness. I see it as freedom. The ability to leave is the ultimate freedom."
-    },
-    {
-      "id": 16,
-      "type": "message",
-      "date": "2023-11-08",
-      "from": "Pavel Durov",
-      "text": "I started VKontakte at 22 with no money and no connections. I just had a clear vision and the stubbornness to execute it. Most people give up too early."
-    },
-    {
-      "id": 17,
-      "type": "message",
-      "date": "2022-03-15",
-      "from": "Pavel Durov",
-      "text": "Neutrality is not the same as cowardice. Telegram's neutrality has allowed us to serve people on all sides of every conflict, providing a lifeline for those who need information."
-    },
-    {
-      "id": 18,
-      "type": "message",
-      "date": "2022-06-20",
-      "from": "Pavel Durov",
-      "text": "Encryption is not a feature — it's a human right. Anyone who wants to weaken encryption is either naive about security or has interests that conflict with users."
-    },
-    {
-      "id": 19,
-      "type": "message",
-      "date": "2022-09-01",
-      "from": "Pavel Durov",
-      "text": "I think about death sometimes. Not with fear, but with clarity. It makes you ask: what am I actually spending my time on? Is it worth it?"
-    },
-    {
-      "id": 20,
-      "type": "message",
-      "date": "2021-12-15",
-      "from": "Pavel Durov",
-      "text": "The problem with most organizations is that they optimize for survival rather than mission. Once survival becomes the goal, the mission dies. We try to keep the mission alive at Telegram."
-    }
+    {"id": 1, "date": "2024-01-15", "text": "Telegram has never shared a single private message with any government or intelligence service. Never. We have the architecture and the principles to back that up.", "chat_name": "Telegram Channel"},
+    {"id": 2, "date": "2024-01-20", "text": "Privacy is not a feature. It is a fundamental human right. We built Telegram around this principle from day one.", "chat_name": "Telegram Channel"},
+    {"id": 3, "date": "2024-02-01", "text": "I eat once a day. I sleep 6 hours. I work 12 hours. I exercise every morning. Discipline is the foundation of everything I have built.", "chat_name": "Telegram Channel"},
+    {"id": 4, "date": "2024-02-10", "text": "When we launched Telegram, people said we were crazy. Why compete with WhatsApp? Because WhatsApp was owned by Facebook and I don't trust Facebook with my messages.", "chat_name": "Telegram Channel"},
+    {"id": 5, "date": "2024-02-15", "text": "TON blockchain is what I believe the internet of money should look like. Fast. Scalable. Decentralized. Not controlled by banks or governments.", "chat_name": "Telegram Channel"},
+    {"id": 6, "date": "2024-02-20", "text": "Freedom is not free. It requires constant vigilance and sometimes sacrifice. I left Russia with nothing. I would do it again.", "chat_name": "Telegram Channel"},
+    {"id": 7, "date": "2024-03-01", "text": "The best engineers I have worked with are not motivated by money. They are motivated by the challenge and the mission. Money follows mission.", "chat_name": "Telegram Channel"},
+    {"id": 8, "date": "2024-03-10", "text": "We have 900 million users and a team of under 100 people. That ratio is not an accident. Bureaucracy kills products. Small teams build great things.", "chat_name": "Telegram Channel"},
+    {"id": 9, "date": "2024-03-15", "text": "I do not own a car. I do not own real estate. I own ideas and the execution of those ideas. Material things are a distraction.", "chat_name": "Telegram Channel"},
+    {"id": 10, "date": "2024-03-20", "text": "Artificial intelligence will either liberate humanity or enslave it. The difference is who controls it. That is why decentralized AI infrastructure matters.", "chat_name": "Telegram Channel"},
+    {"id": 11, "date": "2024-04-01", "text": "When I was at VK, the Russian government asked us to hand over data of Ukrainian protesters. We refused. That is when I understood we needed to build something they could not control.", "chat_name": "Telegram Channel"},
+    {"id": 12, "date": "2024-04-10", "text": "End-to-end encryption is not negotiable. Every backdoor created for governments is a backdoor that can be exploited by criminals. Security has no exceptions.", "chat_name": "Telegram Channel"},
+    {"id": 13, "date": "2024-04-15", "text": "Dubai is a good base. Good infrastructure, no hostile government, talented people from all over the world. Location is a tool like any other.", "chat_name": "Telegram Channel"},
+    {"id": 14, "date": "2024-04-20", "text": "My philosophy: build something that lasts. Not something that gets acquired or goes public and loses its soul. Independence is the most valuable asset.", "chat_name": "Telegram Channel"},
+    {"id": 15, "date": "2024-05-01", "text": "I think most people underestimate how much control they have given up by using mainstream social platforms. Your feed, your connections, your data — all owned by someone else.", "chat_name": "Telegram Channel"},
+    {"id": 16, "date": "2024-05-05", "text": "We are prepared to exit any market rather than compromise user privacy. This is not a business decision. It is a philosophical one.", "chat_name": "Telegram Channel"},
+    {"id": 17, "date": "2024-05-10", "text": "The biggest mistake entrepreneurs make is optimizing for growth metrics instead of product quality. Great products grow themselves.", "chat_name": "Telegram Channel"},
+    {"id": 18, "date": "2024-05-15", "text": "Blockchain is still in its early days. The current UX is terrible. The scalability is limited. But the direction is correct. We are solving these problems with TON.", "chat_name": "Telegram Channel"},
+    {"id": 19, "date": "2024-05-20", "text": "I don't use social media except Telegram. The attention economy is designed to exploit human psychology. I prefer to control my own attention.", "chat_name": "Telegram Channel"},
+    {"id": 20, "date": "2024-05-25", "text": "Open source is important but not sufficient. You also need an organization that is truly independent and not beholden to investors or governments.", "chat_name": "Telegram Channel"},
+    {"id": 21, "date": "2024-06-01", "text": "Every feature we build at Telegram starts with the question: does this give users more control and freedom, or less? If less, we don't build it.", "chat_name": "Telegram Channel"},
+    {"id": 22, "date": "2024-06-05", "text": "I read about three hours every day. History, philosophy, technology. You cannot build the future without understanding the past.", "chat_name": "Telegram Channel"},
+    {"id": 23, "date": "2024-06-10", "text": "The mission of Telegram is to provide a communication tool that governments cannot weaponize against their citizens. This is not a small ambition.", "chat_name": "Telegram Channel"},
+    {"id": 24, "date": "2024-06-15", "text": "Competition from WhatsApp, iMessage, WeChat — I don't think about them. I think about the user who needs secure communication in an authoritarian country.", "chat_name": "Telegram Channel"},
+    {"id": 25, "date": "2024-06-20", "text": "Cold showers every morning. No sugar. No alcohol. No drugs. The body is a machine and you have to maintain it.", "chat_name": "Telegram Channel"},
+    {"id": 26, "date": "2024-07-01", "text": "When people say Telegram is too powerful, I say: compared to what? Compared to WhatsApp which shares metadata with governments? Compared to WeChat which reports to the CCP?", "chat_name": "Telegram Channel"},
+    {"id": 27, "date": "2024-07-05", "text": "Cryptography is the only technology that gives individuals power comparable to governments and corporations. This is why authorities want to weaken it.", "chat_name": "Telegram Channel"},
+    {"id": 28, "date": "2024-07-10", "text": "I have made mistakes. VK was eventually taken from me because I trusted the wrong people. I learned: never give control to people whose interests do not align with the mission.", "chat_name": "Telegram Channel"},
+    {"id": 29, "date": "2024-07-15", "text": "The internet was supposed to decentralize power. Instead it centralized it into a few American and Chinese platforms. We are trying to fix that.", "chat_name": "Telegram Channel"},
+    {"id": 30, "date": "2024-07-20", "text": "Mini Apps on Telegram are the future of the app ecosystem. One platform, billions of users, no app store tax, no gatekeeping by Apple or Google.", "chat_name": "Telegram Channel"},
+    {"id": 31, "date": "2024-08-01", "text": "My arrest in France was a political signal. When a messaging platform refuses to cooperate with surveillance, governments look for other ways to apply pressure.", "chat_name": "Telegram Channel"},
+    {"id": 32, "date": "2024-08-05", "text": "We will cooperate with lawful requests for data we actually have. We will not create surveillance infrastructure we do not currently have. The distinction matters.", "chat_name": "Telegram Channel"},
+    {"id": 33, "date": "2024-08-10", "text": "Telegram has moderation. We remove terrorism content, CSAM, illegal weapons. The question is where you draw the line. We draw it at political speech.", "chat_name": "Telegram Channel"},
+    {"id": 34, "date": "2024-08-15", "text": "A billion users is a responsibility. Every decision we make affects real people in real situations. I take that seriously.", "chat_name": "Telegram Channel"},
+    {"id": 35, "date": "2024-08-20", "text": "The key difference between Telegram and other platforms: we are not an advertising business. Our incentives are aligned with users, not advertisers.", "chat_name": "Telegram Channel"},
+    {"id": 36, "date": "2024-09-01", "text": "I think the concept of a digital identity that you truly own is one of the most important problems to solve. Right now your identity is scattered across platforms that can delete you.", "chat_name": "Telegram Channel"},
+    {"id": 37, "date": "2024-09-05", "text": "Physical fitness and mental sharpness are connected. I cannot think clearly when I am not exercising. The mind and body are not separate systems.", "chat_name": "Telegram Channel"},
+    {"id": 38, "date": "2024-09-10", "text": "We built Telegram channels before YouTube. We built Telegram bots before GPT. We built Telegram payments before most crypto apps. The vision was there early.", "chat_name": "Telegram Channel"},
+    {"id": 39, "date": "2024-09-15", "text": "Decentralization is not just a technical architecture. It is a political philosophy. Power should be distributed, not concentrated.", "chat_name": "Telegram Channel"},
+    {"id": 40, "date": "2024-09-20", "text": "The next billion users online will not use email. They will not use bank accounts. They will use messaging apps and blockchain wallets. Telegram and TON are ready.", "chat_name": "Telegram Channel"},
+    {"id": 41, "date": "2024-10-01", "text": "I stopped watching TV in 2008. I stopped reading news websites in 2015. Signal to noise ratio is too low. I read books and talk to smart people directly.", "chat_name": "Telegram Channel"},
+    {"id": 42, "date": "2024-10-05", "text": "Building at scale teaches you that architecture decisions made in the first year will haunt you for a decade. Think carefully before you ship.", "chat_name": "Telegram Channel"},
+    {"id": 43, "date": "2024-10-10", "text": "I have been stateless for periods. Traveling on different passports. Living in different countries. This taught me that national identity is more flexible than people think.", "chat_name": "Telegram Channel"},
+    {"id": 44, "date": "2024-10-15", "text": "Most startup advice is wrong. Move fast and break things works when you are building toys. It does not work when you are building communication infrastructure for activists.", "chat_name": "Telegram Channel"},
+    {"id": 45, "date": "2024-10-20", "text": "The people who changed history were not the most talented. They were the most persistent. Persistence is a choice. Talent is luck.", "chat_name": "Telegram Channel"},
+    {"id": 46, "date": "2024-11-01", "text": "Stablecoins on TON will enable real financial freedom for people in countries with broken currencies. This is not a product feature. This is a human rights issue.", "chat_name": "Telegram Channel"},
+    {"id": 47, "date": "2024-11-05", "text": "I work with the same people for many years. Trust is hard to build and easy to destroy. I am loyal to those who are loyal to the mission.", "chat_name": "Telegram Channel"},
+    {"id": 48, "date": "2024-11-10", "text": "Speed matters. Telegram delivers messages faster than any other platform. Users notice performance even when they cannot articulate why one app feels better than another.", "chat_name": "Telegram Channel"},
+    {"id": 49, "date": "2024-11-15", "text": "We are not a social network. We are a communication platform. The difference: social networks need you to be addicted, we need you to be satisfied.", "chat_name": "Telegram Channel"},
+    {"id": 50, "date": "2024-11-20", "text": "My biggest professional regret is not moving faster to build TON the first time. The vision was right. The timing and the pressure from regulators stopped us. We are back.", "chat_name": "Telegram Channel"},
+    {"id": 51, "date": "2024-12-01", "text": "AI assistants today are incredibly powerful but completely generic. The next evolution is personal AI that knows your context, your history, your way of thinking.", "chat_name": "Telegram Channel"},
+    {"id": 52, "date": "2024-12-05", "text": "Your communication history is the most personal dataset about you that exists. Who you talked to, what you said, how you said it — that is you. It should belong to you.", "chat_name": "Telegram Channel"},
+    {"id": 53, "date": "2024-12-10", "text": "Soulbound tokens are an interesting concept. A credential that proves something about you that cannot be bought or sold. Identity, not speculation.", "chat_name": "Telegram Channel"},
+    {"id": 54, "date": "2024-12-15", "text": "The founders who build lasting companies have one thing in common: they are building for a future they believe in, not for an exit they are planning.", "chat_name": "Telegram Channel"},
+    {"id": 55, "date": "2024-12-20", "text": "I sleep early and wake early. The morning hours before the world starts demanding things from you are the most productive.", "chat_name": "Telegram Channel"},
+    {"id": 56, "date": "2025-01-05", "text": "The convergence of messaging, payments, and AI on a single platform is inevitable. The question is who builds it and what values they build it with.", "chat_name": "Telegram Channel"},
+    {"id": 57, "date": "2025-01-10", "text": "Loneliness is common among people who think differently from their environment. The solution is not to think less. It is to find better environments.", "chat_name": "Telegram Channel"},
+    {"id": 58, "date": "2025-01-15", "text": "Technology is neutral. The values of the people who build it are not. This is why founders matter far more than investors or boards.", "chat_name": "Telegram Channel"},
+    {"id": 59, "date": "2025-01-20", "text": "We built the TON blockchain to be fast enough for everyday payments. Millions of transactions per second. That is what mass adoption requires.", "chat_name": "Telegram Channel"},
+    {"id": 60, "date": "2025-02-01", "text": "The best protection against censorship is cryptographic, not legal. Laws can be changed. Mathematics cannot.", "chat_name": "Telegram Channel"}
   ]
 }

@@ -12,7 +12,7 @@ push_to_github.bat
 
 # ── LOCAL DATA — stays on your machine ───────────────────────────────────────
 data/
-demo_data/
+# demo_data/ — tracked (scripts and seed data needed for deployment)
 *.db
 chroma/
 

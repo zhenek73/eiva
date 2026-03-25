@@ -1,54 +1,80 @@
 """
 Script to pre-load Pavel Durov demo twin data.
-Run once: py demo_data/create_durov_demo.py
+Run once from the eiva-bot directory:
+    python demo_data/create_durov_demo.py
 """
 import json
 import sys
 import os
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+import config
+import chromadb
 from embeddings import EmbeddingStore
 from personality import extract_personality, build_system_prompt
+from parser import Message
 
 DEMO_USER_ID = "demo_durov"
 
 def create_durov_demo():
     print("Creating Pavel Durov demo twin...")
 
-    # Load demo messages
-    with open(os.path.join(os.path.dirname(__file__), "durov_demo.json"), "r", encoding="utf-8") as f:
+    # Load demo messages from JSON
+    json_path = os.path.join(os.path.dirname(__file__), "durov_demo.json")
+    with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    messages = [m["text"] for m in data["messages"] if m.get("text")]
+    # Convert to Message objects (as expected by EmbeddingStore.add_messages)
+    messages = []
+    for m in data["messages"]:
+        if m.get("text"):
+            messages.append(Message(
+                id=m["id"],
+                date=m["date"],
+                text=m["text"],
+                chat_name=m.get("chat_name", "Telegram Channel"),
+            ))
 
-    # Build store
+    print(f"Loaded {len(messages)} messages from durov_demo.json")
+
+    # Delete existing demo collection if present, then recreate
+    chroma_client = chromadb.PersistentClient(path=str(config.CHROMA_DIR))
+    existing = [c.name for c in chroma_client.list_collections()]
+    if f"eiva_{DEMO_USER_ID}" in existing:
+        chroma_client.delete_collection(f"eiva_{DEMO_USER_ID}")
+        print("Cleared existing demo collection")
+
     store = EmbeddingStore(DEMO_USER_ID)
-    store.clear()
 
-    # Index messages
-    for i, msg in enumerate(messages):
-        store.add(msg, {"source": "durov_demo", "index": i})
+    # Index messages using real add_messages API
+    print("Indexing messages into ChromaDB (this calls OpenRouter embeddings)...")
+    added = store.add_messages(messages)
+    print(f"Indexed {added} new messages")
 
-    print(f"Indexed {len(messages)} messages")
+    # Extract personality using LLM
+    print("Extracting personality profile via LLM...")
+    profile = extract_personality(messages, DEMO_USER_ID)
 
-    # Save personality metadata
-    personality_data = {
-        "name": "Pavel Durov",
-        "traits": ["principled", "disciplined", "visionary", "blunt", "philosophical"],
-        "topics": ["freedom", "privacy", "Telegram", "TON", "discipline", "technology"],
-        "style": "direct, philosophical, sometimes provocative",
-        "signature_phrases": ["I think", "My philosophy", "We are prepared", "The mission"],
-    }
-    store.save_meta("personality_profile", json.dumps(personality_data, ensure_ascii=False))
+    # Build system prompt
+    system_prompt = build_system_prompt(profile, "Pavel Durov")
+
+    # Save all metadata
     store.save_meta("owner_name", "Pavel Durov")
-    store.save_meta("system_prompt", "You are Pavel Durov, founder of Telegram and VKontakte.")
-    store.save_meta("mode", "professional")
-    store.save_meta("source_count", "2")
+    store.save_meta("personality", json.dumps(profile, ensure_ascii=False))
+    store.save_meta("system_prompt", system_prompt)
+    store.save_meta("mode", "demo")
+    store.save_meta("tier", "silver")
     store.save_meta("is_demo", "true")
+    store.save_meta("source_count", "1")
 
-    print("✅ Pavel Durov demo twin created!")
-    print(f"   User ID: {DEMO_USER_ID}")
-    print(f"   Messages: {len(messages)}")
+    print("\n✅ Pavel Durov demo twin created!")
+    print(f"   User ID  : {DEMO_USER_ID}")
+    print(f"   Messages : {store.count()}")
+    print(f"   Ready    : {store.is_ready()}")
+    print(f"\nProfile preview:")
+    print(f"   Style    : {profile.get('communication_style', 'N/A')}")
+    print(f"   Topics   : {profile.get('topics_of_interest', [])}")
 
 if __name__ == "__main__":
     create_durov_demo()

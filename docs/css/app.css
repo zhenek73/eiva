@@ -81,9 +81,13 @@
 }
 .btn-secondary:hover { background: var(--card-hover); border-color: var(--border2); color: var(--text); }
 
+/* ── Hidden utility ── */
+.hidden { display: none !important; }
+
 /* ── Cabinet ── */
 #cabinet { padding: 16px 0; }
-#cabinet.hidden { display: none; }
+#cabinet.hidden { display: none !important; }
+#not-connected.hidden { display: none !important; }
 
 /* ── Cabinet Header ── */
 .cabinet-header {
