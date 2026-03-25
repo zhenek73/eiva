@@ -8,6 +8,7 @@
 
 // ── Config ──────────────────────────────────────────────────────────────────
 const NETWORK   = 'testnet';   // change to 'mainnet' for production
+const API_URL   = 'https://api.eiva.space'; // Eiva backend
 const TONCENTER = NETWORK === 'testnet'
   ? 'https://testnet.toncenter.com/api/v2'
   : 'https://toncenter.com/api/v2';
@@ -43,7 +44,7 @@ async function initTonConnect() {
       return;
     }
     tonConnectUI = new TonConnectUI({
-      manifestUrl: 'https://zhenek73.github.io/eiva/tonconnect-manifest.json',
+      manifestUrl: 'https://eiva.space/tonconnect-manifest.json',
       buttonRootId: null,   // manual button management
     });
     tonConnectUI.onStatusChange(handleWalletChange);
@@ -260,6 +261,8 @@ fileInput.addEventListener('change', (e) => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
 });
 
+let _pendingFile = null;
+
 function handleFile(file) {
   if (!file.name.endsWith('.json')) {
     showStatus(uploadStatus, '❌ Please upload a .json file (Telegram export)', 'error');
@@ -271,12 +274,18 @@ function handleFile(file) {
       const data = JSON.parse(e.target.result);
       const messages = data.messages || [];
       const msgCount = messages.filter(m => typeof m.text === 'string' || Array.isArray(m.text)).length;
-      showStatus(uploadStatus,
-        `✅ Valid Telegram export! Found ~${msgCount} messages. Continue in the bot to build your twin.`,
-        'success'
-      );
-      uploadBtn.style.display = '';
-      uploadBtn.textContent = `🤖 Continue in @eivatonbot (${msgCount} messages)`;
+      _pendingFile = file;
+      if (!connectedWallet) {
+        showStatus(uploadStatus, `✅ Found ${msgCount} messages. Connect your TON wallet to build your twin.`, 'success');
+        uploadBtn.style.display = '';
+        uploadBtn.textContent = '🔗 Connect Wallet to Upload';
+        uploadBtn.onclick = connectWallet;
+      } else {
+        showStatus(uploadStatus, `✅ Found ${msgCount} messages. Ready to upload!`, 'success');
+        uploadBtn.style.display = '';
+        uploadBtn.textContent = `🚀 Build My Twin (${msgCount} messages)`;
+        uploadBtn.onclick = () => uploadToAPI(file);
+      }
     } catch {
       showStatus(uploadStatus, '❌ Invalid JSON file', 'error');
     }
@@ -284,9 +293,39 @@ function handleFile(file) {
   reader.readAsText(file);
 }
 
-uploadBtn.addEventListener('click', () => {
-  window.open('https://t.me/eivatonbot', '_blank');
-});
+async function uploadToAPI(file) {
+  if (!connectedWallet) { connectWallet(); return; }
+  const walletAddr = connectedWallet.account?.address || '';
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = '⏳ Building your twin...';
+  showStatus(uploadStatus, '⏳ Uploading and analyzing messages... This may take 30–60 seconds.', 'info');
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`${API_URL}/api/upload`, {
+      method: 'POST',
+      headers: {
+        'x-wallet-address': walletAddr,
+        'x-demo-mode': 'false',
+      },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Upload failed');
+
+    showStatus(uploadStatus, `✅ Twin created for ${data.message}! ${data.messages_indexed} messages indexed.`, 'success');
+    uploadBtn.textContent = '💬 Chat with Your Twin';
+    uploadBtn.disabled = false;
+    uploadBtn.onclick = () => showTab('chat');
+    loadProfile(walletAddr);
+  } catch (err) {
+    showStatus(uploadStatus, `❌ ${err.message}`, 'error');
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = '🔄 Retry Upload';
+    uploadBtn.onclick = () => uploadToAPI(file);
+  }
+}
 
 // ── Modal Controls ───────────────────────────────────────────────────────────
 document.getElementById('modalClose').addEventListener('click', () => {
@@ -469,19 +508,94 @@ function tryDemoTwin() {
 
 function onWalletConnected(address) {
   const cabinet = document.getElementById('cabinet');
-  if (cabinet) {
-    cabinet.classList.remove('hidden');
-    // Animate confidence bar
-    setTimeout(() => {
-      const overallBar = document.getElementById('overall-bar');
-      const overallPct = document.getElementById('overall-pct');
-      if (overallBar && overallPct) {
-        overallBar.style.width = '62%';
-        overallPct.textContent = '62%';
-      }
-    }, 500);
+  if (cabinet) cabinet.classList.remove('hidden');
+  loadProfile(address);
+  // If there's a pending file, update upload button
+  if (_pendingFile) {
+    uploadBtn.style.display = '';
+    uploadBtn.textContent = `🚀 Build My Twin`;
+    uploadBtn.onclick = () => uploadToAPI(_pendingFile);
   }
 }
+
+async function loadProfile(walletAddr) {
+  try {
+    const res = await fetch(`${API_URL}/api/profile`, {
+      headers: { 'x-wallet-address': walletAddr }
+    });
+    if (!res.ok) return; // no twin yet, that's fine
+    const p = await res.json();
+
+    // Update stats
+    const el = (id) => document.getElementById(id);
+    if (el('twin-messages')) el('twin-messages').textContent = p.messages_indexed || '—';
+    if (el('twin-sources'))  el('twin-sources').textContent  = p.sources || '—';
+    if (el('twin-mode'))     el('twin-mode').textContent     = p.mode || 'Personal';
+
+    // Update traits
+    if (p.topics?.length && el('traits-list')) {
+      el('traits-list').innerHTML = p.topics.map(t => `<span class="trait">${t}</span>`).join('');
+    }
+
+    // Update confidence bar
+    const pct = p.messages_indexed > 500 ? 90 : p.messages_indexed > 100 ? 70 : 40;
+    setTimeout(() => {
+      const bar = el('overall-bar'), pctEl = el('overall-pct');
+      if (bar) bar.style.width = pct + '%';
+      if (pctEl) pctEl.textContent = pct + '%';
+    }, 400);
+
+    // NFT address
+    if (p.nft_address && el('nft-address')) el('nft-address').textContent = p.nft_address;
+
+  } catch (e) { console.warn('Profile load:', e); }
+}
+
+// ── Chat with Twin ────────────────────────────────────────────────────────────
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const msg = input?.value?.trim();
+  if (!msg) return;
+  if (!connectedWallet && !window._demoMode) {
+    alert('Connect your wallet first'); return;
+  }
+  input.value = '';
+  appendChatBubble('user', msg);
+
+  const walletAddr = connectedWallet?.account?.address || 'demo';
+  try {
+    const res = await fetch(`${API_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        wallet_address: walletAddr,
+        demo_mode: !!window._demoMode,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Chat error');
+    appendChatBubble('twin', data.reply, data.confidence, data.twin_name);
+  } catch (err) {
+    appendChatBubble('twin', `⚠️ ${err.message}`, 'LOW ⚠️', 'Error');
+  }
+}
+
+function appendChatBubble(role, text, confidence = '', name = '') {
+  const log = document.getElementById('chat-log');
+  if (!log) return;
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${role}`;
+  div.innerHTML = `
+    ${name ? `<div class="chat-name">${name}</div>` : ''}
+    <div class="chat-text">${text}</div>
+    ${confidence ? `<div class="chat-confidence">${confidence}</div>` : ''}
+  `;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+window.sendChatMessage = sendChatMessage;
 
 // ── Privacy Functions ────────────────────────────────────────────────────────
 function addPrivacyTag() {

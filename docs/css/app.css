@@ -348,3 +348,20 @@
   .nft-card-actions { flex-direction: column; }
   .connect-prompt { padding: 32px 24px; }
 }
+
+/* ── Chat Bubbles ── */
+.chat-bubble {
+  max-width: 80%; padding: 10px 14px; border-radius: 14px;
+  font-size: 14px; line-height: 1.5; animation: fadeIn 0.2s ease;
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  background: rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.25);
+}
+.chat-bubble.twin {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+}
+.chat-name { font-size: 11px; color: var(--cyan); margin-bottom: 4px; font-weight: 600; }
+.chat-confidence { font-size: 11px; color: var(--muted); margin-top: 4px; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }

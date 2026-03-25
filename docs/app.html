@@ -56,10 +56,25 @@
     <!-- ── TABS ── -->
     <div class="cabinet-tabs">
       <button class="tab active" onclick="showTab('twin')" data-i18n="tabs.twin">👤 My Twin</button>
+      <button class="tab" onclick="showTab('chat')">💬 Chat</button>
       <button class="tab" onclick="showTab('hallucinations')" data-i18n="tabs.hallucinations">🤖 Hallucinations</button>
       <button class="tab" onclick="showTab('nft')" data-i18n="tabs.nft">🎫 Soul Certificate</button>
       <button class="tab" onclick="showTab('confidence')" data-i18n="tabs.confidence">📊 Confidence</button>
       <button class="tab" onclick="showTab('privacy')" data-i18n="tabs.privacy">🔒 Privacy</button>
+    </div>
+
+    <!-- ── TAB: Chat ── -->
+    <div id="tab-chat" class="tab-content hidden">
+      <h3>💬 Chat with Your Twin</h3>
+      <p class="caption">Talk to your AI digital twin. It responds in your voice based on your message history.</p>
+      <div id="chat-log" style="min-height:260px;max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:16px;background:rgba(0,229,255,0.03);border:1px solid rgba(0,229,255,0.1);border-radius:12px;margin-bottom:16px;">
+        <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:40px 0;">Send a message to start the conversation</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input id="chat-input" type="text" placeholder="Ask your twin something..." onkeydown="if(event.key==='Enter')sendChatMessage()"
+          style="flex:1;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,229,255,0.2);border-radius:10px;color:#fff;font-size:15px;outline:none;">
+        <button onclick="sendChatMessage()" class="btn-primary" style="padding:12px 20px;white-space:nowrap;">Send →</button>
+      </div>
     </div>
 
     <!-- ── TAB: My Twin ── -->
