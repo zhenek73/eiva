@@ -1,85 +1,104 @@
-# Eiva Pitch
+# EIVA — TON AI Hackathon 2026 Pitch
 
-## 30 Seconds
-
-We're building Eiva — an AI that sounds like you.
-
-But here's what makes us different:
-Most digital twins hallucinate. They invent memories.
-
-Eiva is honest. It learns from your real messages,
-builds structured memory, and knows when to say "I'm not sure."
-
-The more you feed it, the better it gets.
-
-Your AI self — owned by you on TON.
-
-And your data stays yours — private, local, protected.
+## One-liner
+> Turn your Telegram history into a personal AI twin — reconstructed from your own conversations, verifiable on TON blockchain.
 
 ---
 
-## 2 Minutes
+## The Problem
 
-Everyone's trying to clone people with AI.
-But raw chat data doesn't work.
+Current AI assistants are incredibly powerful — but completely generic. They know the world, but not *you*.
 
-You sound different at work, with friends, with family.
-One source is never enough.
+Your digital identity is:
+- Scattered across messaging apps in unstructured form
+- Stored on corporate servers you don't control  
+- Impossible to own, verify, or port
 
-So we built Eiva differently:
+**Result:** no personal AI, no privacy, lock-in to platforms.
 
-**1. Structured Memory**
-Instead of raw chat lists, we categorize memories:
-- What you said (Memories)
-- What you believe (Opinions)
-- What you've experienced (Facts)
+---
 
-**2. Multi-Source Learning**
-Combine data from different contexts.
-Work chat + personal messages + group conversations
-= Complete personality picture.
+## The Solution
 
-**3. Honest About Limitations**
-All AI hallucinates. We don't hide it.
-Your profile shows confidence levels for each personality trait.
-You control how cautious your twin is.
+**EIVA (Embedded Intelligence Virtual Avatar)** reconstructs your personality from your own message history and gives you a digital twin that:
 
-**Result?**
-An AI that sounds like you in most situations.
-Gets better with more data.
-You own it completely on TON blockchain.
+- 🧠 **Speaks like you** — trained on your actual messages via RAG + ChromaDB
+- 🔑 **Belongs to you** — tied to your TON wallet address, not a platform
+- ⛓️ **Verifiable on-chain** — TON Soulbound NFT proves authenticity
+- 🔒 **Private by design** — messages processed locally, never sold
 
-This isn't about creating a digital zombie.
-It's about creating a persistent, honest digital extension of yourself.
+Today: Telegram history. Tomorrow: voice notes, social posts, journals — the more sources, the richer your twin.
 
-**4. Privacy by Design**
-Most AI products send your data to their servers.
-We don't.
+---
 
-Your messages stay on your machine.
-A PII filter removes passwords, emails, phone numbers before indexing.
-The AI has a hardcoded rule: never share sensitive data, no matter how you ask.
+## How It Works
 
-Your twin is your digital self — not a data leak.
+```
+Export Telegram JSON
+→ Parse + clean messages
+→ GPT-4o extracts personality profile
+→ Messages indexed in ChromaDB (per-user RAG)
+→ AI twin responds in your voice
+→ Mint Soulbound NFT (Soul Certificate) on TON
+```
+
+---
+
+## TON Integration
+
+| Feature | Implementation |
+|---|---|
+| Identity | TonConnect 2.0 — wallet = identity |
+| Ownership | Soulbound NFT (TEP-85, non-transferable) |
+| Monetization | Tiered access — free 3MB, paid upgrades in TON |
+| Network | Testnet live, mainnet architecture ready |
+
+---
+
+## Live Product
+
+| | |
+|---|---|
+| 🌐 Web | [eiva.space](https://eiva.space) |
+| 🤖 Bot | [@eivatonbot](https://t.me/eivatonbot) |
+| ⚡ API | [api.eiva.space/health](https://api.eiva.space/health) |
+
+✅ Full end-to-end pipeline working  
+✅ TonConnect 2.0 wallet auth  
+✅ Pavel Durov demo twin (try without wallet)  
+✅ Testnet NFT minting  
+✅ Auto-deploy CI/CD  
+
+---
+
+## Tech Stack
+
+**AI:** OpenRouter GPT-4o · ChromaDB · RAG  
+**Backend:** FastAPI · Python 3.10+ · TimeWeb Cloud VPS  
+**Frontend:** Vanilla JS · TonConnect UI · Particles.js  
+**Blockchain:** tonsdk · tonutils · TEP-85 Soulbound  
+**Infra:** Vercel · GitHub Actions · nginx · SSL  
 
 ---
 
 ## Why TON?
-- Owned by you via NFT (Soul Certificate)
-- Frictionless in Telegram
-- Low gas fees for identity operations
-- Not locked into someone's platform
+
+TON is the natural home for EIVA because:
+1. **1B+ Telegram users** — our primary data source is Telegram, our users live there
+2. **TonConnect** — seamless wallet auth without extra apps
+3. **Soulbound NFTs** — non-transferable identity certificates fit exactly our use case
+4. **Mini Apps ecosystem** — future integration path
 
 ---
 
-## What Makes Us Different?
+## What's Next
 
-| Feature | Eiva | Competitors |
-|---------|------|-------------|
-| Personality extraction | ✅ Structured | ❌ Raw data |
-| Mobile access | ✅ Telegram bot | ❌ Usually none |
-| Blockchain ownership | ✅ TON NFT | ❌ No |
-| Honest about limits | ✅ Yes | ❌ No |
-| Multi-source | ✅ Built-in | ❌ Usually not |
-| Multi-language | ✅ RU/EN | ❌ Rarely |
-| Production ready | ✅ Yes | ❌ Demo only |
+- Voice messages (Whisper transcription)
+- Multi-source personality merge (Telegram + Twitter/X + journal)
+- TON mainnet deployment
+- Paid tier upgrades via TON tokens
+- Third-party API access to your twin
+
+---
+
+*Built for TON AI Hackathon 2026*

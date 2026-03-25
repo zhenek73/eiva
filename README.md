@@ -1,117 +1,91 @@
-# 🎭 Eiva — AI Digital Twin on TON
+# EIVA — Embedded Intelligence Virtual Avatar
 
-> *Your personality, preserved on the blockchain.*
+> *Reconstruct your personality from chat history. Own it as a TON Soulbound NFT.*
 
-![TON Testnet](https://img.shields.io/badge/TON-Testnet-blue?logo=ton)
-![Status](https://img.shields.io/badge/Status-Active-success)
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
-![Hackathon 2026](https://img.shields.io/badge/TON%20AI-Hackathon%202026-FF4500)
-
-🤖 Bot: [@eivatonbot](https://t.me/eivatonbot)
-🌐 Dashboard: [zhenek73.github.io/eiva](https://zhenek73.github.io/eiva/)
+[![Live Demo](https://img.shields.io/badge/Live-eiva.space-00E5FF)](https://eiva.space)
+[![API](https://img.shields.io/badge/API-api.eiva.space-brightgreen)](https://api.eiva.space/health)
+[![Bot](https://img.shields.io/badge/Telegram-@eivatonbot-2CA5E0)](https://t.me/eivatonbot)
+[![TON](https://img.shields.io/badge/TON-Testnet-0088CC)](https://testnet.tonscan.org)
+[![Hackathon](https://img.shields.io/badge/TON%20AI-Hackathon%202026-FF4500)](https://identityhub.app)
 
 ---
 
-## What it does
+## What is EIVA?
 
-Upload your Telegram chat export → Eiva builds a vector memory of your communication style → a digital twin responds like you → mint a Soul Certificate on the TON blockchain as proof.
+Every day you leave traces of yourself in chats — your jokes, your opinions, the way you explain things. That personality is never captured. It just disappears into message history.
 
-1. **Upload** Telegram chat export (JSON from Telegram Desktop)
-2. **AI extracts** your personality: tone, vocabulary, topics, humor
-3. **Digital twin** answers anyone exactly like you would
-4. **Soul Certificate** minted on TON — permanent, verifiable, on-chain
+**EIVA reconstructs you.**
 
----
+Upload your Telegram history → connect your TON wallet → in minutes, an AI twin emerges that speaks in your voice, uses your humor, and references your actual memories. Not a generic assistant. A reflection of *you*, built from the conversations that shaped you.
 
-## Quick Start (Windows)
-
-```bash
-git clone https://github.com/zhenek73/eiva
-cd eiva/eiva-bot
-cp .env.example .env
-# Fill in your API keys in .env
-run.bat
-```
-
-Open Telegram → [@eivatonbot](https://t.me/eivatonbot) → `/setup`
-
-### Running Web Dashboard Locally
-
-```bash
-run_web.bat      # Windows
-./run_web.sh     # Linux/Mac
-```
-
-Open **http://localhost:8080**
+Your twin is tied to your TON wallet address and anchored on-chain via a **Soulbound NFT** — proof that this AI is authentically yours.
 
 ---
 
-## The Honest Truth About AI Clones
+## 🚀 Live Demo
 
-### The Problem
-Every AI has a fundamental limitation: **hallucinations**.
-
-Your AI twin might:
-- Invent memories that never happened
-- Confuse dates and timelines
-- Talk about things not in your messages
-- Be overly confident about uncertain things
-
-This isn't a bug—it's how all LLMs work. Even Claude, GPT-4, and others hallucinate.
-
-### How We Handle It
-Instead of hiding the problem, we manage it:
-
-1. **Structured Memory** — We categorize memories (Opinions/Facts/Memories), not just list them
-2. **Multi-Source Learning** — More data sources = better accuracy (use `/add_source`)
-3. **Confidence Scoring** — Your profile shows what we're sure about vs what's uncertain
-4. **Hallucination Control** — You can toggle settings to make your twin more or less cautious
-
-### Realistic Expectations
-Your AI twin will sound like you in most situations.
-But it won't be perfect. And that's OK.
-
-The more data you give it (multiple sources), the better it gets.
-Check `/profile` to see where you need more data.
-
-### Why This Matters
-Most AI projects hide their limitations.
-We're honest about them.
-
-Because an AI twin that knows its limits is more trustworthy than one that pretends to be perfect.
-
----
-
-## Commands
-
-| Command | Description |
+| | |
 |---|---|
-| `/start` | Welcome + intro |
-| `/setup` | Upload Telegram JSON → build your twin |
-| `/add_source` | Add another chat export to deepen personality |
-| `/settings` | Configure twin behaviour (tone, emoji, language) |
-| `/profile` | View extracted personality |
-| `/status` | Check twin status |
-| `/ask <message>` | Chat with your twin directly |
-| `/mint` | Anchor Soul Certificate on TON |
-| `/avatar` | Generate AI avatar |
-| `/wallet` | Link TON wallet |
-| `/twins` | View your digital twins |
-| `/demo` | See sample twin (no setup needed) |
-| `/help` | All commands |
+| 🌐 **Web App** | [eiva.space](https://eiva.space) |
+| 🤖 **Telegram Bot** | [@eivatonbot](https://t.me/eivatonbot) |
+| ⚡ **API** | [api.eiva.space/health](https://api.eiva.space/health) |
+| 🎭 **Try Demo** | [eiva.space/app.html](https://eiva.space/app.html) → "View Durov Demo" |
+
+Try the Pavel Durov demo twin — **no wallet needed**. Open the cabinet and click **"View Durov Demo Cabinet"**.
 
 ---
 
-## Configuration (`.env`)
+## How It Works
 
-```env
-TELEGRAM_BOT_TOKEN=       # From @BotFather
-OPENROUTER_API_KEY=       # From openrouter.ai
-TON_MNEMONIC=             # 24-word TON wallet mnemonic
-TON_NETWORK=testnet
-TON_API_KEY=              # Optional: toncenter.com
-GITHUB_TOKEN=             # Optional: for NFT metadata hosting
 ```
+Telegram Export (JSON)
+        ↓
+   Parser extracts your messages
+        ↓
+   LLM (GPT-4o) extracts personality profile
+        ↓
+   Messages embedded → ChromaDB vector store (RAG)
+        ↓
+   AI twin responds in your authentic voice
+        ↓
+   TON Soulbound NFT minted as Soul Certificate
+```
+
+1. **Export** — Download your Telegram history as JSON (Settings → Advanced → Export)
+2. **Connect** — Authenticate with your TON wallet via TonConnect 2.0
+3. **Upload** — JSON processed, free up to 3 MB
+4. **Twin Ready** — AI responds in your style within ~60 seconds
+5. **Mint** — Optional Soul Certificate on TON blockchain
+
+---
+
+## TON Integration
+
+EIVA is built natively on TON:
+
+| Component | Implementation |
+|---|---|
+| **Identity layer** | TonConnect 2.0 — wallet address = your identity |
+| **Ownership proof** | Soulbound NFT (TEP-85, non-transferable) |
+| **Tiered access** | Free 3 MB · paid upgrades in TON tokens |
+| **Network** | Testnet live · mainnet-ready architecture |
+
+The Soulbound NFT stores a SHA-256 hash of your personality profile on-chain. Your AI twin is **verifiably yours** — not a platform's property.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Backend** | FastAPI (Python 3.10+) · TimeWeb Cloud VPS |
+| **AI/LLM** | OpenRouter → GPT-4o (personality) + GPT-4o-mini (chat) |
+| **Vector DB** | ChromaDB — per-user collections |
+| **Frontend** | Vanilla JS · Particles.js · TonConnect 2.0 UI |
+| **Bot** | python-telegram-bot · [@eivatonbot](https://t.me/eivatonbot) |
+| **Blockchain** | tonsdk · tonutils · pytoniq-core |
+| **Deploy** | Vercel (frontend) · GitHub Actions CI/CD |
+| **Domain** | eiva.space · api.eiva.space (SSL via FASTPANEL) |
 
 ---
 
@@ -119,43 +93,113 @@ GITHUB_TOKEN=             # Optional: for NFT metadata hosting
 
 ```
 eiva-bot/
-├── bot.py              — Telegram bot
-├── parser.py           — Telegram JSON parser
-├── embeddings.py       — ChromaDB vector store (RAG)
-├── personality.py      — GPT-4o personality extraction
-├── agent.py            — Digital twin chat engine
-├── ton_identity.py     — TON wallet + Soul Certificate
-├── nft_contract.py     — Soulbound NFT (TEP-85)
-├── eiva-web/           — Web dashboard source
-├── docs/               — GitHub Pages (synced from eiva-web/)
-├── data/               — ChromaDB storage (local only)
-└── metadata/           — Personality profiles (local only)
+├── api.py              ← FastAPI backend (main entry point)
+├── bot.py              ← Telegram bot
+├── parser.py           ← Telegram JSON export parser
+├── embeddings.py       ← ChromaDB vector store + RAG
+├── personality.py      ← GPT-4o personality extraction
+├── agent.py            ← Digital twin chat engine
+├── ton_identity.py     ← TON wallet + NFT integration
+├── nft_contract.py     ← Soulbound NFT (TEP-85)
+├── config.py           ← Configuration + env vars
+├── demo_data/
+│   ├── durov_demo.json         ← 60 seed messages for Durov demo
+│   └── create_durov_demo.py    ← Script to pre-load demo twin
+├── eiva-web/           ← Web app source (synced to docs/)
+│   ├── index.html      ← Landing page
+│   ├── app.html        ← Personal cabinet
+│   ├── js/app.js       ← TonConnect + upload + NFT
+│   ├── js/cabinet.js   ← Cabinet + chat + demo mode
+│   └── js/i18n.js      ← EN/RU translations
+└── docs/               ← GitHub Pages (mirror of eiva-web/)
 ```
 
-**Stack:** Python 3.10+, python-telegram-bot, ChromaDB, OpenRouter, tonsdk, tonutils
+---
+
+## API Reference
+
+**Base URL:** `https://api.eiva.space`
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/health` | GET | Service status |
+| `/api/upload` | POST | Upload Telegram JSON, build twin |
+| `/api/chat` | POST | Chat with digital twin |
+| `/api/profile` | GET | Get twin profile for wallet |
+| `/api/demo/profile` | GET | Durov demo profile (no auth) |
+| `/api/stats` | GET | Platform stats |
+
+**Example:**
+```bash
+# Check API
+curl https://api.eiva.space/health
+
+# Chat with Durov demo
+curl -X POST https://api.eiva.space/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What do you think about AI?", "wallet_address": "demo", "demo_mode": true}'
+```
 
 ---
 
-## Privacy & Data Protection
+## Quick Start (Local Dev)
 
-Your data has three layers of protection:
+```bash
+git clone https://github.com/zhenek73/eiva
+cd eiva/eiva-bot
+cp .env.example .env       # Fill in TELEGRAM_BOT_TOKEN + OPENROUTER_API_KEY
+pip install -r requirements.txt
+uvicorn api:app --reload   # API → http://localhost:8000
+python bot.py              # Telegram bot (separate terminal)
+```
 
-**Layer 1 — Parser Filter (before indexing)**
-Messages containing emails, phone numbers, passwords, card numbers, API keys, and passport data are automatically filtered out before entering the AI's memory. They never get indexed.
+**Load Durov demo twin:**
+```bash
+python demo_data/create_durov_demo.py
+```
 
-**Layer 2 — AI Instruction Lock (non-overridable)**
-A hardcoded system prompt rule tells your twin to refuse any request for sensitive personal data — regardless of how the question is phrased. This cannot be turned off.
+### Required Environment Variables
 
-**Layer 3 — Local Storage**
-Your raw messages never leave your machine. Only embeddings (numeric vectors) are stored in ChromaDB locally. The only external call is a short sample sent to OpenRouter for personality extraction — no bulk message upload.
-
-**What your twin will NEVER share:**
-passwords · emails · phone numbers · home address · bank/card data · passport/ID · API keys · medical info
-
-**On-chain:** Only a SHA-256 hash of your personality profile is stored on TON — no personal content.
+```env
+TELEGRAM_BOT_TOKEN=   # @BotFather (use @eivadevbot for local dev)
+OPENROUTER_API_KEY=   # https://openrouter.ai (free tier available)
+TON_MNEMONIC=         # 24-word wallet mnemonic (for NFT minting)
+TON_NETWORK=testnet
+```
 
 ---
 
-## License
+## Privacy & Security
 
-MIT
+- **Raw messages** are never stored persistently — processed in memory, then discarded
+- **Only embeddings** (numeric vectors) are saved in ChromaDB
+- **External API** receives only a small anonymized sample for personality extraction
+- **On-chain** stores only a SHA-256 hash — zero personal content on blockchain
+
+Your twin will **never share**: passwords · emails · phone numbers · home address · bank/card data · passport/ID · API keys · medical info
+
+Enforced at system prompt level — cannot be disabled.
+
+---
+
+## Roadmap
+
+- [x] Telegram export → digital twin pipeline
+- [x] TonConnect 2.0 wallet authentication  
+- [x] Soulbound NFT minting (testnet)
+- [x] Web cabinet with live chat interface
+- [x] Demo twin (Pavel Durov) — try without wallet
+- [x] CI/CD auto-deploy (GitHub Actions → Vercel + VPS)
+- [ ] Voice message support (Whisper transcription)
+- [ ] Multi-source merge (Telegram + Twitter/X + journal)
+- [ ] TON mainnet deployment
+- [ ] Paid tier upgrades via TON token payments
+- [ ] Third-party API access to your twin
+
+---
+
+## Built for TON AI Hackathon 2026
+
+🌐 [eiva.space](https://eiva.space) · 🤖 [@eivatonbot](https://t.me/eivatonbot) · 💻 [GitHub](https://github.com/zhenek73/eiva)
+
+*MIT License*

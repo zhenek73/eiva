@@ -2,7 +2,7 @@
 _private/
 project-docs/
 CHANGELOG.md
-DEMO.md
+# DEMO.md — tracked
 push_to_github.bat
 
 # ── SECRETS — never commit ────────────────────────────────────────────────────
