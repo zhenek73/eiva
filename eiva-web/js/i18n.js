@@ -166,7 +166,26 @@ const TRANSLATIONS = {
     // Demo dialog labels
     "demo.dialogLabel": "Example conversation:",
     "demo.userLabel": "You:",
-    "demo.twinLabel": "Durov twin:"
+    "demo.twinLabel": "Durov twin:",
+
+    // Nav extras (cabinet)
+    "nav.disconnect": "🔌 Disconnect",
+
+    // Sources tab
+    "tabs.sources": "📤 Sources",
+    "sources.title": "📤 Upload Sources",
+    "sources.desc": "Upload your Telegram chat export (JSON). Max 2 sources · 5 MB per file.",
+    "sources.dragDrop": "Drag & drop your Telegram export here",
+    "sources.browse": "or click to browse files",
+    "sources.limit": "Limit: 2 sources · 5 MB per file · .json only",
+    "sources.upload": "🚀 Upload Source",
+    "sources.noSources": "No sources yet — upload your first Telegram export below.",
+    "sources.maxReached": "⚠️ Maximum 2 sources reached. Remove a source to add a new one.",
+    "sources.errJson": "❌ Please select a .json file (Telegram export)",
+    "sources.errSize": "❌ File exceeds 5 MB limit. Please export a smaller chat.",
+    "sources.errNoWallet": "⚠️ Connect your TON wallet first.",
+    "sources.errNoFile": "⚠️ Select a file first.",
+    "sources.uploading": "⏳ Uploading and analyzing messages… This may take 30–60 seconds."
   },
 
   ru: {
@@ -331,7 +350,26 @@ const TRANSLATIONS = {
     // Demo dialog labels
     "demo.dialogLabel": "Пример разговора:",
     "demo.userLabel": "Вы:",
-    "demo.twinLabel": "Двойник Дурова:"
+    "demo.twinLabel": "Двойник Дурова:",
+
+    // Nav extras (cabinet)
+    "nav.disconnect": "🔌 Выйти",
+
+    // Sources tab
+    "tabs.sources": "📤 Источники",
+    "sources.title": "📤 Загрузить источники",
+    "sources.desc": "Загрузи экспорт чатов Telegram (JSON). Максимум 2 источника · 5 МБ на файл.",
+    "sources.dragDrop": "Перетащи сюда экспорт Telegram",
+    "sources.browse": "или нажми для выбора файла",
+    "sources.limit": "Ограничение: 2 источника · 5 МБ на файл · только .json",
+    "sources.upload": "🚀 Загрузить источник",
+    "sources.noSources": "Источников ещё нет — загрузи первый экспорт ниже.",
+    "sources.maxReached": "⚠️ Достигнут лимит в 2 источника.",
+    "sources.errJson": "❌ Выбери .json файл (экспорт Telegram)",
+    "sources.errSize": "❌ Файл превышает 5 МБ. Выбери меньший чат.",
+    "sources.errNoWallet": "⚠️ Сначала подключи TON кошелёк.",
+    "sources.errNoFile": "⚠️ Сначала выбери файл.",
+    "sources.uploading": "⏳ Загружаем и анализируем сообщения… 30–60 секунд."
   }
 };
 
@@ -366,5 +404,4 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
   // Set initial language button state
   const langBtn = document.querySelector(`[data-lang="${currentLang}"]`);
-  if (langBtn) langBtn.classList.add('active');
-});
+  if (langBtn) langBtn.classList.add('activ

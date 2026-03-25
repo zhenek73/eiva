@@ -26,7 +26,14 @@
   <div class="nav-inner">
     <a href="./" class="nav-back" data-i18n="nav.back">← Back to Eiva</a>
     <span class="nav-title" data-i18n="cabinet.cabinet">My Cabinet</span>
-    <div id="wallet-btn" onclick="window.open('https://t.me/eivatonbot', '_blank')">🔗 @eivatonbot</div>
+    <div class="nav-links">
+      <button onclick="loadDemoMode()" class="nav-link" data-i18n="nav.demo">Demo</button>
+      <div class="language-selector">
+        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
+      </div>
+      <button id="disconnect-btn" class="btn-disconnect hidden" onclick="disconnectWallet()" data-i18n="nav.disconnect">Disconnect</button>
+    </div>
   </div>
 </nav>
 
@@ -60,6 +67,7 @@
       <button class="tab" onclick="showTab('chat')">💬 Chat</button>
       <button class="tab" onclick="showTab('hallucinations')" data-i18n="tabs.hallucinations">🤖 Hallucinations</button>
       <button class="tab" onclick="showTab('nft')" data-i18n="tabs.nft">🎫 Soul Certificate</button>
+      <button class="tab" onclick="showTab('sources')" data-i18n="tabs.sources">📤 Sources</button>
       <button class="tab" onclick="showTab('confidence')" data-i18n="tabs.confidence">📊 Confidence</button>
       <button class="tab" onclick="showTab('privacy')" data-i18n="tabs.privacy">🔒 Privacy</button>
     </div>
@@ -236,6 +244,31 @@
       <div class="conf-recommendation">
         💡 <span data-i18n="conf.tip">Add more sources with <code>/add_source</code> to improve accuracy</span>
       </div>
+    </div>
+
+    <!-- ── TAB: Sources ── -->
+    <div id="tab-sources" class="tab-content hidden">
+      <h3 data-i18n="sources.title">📤 Upload Sources</h3>
+      <p class="caption" data-i18n="sources.desc">Upload your Telegram chat export (JSON). Max 2 sources · 5 MB per file.</p>
+
+      <div id="sources-list" style="margin-bottom:16px;"></div>
+
+      <div id="upload-area" class="upload-area" onclick="document.getElementById('source-file-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleSourceDrop(event)">
+        <div class="upload-icon">📁</div>
+        <p data-i18n="sources.dragDrop">Drag &amp; drop your Telegram export here</p>
+        <p class="caption" data-i18n="sources.browse">or click to browse files</p>
+        <p class="caption" style="margin-top:8px;opacity:.6;" data-i18n="sources.limit">Limit: 2 sources · 5 MB per file · .json only</p>
+      </div>
+      <input type="file" id="source-file-input" accept=".json" style="display:none" onchange="handleSourceFileSelect(this)">
+
+      <div id="source-selected" style="display:none;margin-top:12px;padding:12px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:10px;">
+        <span id="source-filename" style="font-size:13px;color:rgba(255,255,255,0.8);"></span>
+        <span id="source-filesize" style="font-size:12px;color:rgba(255,255,255,0.4);margin-left:8px;"></span>
+      </div>
+
+      <div id="source-status" style="margin-top:10px;font-size:13px;min-height:20px;"></div>
+
+      <button id="source-upload-btn" class="btn-primary" style="margin-top:16px;display:none" onclick="uploadSource()" data-i18n="sources.upload">🚀 Upload Source</button>
     </div>
 
     <!-- ── TAB: Privacy ── -->

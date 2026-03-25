@@ -130,12 +130,32 @@ function onWalletConnected(wallet) {
   document.getElementById('cabinet').classList.remove('hidden');
   document.getElementById('demo-badge').classList.add('hidden');
 
+  // Show disconnect button, hide demo badge
+  const disconnectBtn = document.getElementById('disconnect-btn');
+  if (disconnectBtn) disconnectBtn.classList.remove('hidden');
+
   const short = rawAddr.slice(0, 6) + '...' + rawAddr.slice(-4);
   document.getElementById('cab-wallet').textContent = '🔗 ' + short;
   document.getElementById('cab-name').textContent = 'My Twin';
 
   // Load real profile
   loadProfileForWallet(rawAddr);
+  // Load sources count
+  loadSourcesCount(rawAddr);
+}
+
+async function disconnectWallet() {
+  try {
+    if (tonConnectUI) await tonConnectUI.disconnect();
+  } catch (e) { /* ignore */ }
+  window._walletAddr = null;
+  window._demoMode = false;
+
+  document.getElementById('cabinet').classList.add('hidden');
+  document.getElementById('not-connected').classList.remove('hidden');
+
+  const disconnectBtn = document.getElementById('disconnect-btn');
+  if (disconnectBtn) disconnectBtn.classList.add('hidden');
 }
 
 async function loadProfileForWallet(walletAddr) {
@@ -243,6 +263,132 @@ function saveHallucinationSettings() {
   }
 }
 
+// ── Upload Sources ────────────────────────────────────────────────────────────
+const MAX_SOURCES = 2;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+let _selectedSourceFile = null;
+
+async function loadSourcesCount(walletAddr) {
+  try {
+    const res = await fetch(`${API_URL}/api/profile`, {
+      headers: { 'x-wallet-address': walletAddr }
+    });
+    if (!res.ok) return;
+    const p = await res.json();
+    renderSourcesList(p.sources || 0);
+  } catch (e) { /* ignore */ }
+}
+
+function renderSourcesList(count) {
+  const el = document.getElementById('sources-list');
+  if (!el) return;
+  if (count === 0) {
+    el.innerHTML = `<p class="caption" style="opacity:.5" data-i18n="sources.noSources">${t('sources.noSources')}</p>`;
+  } else {
+    const items = Array.from({length: count}, (_, i) =>
+      `<div style="padding:10px 14px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:8px;margin-bottom:8px;font-size:13px;">
+        📂 Source ${i + 1} <span style="opacity:.5;margin-left:8px;">✅ Indexed</span>
+       </div>`
+    ).join('');
+    el.innerHTML = items;
+  }
+
+  // Disable upload area if at max
+  const uploadArea = document.getElementById('upload-area');
+  const fileInput = document.getElementById('source-file-input');
+  const statusEl = document.getElementById('source-status');
+  if (count >= MAX_SOURCES) {
+    if (uploadArea) { uploadArea.style.opacity = '.4'; uploadArea.style.pointerEvents = 'none'; }
+    if (fileInput) fileInput.disabled = true;
+    if (statusEl) statusEl.textContent = t('sources.maxReached');
+    statusEl.style.color = 'rgba(255,165,0,.8)';
+  }
+}
+
+function handleSourceDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-area').classList.remove('drag-over');
+  const file = e.dataTransfer?.files?.[0];
+  if (file) selectSourceFile(file);
+}
+
+function handleSourceFileSelect(input) {
+  const file = input?.files?.[0];
+  if (file) selectSourceFile(file);
+}
+
+function selectSourceFile(file) {
+  const statusEl = document.getElementById('source-status');
+
+  if (!file.name.endsWith('.json')) {
+    statusEl.textContent = t('sources.errJson');
+    statusEl.style.color = '#ff6b6b';
+    return;
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    statusEl.textContent = t('sources.errSize');
+    statusEl.style.color = '#ff6b6b';
+    return;
+  }
+
+  _selectedSourceFile = file;
+  const kb = (file.size / 1024).toFixed(0);
+  document.getElementById('source-filename').textContent = file.name;
+  document.getElementById('source-filesize').textContent = `${kb} KB`;
+  document.getElementById('source-selected').style.display = '';
+  document.getElementById('source-upload-btn').style.display = '';
+  statusEl.textContent = '';
+}
+
+async function uploadSource() {
+  const walletAddr = window._walletAddr;
+  if (!walletAddr || window._demoMode) {
+    document.getElementById('source-status').textContent = t('sources.errNoWallet');
+    return;
+  }
+  if (!_selectedSourceFile) {
+    document.getElementById('source-status').textContent = t('sources.errNoFile');
+    return;
+  }
+
+  const btn = document.getElementById('source-upload-btn');
+  const statusEl = document.getElementById('source-status');
+  btn.disabled = true;
+  btn.textContent = '⏳ Uploading...';
+  statusEl.textContent = t('sources.uploading');
+  statusEl.style.color = 'rgba(0,229,255,.8)';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', _selectedSourceFile);
+    formData.append('wallet_address', walletAddr);
+
+    const res = await fetch(`${API_URL}/api/upload`, {
+      method: 'POST',
+      headers: { 'x-wallet-address': walletAddr },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Upload failed');
+
+    statusEl.textContent = `✅ ${data.message || 'Source uploaded!'} ${data.messages_indexed ? `(${data.messages_indexed} messages)` : ''}`;
+    statusEl.style.color = 'rgba(0,229,255,.9)';
+    btn.textContent = '✅ Done';
+    _selectedSourceFile = null;
+    document.getElementById('source-selected').style.display = 'none';
+
+    // Refresh profile + sources count
+    loadProfileForWallet(walletAddr);
+    loadSourcesCount(walletAddr);
+  } catch (err) {
+    statusEl.textContent = `❌ ${err.message}`;
+    statusEl.style.color = '#ff6b6b';
+    btn.disabled = false;
+    btn.textContent = t('sources.upload');
+  }
+}
+
 // ── Mint Demo NFT ─────────────────────────────────────────────────────────────
 function mintDurovNFT() {
   const btn = document.getElementById('mint-durov-btn');
@@ -279,3 +425,7 @@ window.addPreset = addPreset;
 window.saveHallucinationSettings = saveHallucinationSettings;
 window.mintDurovNFT = mintDurovNFT;
 window.connectWalletCabinet = connectWalletCabinet;
+window.disconnectWallet = disconnectWallet;
+window.handleSourceDrop = handleSourceDrop;
+window.handleSourceFileSelect = handleSourceFileSelect;
+window.uploadSource = uploadSource;

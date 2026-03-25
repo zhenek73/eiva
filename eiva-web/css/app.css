@@ -27,6 +27,36 @@
 }
 #wallet-btn:hover { background: rgba(0,229,255,0.15); box-shadow: 0 0 16px var(--cyan-glow); }
 
+/* ── Disconnect Button ── */
+.btn-disconnect {
+  padding: 7px 14px;
+  background: rgba(255, 75, 75, 0.08);
+  border: 1px solid rgba(255, 75, 75, 0.25);
+  color: rgba(255, 120, 120, 0.9);
+  border-radius: 8px;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-disconnect:hover { background: rgba(255, 75, 75, 0.18); border-color: rgba(255, 75, 75, 0.5); }
+
+/* ── Upload Area ── */
+.upload-area {
+  border: 2px dashed rgba(0,229,255,0.25);
+  border-radius: 12px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(0,229,255,0.02);
+  margin-top: 8px;
+}
+.upload-area:hover, .upload-area.drag-over {
+  border-color: rgba(0,229,255,0.6);
+  background: rgba(0,229,255,0.05);
+}
+.upload-icon { font-size: 32px; margin-bottom: 8px; }
+
 /* ── Not Connected Screen ── */
 #not-connected {
   display: flex; align-items: center; justify-content: center;
