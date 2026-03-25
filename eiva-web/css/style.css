@@ -89,17 +89,17 @@ nav {
   height: 64px; gap: 16px;
 }
 .logo {
-  font-size: 20px; font-weight: 800; color: var(--text);
+  font-size: 20px; font-weight: 400; color: var(--text);
   display: flex; align-items: center; gap: 10px; text-decoration: none;
   letter-spacing: -0.02em;
 }
-.logo-glyph {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--cyan), var(--ton));
+.logo-img {
+  width: 46px;
+  height: 46px;
   border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 0 16px var(--cyan-glow);
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
 }
 .logo-text { color: var(--cyan); }
 
