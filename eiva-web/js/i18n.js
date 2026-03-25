@@ -7,7 +7,7 @@ const TRANSLATIONS = {
   en: {
     // Hero
     "hero.tag": "TON AI Hackathon 2026",
-    "hero.title": "Your AI Self — owned by you",
+    "hero.title": "Your words. Your voice. Your twin.",
     "hero.subtitle": "Turn your Telegram history into a living AI. Verifiable on TON blockchain.",
     "hero.tryDemo": "🤖 Try Demo in Telegram",
     "hero.openCabinet": "Open Your Cabinet →",
@@ -172,7 +172,7 @@ const TRANSLATIONS = {
   ru: {
     // Hero
     "hero.tag": "TON AI Хакатон 2026",
-    "hero.title": "Твой AI двойник — принадлежит тебе",
+    "hero.title": "Твои слова. Твой голос. Твой двойник.",
     "hero.subtitle": "Превращаем историю твоих чатов в живой AI. Верифицируется на блокчейне TON.",
     "hero.tryDemo": "🤖 Попробовать демо в Telegram",
     "hero.openCabinet": "Открыть кабинет →",

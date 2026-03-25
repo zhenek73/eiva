@@ -43,12 +43,7 @@ desktop.ini
 *.swo
 
 # ── AVATARS / GENERATED IMAGES (local cache) ─────────────────────────────────
-avatars/
-*.png
-*.jpg
-*.jpeg
-!docs/*.png
-!docs/*.jpg
+  
 
 # ── LOGS ──────────────────────────────────────────────────────────────────────
 *.log
