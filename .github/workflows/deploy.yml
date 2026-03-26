@@ -29,10 +29,9 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: 22
           script: |
-            cd /var/www/eiva-bot
+            cd /var/www/eiva
             git pull origin main
-            cd eiva-bot
-            source venv/bin/activate
+            source eiva-bot/venv/bin/activate
             pip install -r requirements.txt -q
             pip install fastapi "uvicorn[standard]" python-multipart -q
             deactivate
