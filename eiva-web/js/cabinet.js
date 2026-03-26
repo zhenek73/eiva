@@ -30,7 +30,9 @@ async function loadDemoMode() {
 
   // Set avatar & name immediately (will update from API)
   document.getElementById('cab-name').textContent = 'Pavel Durov';
-  document.getElementById('cab-avatar').src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117';
+  document.getElementById('cab-avatar').src = 'images/avatars/durov.png';
+  document.getElementById('cab-avatar').style.objectFit = 'cover';
+  document.getElementById('cab-avatar').style.borderRadius = '50%';
   document.getElementById('cab-wallet').textContent = '🎭 Demo Mode — no wallet connected';
 
   // Welcome message in chat
@@ -67,7 +69,11 @@ function updateProfileUI(p) {
   if (el('cab-name') && p.twin_name) el('cab-name').textContent = p.twin_name;
   if (el('twin-messages')) el('twin-messages').textContent = p.messages_indexed || '—';
   if (el('twin-sources'))  el('twin-sources').textContent  = p.sources || '—';
-  if (el('twin-mode'))     el('twin-mode').textContent     = p.mode ? p.mode.charAt(0).toUpperCase() + p.mode.slice(1) : 'Demo';
+
+  // Update mode toggle buttons
+  const mode = p.mode || 'personal';
+  window._currentMode = mode;
+  updateModeUI(mode);
 
   // Update personality traits
   if (p.topics?.length && el('traits-list')) {
@@ -247,20 +253,82 @@ function addPreset(text) {
   if (ta) ta.value = (ta.value ? ta.value + '\n' : '') + text;
 }
 
-function saveHallucinationSettings() {
+// ── Mode Switching ────────────────────────────────────────────────────────────
+function updateModeUI(mode) {
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  if (document.getElementById('twin-mode')) {
+    document.getElementById('twin-mode').textContent =
+      mode === 'professional' ? 'Professional' : 'Personal';
+  }
+}
+
+async function setMode(mode) {
+  if (window._demoMode) return; // read-only in demo
+  window._currentMode = mode;
+  updateModeUI(mode);
+
+  const walletAddr = window._walletAddr;
+  if (!walletAddr) return;
+  try {
+    await fetch(`${API_URL}/api/set-mode`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-wallet-address': walletAddr },
+      body: JSON.stringify({ mode }),
+    });
+  } catch (e) { console.warn('setMode failed', e); }
+}
+
+// ── Hallucination Settings ────────────────────────────────────────────────────
+async function saveHallucinationSettings() {
   const settings = {
     show_uncertainty:      document.getElementById('ctrl-uncertainty')?.checked,
     refuse_low_confidence: document.getElementById('ctrl-refuse')?.checked,
     no_invent_memories:    document.getElementById('ctrl-no-invent')?.checked,
-    custom_instructions:   document.getElementById('custom-instructions')?.value,
+    custom_instructions:   document.getElementById('custom-instructions')?.value || '',
   };
+  // Always save to localStorage as cache
   localStorage.setItem('hallucination_settings', JSON.stringify(settings));
+
   const btn = event?.target;
-  if (btn) {
-    const orig = btn.textContent;
-    btn.textContent = '✅ Saved!';
-    setTimeout(() => { btn.textContent = orig; }, 2000);
+  const orig = btn?.textContent;
+
+  // Push to API if wallet connected
+  const walletAddr = window._walletAddr;
+  if (walletAddr && !window._demoMode) {
+    try {
+      if (btn) btn.textContent = '⏳ Saving…';
+      const res = await fetch(`${API_URL}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-wallet-address': walletAddr },
+        body: JSON.stringify(settings),
+      });
+      if (res.ok) {
+        if (btn) { btn.textContent = '✅ Saved!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+      } else {
+        if (btn) { btn.textContent = '⚠️ Saved locally'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+      }
+    } catch (e) {
+      if (btn) { btn.textContent = '⚠️ Saved locally'; setTimeout(() => { btn.textContent = orig; }, 2000); }
+    }
+  } else {
+    if (btn) { btn.textContent = '✅ Saved!'; setTimeout(() => { btn.textContent = orig; }, 2000); }
   }
+}
+
+function loadHallucinationSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('hallucination_settings') || '{}');
+    if (document.getElementById('ctrl-uncertainty'))
+      document.getElementById('ctrl-uncertainty').checked = saved.show_uncertainty ?? true;
+    if (document.getElementById('ctrl-refuse'))
+      document.getElementById('ctrl-refuse').checked = saved.refuse_low_confidence ?? false;
+    if (document.getElementById('ctrl-no-invent'))
+      document.getElementById('ctrl-no-invent').checked = saved.no_invent_memories ?? true;
+    if (document.getElementById('custom-instructions') && saved.custom_instructions)
+      document.getElementById('custom-instructions').value = saved.custom_instructions;
+  } catch (e) { /* ignore */ }
 }
 
 // ── Upload Sources ────────────────────────────────────────────────────────────
@@ -276,33 +344,48 @@ async function loadSourcesCount(walletAddr) {
     });
     if (!res.ok) return;
     const p = await res.json();
-    renderSourcesList(p.sources || 0);
+    // Try to get source labels from metadata
+    const labels = p.source_labels || [];
+    renderSourcesList(p.sources || 0, labels);
   } catch (e) { /* ignore */ }
 }
 
-function renderSourcesList(count) {
+const SOURCE_TYPE_LABELS = {
+  telegram_channel: '📢 Telegram channel',
+  telegram_chat: '💬 Telegram chat',
+  interview: '🎙 Interview',
+  other: '📄 Document',
+};
+
+function renderSourcesList(count, labels = []) {
   const el = document.getElementById('sources-list');
+  const paidCta = document.getElementById('source-paid-cta');
+  const uploadForm = document.getElementById('source-upload-form');
   if (!el) return;
+
   if (count === 0) {
-    el.innerHTML = `<p class="caption" style="opacity:.5" data-i18n="sources.noSources">${t('sources.noSources')}</p>`;
+    el.innerHTML = `<p class="caption" style="opacity:.5;">${t('sources.noSources')}</p>`;
   } else {
-    const items = Array.from({length: count}, (_, i) =>
-      `<div style="padding:10px 14px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:8px;margin-bottom:8px;font-size:13px;">
-        📂 Source ${i + 1} <span style="opacity:.5;margin-left:8px;">✅ Indexed</span>
-       </div>`
-    ).join('');
+    const items = Array.from({length: count}, (_, i) => {
+      const label = labels[i];
+      const typeName = label ? (SOURCE_TYPE_LABELS[label.type] || label.type) : '📂 Source';
+      const comment = label?.comment ? ` — <span style="opacity:.6">${label.comment}</span>` : '';
+      return `<div style="padding:12px 14px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:10px;margin-bottom:8px;font-size:13px;display:flex;align-items:center;gap:10px;">
+        <span style="flex:1">${typeName} #${i+1}${comment}</span>
+        <span style="font-size:11px;color:rgba(0,229,255,.7);background:rgba(0,229,255,.08);padding:3px 8px;border-radius:6px;">✅ Indexed</span>
+      </div>`;
+    }).join('');
     el.innerHTML = items;
   }
 
-  // Disable upload area if at max
-  const uploadArea = document.getElementById('upload-area');
-  const fileInput = document.getElementById('source-file-input');
-  const statusEl = document.getElementById('source-status');
+  // Show/hide upload form & paid CTA
   if (count >= MAX_SOURCES) {
-    if (uploadArea) { uploadArea.style.opacity = '.4'; uploadArea.style.pointerEvents = 'none'; }
-    if (fileInput) fileInput.disabled = true;
-    if (statusEl) statusEl.textContent = t('sources.maxReached');
-    statusEl.style.color = 'rgba(255,165,0,.8)';
+    // Free tier maxed — hide upload form, show paid CTA
+    if (uploadForm) uploadForm.style.display = 'none';
+    if (paidCta) paidCta.style.display = '';
+  } else {
+    if (uploadForm) uploadForm.style.display = '';
+    if (paidCta) paidCta.style.display = 'none';
   }
 }
 
@@ -354,6 +437,9 @@ async function uploadSource() {
 
   const btn = document.getElementById('source-upload-btn');
   const statusEl = document.getElementById('source-status');
+  const sourceType = document.getElementById('source-type')?.value || 'telegram_channel';
+  const sourceComment = document.getElementById('source-comment')?.value || '';
+
   btn.disabled = true;
   btn.textContent = '⏳ Uploading...';
   statusEl.textContent = t('sources.uploading');
@@ -363,6 +449,8 @@ async function uploadSource() {
     const formData = new FormData();
     formData.append('file', _selectedSourceFile);
     formData.append('wallet_address', walletAddr);
+    formData.append('source_type', sourceType);
+    formData.append('source_comment', sourceComment);
 
     const res = await fetch(`${API_URL}/api/upload`, {
       method: 'POST',
@@ -372,11 +460,12 @@ async function uploadSource() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Upload failed');
 
-    statusEl.textContent = `✅ ${data.message || 'Source uploaded!'} ${data.messages_indexed ? `(${data.messages_indexed} messages)` : ''}`;
+    statusEl.textContent = `✅ ${data.message || 'Source uploaded!'} ${data.messages_indexed ? `(${data.messages_indexed} messages indexed)` : ''}`;
     statusEl.style.color = 'rgba(0,229,255,.9)';
     btn.textContent = '✅ Done';
     _selectedSourceFile = null;
     document.getElementById('source-selected').style.display = 'none';
+    if (document.getElementById('source-comment')) document.getElementById('source-comment').value = '';
 
     // Refresh profile + sources count
     loadProfileForWallet(walletAddr);
@@ -386,6 +475,27 @@ async function uploadSource() {
     statusEl.style.color = '#ff6b6b';
     btn.disabled = false;
     btn.textContent = t('sources.upload');
+  }
+}
+
+// ── Paid source modal ─────────────────────────────────────────────────────────
+function openPaidSourceModal() {
+  const modal = document.getElementById('paid-source-modal');
+  if (!modal) return;
+  const shortEl = document.getElementById('modal-wallet-short');
+  if (shortEl && window._walletAddr) {
+    const addr = window._walletAddr;
+    shortEl.textContent = addr.slice(0, 8);
+  }
+  modal.classList.remove('hidden');
+}
+function closePaidSourceModal() {
+  document.getElementById('paid-source-modal')?.classList.add('hidden');
+}
+function openTonPayment() {
+  // Open TonConnect payment flow if available
+  if (window.tonConnectUI) {
+    alert('TON payment integration coming soon. Please send 1 TON manually to unlock the 3rd slot.');
   }
 }
 
@@ -408,6 +518,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Init TonConnect (for real wallet connect)
   initTonConnectCabinet();
 
+  // Load saved hallucination settings
+  loadHallucinationSettings();
+
   // Enter key in chat
   const chatInput = document.getElementById('chat-input');
   if (chatInput) {
@@ -429,3 +542,8 @@ window.disconnectWallet = disconnectWallet;
 window.handleSourceDrop = handleSourceDrop;
 window.handleSourceFileSelect = handleSourceFileSelect;
 window.uploadSource = uploadSource;
+window.setMode = setMode;
+window.loadHallucinationSettings = loadHallucinationSettings;
+window.openPaidSourceModal = openPaidSourceModal;
+window.closePaidSourceModal = closePaidSourceModal;
+window.openTonPayment = openTonPayment;

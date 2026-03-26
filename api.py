@@ -73,6 +73,16 @@ class ProfileResponse(BaseModel):
     tier: str
     mode: str
     nft_address: Optional[str] = None
+    source_labels: Optional[list] = None
+
+class SettingsRequest(BaseModel):
+    show_uncertainty: bool = True
+    refuse_low_confidence: bool = False
+    no_invent_memories: bool = True
+    custom_instructions: str = ""
+
+class SetModeRequest(BaseModel):
+    mode: str  # "personal" | "professional"
 
 
 # ─────────────────────────────────────────
@@ -111,6 +121,8 @@ async def upload_export(
     file: UploadFile = File(...),
     x_wallet_address: str = Header(..., description="TON wallet address"),
     x_demo_mode: bool = Header(False),
+    source_type: str = "telegram_channel",
+    source_comment: str = "",
 ):
     """Upload Telegram JSON export and build digital twin"""
     try:
@@ -155,6 +167,15 @@ async def upload_export(
         store.save_meta("system_prompt", system_prompt)
         store.save_meta("tier", tier_or_msg)
 
+        # Store source label
+        existing_labels_raw = store.load_meta("source_labels") or "[]"
+        try:
+            existing_labels = json.loads(existing_labels_raw) if isinstance(existing_labels_raw, str) else existing_labels_raw
+        except Exception:
+            existing_labels = []
+        existing_labels.append({"type": source_type, "comment": source_comment})
+        store.save_meta("source_labels", json.dumps(existing_labels))
+
         # Cleanup temp
         temp_path.unlink(missing_ok=True)
 
@@ -192,6 +213,37 @@ async def chat(req: ChatRequest):
         owner_name = store.load_meta("owner_name") or twin_name
         twin_name = owner_name if owner_name != "Unknown" else twin_name
 
+        # Apply hallucination control settings if saved
+        settings = {}
+        raw_settings = store.load_meta("hallucination_settings")
+        if raw_settings:
+            try:
+                settings = json.loads(raw_settings) if isinstance(raw_settings, str) else raw_settings
+            except Exception:
+                pass
+
+        # Apply mode (personal vs professional)
+        mode = store.load_meta("mode") or "personal"
+
+        # Build final system prompt with settings appended
+        final_prompt = system_prompt
+        extra_rules = []
+        if settings.get("show_uncertainty"):
+            extra_rules.append("When you are not certain about something, express uncertainty naturally (use phrases like 'I think', 'I believe', 'if I recall correctly').")
+        if settings.get("refuse_low_confidence"):
+            extra_rules.append("If you have very low confidence in a memory or fact, politely decline to answer rather than guess.")
+        if settings.get("no_invent_memories"):
+            extra_rules.append("NEVER invent or fabricate memories, events, or experiences that are not supported by what you know. If you don't know, say so.")
+        custom = settings.get("custom_instructions", "").strip()
+        if custom:
+            extra_rules.append(f"Additional instructions from the user:\n{custom}")
+        if mode == "professional":
+            extra_rules.append("Respond in a professional, expert tone — thoughtful, precise, and authoritative.")
+        else:
+            extra_rules.append("Respond in a warm, personal, conversational tone — like talking with a close friend.")
+        if extra_rules:
+            final_prompt = final_prompt + "\n\n--- Behavior Rules ---\n" + "\n".join(f"- {r}" for r in extra_rules)
+
         # Determine confidence from memory retrieval count
         similar = store.search(req.message, top_k=config.TOP_K_SIMILAR)
         count = len(similar)
@@ -203,7 +255,7 @@ async def chat(req: ChatRequest):
             confidence = "HIGH ✅"
 
         # Generate reply
-        agent = EivaAgent(user_id, system_prompt)
+        agent = EivaAgent(user_id, final_prompt)
         reply = await asyncio.to_thread(agent.reply, req.message)
 
         return ChatResponse(reply=reply, confidence=confidence, twin_name=twin_name)
@@ -228,6 +280,14 @@ async def get_profile(x_wallet_address: str = Header(...)):
         profile = store.load_meta("personality") or {}
         owner_name = store.load_meta("owner_name") or "Unknown"
 
+        source_labels = []
+        raw_labels = store.load_meta("source_labels")
+        if raw_labels:
+            try:
+                source_labels = json.loads(raw_labels) if isinstance(raw_labels, str) else raw_labels
+            except Exception:
+                pass
+
         return ProfileResponse(
             twin_name=owner_name,
             personality_summary=profile.get("emotional_tone", ""),
@@ -238,6 +298,7 @@ async def get_profile(x_wallet_address: str = Header(...)):
             tier=store.get_tier(),
             mode=store.load_meta("mode") or "personal",
             nft_address=store.load_meta("nft_address"),
+            source_labels=source_labels,
         )
 
     except HTTPException:
@@ -274,6 +335,45 @@ async def get_demo_profile():
         "tier": "silver",
         "mode": "personal",
     }
+
+
+@app.post("/api/settings")
+async def save_settings(req: SettingsRequest, x_wallet_address: str = Header(...)):
+    """Save hallucination control settings for wallet"""
+    try:
+        user_id = _user_id_from_wallet(x_wallet_address)
+        store = EmbeddingStore(user_id)
+        if not store.is_ready():
+            raise HTTPException(status_code=404, detail="Twin not found.")
+        store.save_meta("hallucination_settings", json.dumps({
+            "show_uncertainty": req.show_uncertainty,
+            "refuse_low_confidence": req.refuse_low_confidence,
+            "no_invent_memories": req.no_invent_memories,
+            "custom_instructions": req.custom_instructions,
+        }))
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/set-mode")
+async def set_mode(req: SetModeRequest, x_wallet_address: str = Header(...)):
+    """Set twin response mode (personal / professional)"""
+    try:
+        if req.mode not in ("personal", "professional"):
+            raise HTTPException(status_code=400, detail="Mode must be 'personal' or 'professional'")
+        user_id = _user_id_from_wallet(x_wallet_address)
+        store = EmbeddingStore(user_id)
+        if not store.is_ready():
+            raise HTTPException(status_code=404, detail="Twin not found.")
+        store.save_meta("mode", req.mode)
+        return {"success": True, "mode": req.mode}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/stats")

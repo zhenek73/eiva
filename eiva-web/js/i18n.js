@@ -185,7 +185,17 @@ const TRANSLATIONS = {
     "sources.errSize": "❌ File exceeds 5 MB limit. Please export a smaller chat.",
     "sources.errNoWallet": "⚠️ Connect your TON wallet first.",
     "sources.errNoFile": "⚠️ Select a file first.",
-    "sources.uploading": "⏳ Uploading and analyzing messages… This may take 30–60 seconds."
+    "sources.uploading": "⏳ Uploading and analyzing messages… This may take 30–60 seconds.",
+    "sources.typeLabel": "Source type:",
+    "sources.typeTelegramChannel": "📢 Telegram channel archive",
+    "sources.typeTelegramChat": "💬 Telegram personal chat",
+    "sources.typeInterview": "🎙 Interview transcript",
+    "sources.typeOther": "📄 Other text document",
+    "sources.commentLabel": "Label (optional):",
+    "sources.paidTitle": "🔓 Want more sources?",
+    "sources.paidDesc": "Add a 3rd source for 1 TON — one-time payment.",
+    "sources.paidBtn": "➕ Add 3rd Source — 1 TON",
+    "sources.paidNote": "After payment your slot unlocks automatically within 2 minutes."
   },
 
   ru: {
@@ -369,7 +379,17 @@ const TRANSLATIONS = {
     "sources.errSize": "❌ Файл превышает 5 МБ. Выбери меньший чат.",
     "sources.errNoWallet": "⚠️ Сначала подключи TON кошелёк.",
     "sources.errNoFile": "⚠️ Сначала выбери файл.",
-    "sources.uploading": "⏳ Загружаем и анализируем сообщения… 30–60 секунд."
+    "sources.uploading": "⏳ Загружаем и анализируем сообщения… 30–60 секунд.",
+    "sources.typeLabel": "Тип источника:",
+    "sources.typeTelegramChannel": "📢 Архив Telegram-канала",
+    "sources.typeTelegramChat": "💬 Личный чат Telegram",
+    "sources.typeInterview": "🎙 Транскрипт интервью",
+    "sources.typeOther": "📄 Другой текстовый документ",
+    "sources.commentLabel": "Метка (необязательно):",
+    "sources.paidTitle": "🔓 Хочешь больше источников?",
+    "sources.paidDesc": "Добавь 3-й источник за 1 TON — разовая оплата.",
+    "sources.paidBtn": "➕ Добавить 3-й источник — 1 TON",
+    "sources.paidNote": "После оплаты слот разблокируется автоматически в течение 2 минут."
   }
 };
 

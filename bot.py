@@ -98,9 +98,22 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     # Load user's language preference
     store = EmbeddingStore(str(user.id))
-    user_lang = store.load_meta("language") or "en"
-    i18n.set_language(user_lang)
+    user_lang = store.load_meta("language")
 
+    # ── First run: show language selector ──
+    if not user_lang:
+        keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("🇬🇧 English", callback_data="start_lang_en"),
+            InlineKeyboardButton("🇷🇺 Русский", callback_data="start_lang_ru"),
+        ]])
+        await update.message.reply_text(
+            "🌐 *Choose your language / Выберите язык:*",
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=keyboard,
+        )
+        return
+
+    i18n.set_language(user_lang)
     already_setup = _is_setup(user.id)
 
     text = (
@@ -128,7 +141,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         text += "🔄 /reset — clear conversation history\n"
         text += "❓ /help — show all commands"
         keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("🌐 Web Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+            InlineKeyboardButton("🌐 Web Cabinet", url="https://eiva.space/app.html"),
             InlineKeyboardButton("💎 Mint NFT", callback_data="start_mint"),
         ]])
     else:
@@ -142,7 +155,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
         keyboard = InlineKeyboardMarkup([[
             InlineKeyboardButton("📂 Start Setup", callback_data="start_setup"),
-            InlineKeyboardButton("🌐 Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+            InlineKeyboardButton("🌐 Web Cabinet", url="https://eiva.space/app.html"),
         ]])
 
     await update.message.reply_text(
@@ -1009,6 +1022,68 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
             reply_markup=keyboard,
             parse_mode=ParseMode.MARKDOWN,
         )
+
+    elif query.data.startswith("start_lang_"):
+        # First-run language selection — save and show full /start
+        lang_code = query.data.replace("start_lang_", "")
+        store = EmbeddingStore(str(user_id))
+        store.save_meta("language", lang_code)
+        i18n.set_language(lang_code)
+        await query.answer()
+        # Proceed to show the main welcome message
+        already_setup = _is_setup(user_id)
+        if lang_code == "ru":
+            text = (
+                f"👋 Привет, {query.from_user.first_name}!\n\n"
+                "🎭 *Eiva — твой бессмертный цифровой двойник*\n\n"
+                "Превращаю твои Telegram-переписки в живой AI-двойник:\n"
+                "• Изучает твои сообщения и манеру речи\n"
+                "• Отвечает твоим голосом и стилем\n"
+                "• Минтится как *Soulbound NFT* на TON\n"
+                "• Живёт вечно на блокчейне\n\n"
+            )
+        else:
+            text = (
+                f"👋 Hi, {query.from_user.first_name}!\n\n"
+                "🎭 *Eiva — Your Immortal Digital Twin*\n\n"
+                "Transform your Telegram chats into a living AI twin:\n"
+                "• Learns your messages and speech patterns\n"
+                "• Responds in your authentic voice\n"
+                "• Mints as a *Soulbound NFT* on TON blockchain\n"
+                "• Lives forever on-chain\n\n"
+            )
+        if already_setup:
+            _load_agent(user_id)
+            if lang_code == "ru":
+                text += "✅ *Твой двойник уже готов!* Просто пиши и я отвечу как ты.\n\nКоманды: /profile /mint /status /reset /help"
+            else:
+                text += "✅ *Your twin is live!* Just chat and I'll respond as you.\n\nCommands: /profile /mint /status /reset /help"
+            keyboard = InlineKeyboardMarkup([[
+                InlineKeyboardButton("🌐 Web Cabinet", url="https://eiva.space/app.html"),
+                InlineKeyboardButton("💎 Mint NFT", callback_data="start_mint"),
+            ]])
+        else:
+            if lang_code == "ru":
+                text += (
+                    "Чтобы создать двойника — загрузи экспорт переписок.\n\n"
+                    "*📝 3 простых шага:*\n"
+                    "1️⃣ *Экспорт:* Telegram → Настройки → Расширенные → Экспорт\n"
+                    "2️⃣ *Формат:* JSON\n"
+                    "3️⃣ *Загрузи:* отправь файл `result.json` командой /setup"
+                )
+            else:
+                text += (
+                    "Upload a Telegram chat export to create your twin.\n\n"
+                    "*📝 3 Easy Steps:*\n"
+                    "1️⃣ *Export:* Telegram → Settings → Advanced → Export\n"
+                    "2️⃣ *Format:* JSON\n"
+                    "3️⃣ *Upload:* Send `result.json` using /setup"
+                )
+            keyboard = InlineKeyboardMarkup([[
+                InlineKeyboardButton("📂 Start Setup" if lang_code == "en" else "📂 Начать", callback_data="start_setup"),
+                InlineKeyboardButton("🌐 Web Cabinet", url="https://eiva.space/app.html"),
+            ]])
+        await query.edit_message_text(text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
 
     elif query.data.startswith("lang_"):
         lang_code = query.data.replace("lang_", "")

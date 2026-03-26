@@ -98,8 +98,12 @@
           <div class="stat-num" id="twin-sources">2</div>
           <div class="stat-label" data-i18n="twin.sources">Sources</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-num" id="twin-mode">Personal</div>
+        <div class="stat-card" style="min-width:160px;">
+          <div id="twin-mode" style="display:none">Personal</div>
+          <div class="mode-toggle" id="mode-toggle">
+            <button class="mode-btn active" data-mode="personal" onclick="setMode('personal')" data-i18n="twin.modePersonal">Personal</button>
+            <button class="mode-btn" data-mode="professional" onclick="setMode('professional')" data-i18n="twin.modeProfessional">Professional</button>
+          </div>
           <div class="stat-label" data-i18n="twin.mode">Mode</div>
         </div>
       </div>
@@ -170,7 +174,7 @@
       <h3 data-i18n="nft.title">🎫 Soul Certificate</h3>
       <div class="nft-card">
         <div class="nft-card-header">
-          <img id="nft-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=durov&backgroundColor=0d1117" class="nft-avatar" alt="Twin Avatar">
+          <img id="nft-avatar" src="images/avatars/durov.png" class="nft-avatar" style="object-fit:cover;border-radius:50%;" alt="Twin Avatar">
           <div>
             <h3 id="nft-name">Pavel Durov</h3>
             <p class="mono caption" id="nft-address">EQDemo...Certificate</p>
@@ -249,26 +253,79 @@
     <!-- ── TAB: Sources ── -->
     <div id="tab-sources" class="tab-content hidden">
       <h3 data-i18n="sources.title">📤 Upload Sources</h3>
-      <p class="caption" data-i18n="sources.desc">Upload your Telegram chat export (JSON). Max 2 sources · 5 MB per file.</p>
+      <p class="caption" data-i18n="sources.desc">Upload your Telegram chat export (JSON). Free plan: 2 sources · 5 MB per file.</p>
 
-      <div id="sources-list" style="margin-bottom:16px;"></div>
+      <!-- Existing sources list -->
+      <div id="sources-list" style="margin-bottom:20px;"></div>
 
-      <div id="upload-area" class="upload-area" onclick="document.getElementById('source-file-input').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleSourceDrop(event)">
-        <div class="upload-icon">📁</div>
-        <p data-i18n="sources.dragDrop">Drag &amp; drop your Telegram export here</p>
-        <p class="caption" data-i18n="sources.browse">or click to browse files</p>
-        <p class="caption" style="margin-top:8px;opacity:.6;" data-i18n="sources.limit">Limit: 2 sources · 5 MB per file · .json only</p>
+      <!-- Upload form -->
+      <div id="source-upload-form">
+        <!-- Source type selector -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px;opacity:.7;display:block;margin-bottom:6px;" data-i18n="sources.typeLabel">Source type:</label>
+          <select id="source-type" style="width:100%;padding:10px 14px;background:var(--card);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:13px;">
+            <option value="telegram_channel" data-i18n="sources.typeTelegramChannel">📢 Telegram channel archive</option>
+            <option value="telegram_chat" data-i18n="sources.typeTelegramChat">💬 Telegram personal chat</option>
+            <option value="interview" data-i18n="sources.typeInterview">🎙 Interview transcript</option>
+            <option value="other" data-i18n="sources.typeOther">📄 Other text document</option>
+          </select>
+        </div>
+
+        <!-- Comment / label -->
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px;opacity:.7;display:block;margin-bottom:6px;" data-i18n="sources.commentLabel">Label (optional):</label>
+          <input id="source-comment" type="text" maxlength="80"
+            placeholder="e.g. @durov Telegram channel, Lex Fridman interview 2023"
+            style="width:100%;box-sizing:border-box;padding:10px 14px;background:var(--card);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:13px;">
+        </div>
+
+        <!-- Drop zone -->
+        <div id="upload-area" class="upload-area"
+          onclick="document.getElementById('source-file-input').click()"
+          ondragover="event.preventDefault();this.classList.add('drag-over')"
+          ondragleave="this.classList.remove('drag-over')"
+          ondrop="handleSourceDrop(event)">
+          <div class="upload-icon">📁</div>
+          <p data-i18n="sources.dragDrop">Drag &amp; drop your Telegram export here</p>
+          <p class="caption" data-i18n="sources.browse">or click to browse files</p>
+          <p class="caption" style="margin-top:8px;opacity:.6;" data-i18n="sources.limit">Limit: 2 sources · 5 MB · .json only</p>
+        </div>
+        <input type="file" id="source-file-input" accept=".json" style="display:none" onchange="handleSourceFileSelect(this)">
+
+        <div id="source-selected" style="display:none;margin-top:12px;padding:12px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:10px;">
+          <span id="source-filename" style="font-size:13px;color:rgba(255,255,255,0.8);"></span>
+          <span id="source-filesize" style="font-size:12px;color:rgba(255,255,255,0.4);margin-left:8px;"></span>
+        </div>
+
+        <div id="source-status" style="margin-top:10px;font-size:13px;min-height:20px;"></div>
+
+        <button id="source-upload-btn" class="btn-primary" style="margin-top:16px;display:none" onclick="uploadSource()" data-i18n="sources.upload">🚀 Upload Source</button>
       </div>
-      <input type="file" id="source-file-input" accept=".json" style="display:none" onchange="handleSourceFileSelect(this)">
 
-      <div id="source-selected" style="display:none;margin-top:12px;padding:12px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:10px;">
-        <span id="source-filename" style="font-size:13px;color:rgba(255,255,255,0.8);"></span>
-        <span id="source-filesize" style="font-size:12px;color:rgba(255,255,255,0.4);margin-left:8px;"></span>
+      <!-- Add 3rd source (paid) -->
+      <div id="source-paid-cta" style="display:none;margin-top:24px;padding:16px;background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.2);border-radius:12px;">
+        <p style="font-size:13px;margin:0 0 10px;" data-i18n="sources.paidTitle">🔓 Want more sources?</p>
+        <p class="caption" data-i18n="sources.paidDesc">Add a 3rd source for 1 TON — one-time payment.</p>
+        <button class="btn-secondary" style="margin-top:10px;" onclick="openPaidSourceModal()" data-i18n="sources.paidBtn">➕ Add 3rd Source — 1 TON</button>
       </div>
+    </div>
 
-      <div id="source-status" style="margin-top:10px;font-size:13px;min-height:20px;"></div>
-
-      <button id="source-upload-btn" class="btn-primary" style="margin-top:16px;display:none" onclick="uploadSource()" data-i18n="sources.upload">🚀 Upload Source</button>
+    <!-- ── Payment Modal (3rd source) ── -->
+    <div id="paid-source-modal" class="modal-overlay hidden" onclick="if(event.target===this)closePaidSourceModal()">
+      <div class="modal-box">
+        <h3>🔓 Add 3rd Source</h3>
+        <p class="caption" style="margin:10px 0 20px;">One-time payment of <strong>1 TON</strong> unlocks a 3rd upload slot permanently.</p>
+        <div style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.2);border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px;">
+          📍 Send exactly <strong>1 TON</strong> to:<br>
+          <span class="mono" style="font-size:12px;word-break:break-all;color:var(--cyan);">EQADemo_Treasury_Address_Here</span><br>
+          <span style="opacity:.6;font-size:11px;">with comment: <code>eiva_unlock_<span id="modal-wallet-short"></span></code></span>
+        </div>
+        <p class="caption" style="opacity:.6;" data-i18n="sources.paidNote">After payment your slot unlocks automatically within 2 minutes.</p>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn-primary" onclick="openTonPayment()">💎 Open TON Wallet</button>
+          <button class="btn-secondary" onclick="closePaidSourceModal()">Cancel</button>
+        </div>
+      </div>
     </div>
 
     <!-- ── TAB: Privacy ── -->
