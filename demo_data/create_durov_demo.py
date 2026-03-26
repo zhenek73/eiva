@@ -1,7 +1,9 @@
 """
 Script to pre-load Pavel Durov demo twin data.
 Run once from the eiva-bot directory:
-    python demo_data/create_durov_demo.py
+    cd /var/www/eiva/eiva-bot
+    source venv/bin/activate
+    python3 demo_data/create_durov_demo.py
 """
 import json
 import sys
@@ -63,10 +65,15 @@ def create_durov_demo():
     store.save_meta("owner_name", "Pavel Durov")
     store.save_meta("personality", json.dumps(profile, ensure_ascii=False))
     store.save_meta("system_prompt", system_prompt)
-    store.save_meta("mode", "demo")
+    store.save_meta("mode", "personal")
     store.save_meta("tier", "silver")
     store.save_meta("is_demo", "true")
-    store.save_meta("source_count", "1")
+    store.save_meta("source_count", "2")
+    source_labels = json.dumps([
+        {"type": "telegram_channel", "comment": "@durov Telegram channel (public posts)"},
+        {"type": "interview", "comment": "Lex Fridman interview transcript"},
+    ])
+    store.save_meta("source_labels", source_labels)
 
     print("\n✅ Pavel Durov demo twin created!")
     print(f"   User ID  : {DEMO_USER_ID}")

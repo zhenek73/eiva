@@ -33,6 +33,7 @@
         <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
       </div>
       <button id="disconnect-btn" class="btn-disconnect hidden" onclick="disconnectWallet()" data-i18n="nav.disconnect">Disconnect</button>
+      <button id="exit-demo-btn" class="btn-exit-demo hidden" onclick="exitDemo()" data-i18n="nav.exitDemo">← Exit Demo</button>
     </div>
   </div>
 </nav>
@@ -53,7 +54,11 @@
 <div id="cabinet" class="hidden">
   <div id="app">
     <div class="cabinet-header">
-      <img id="cab-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user&backgroundColor=0d1117" class="cab-avatar" alt="Twin Avatar">
+      <div class="avatar-wrap" onclick="openAvatarPicker()" title="Change avatar">
+        <img id="cab-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user&backgroundColor=0d1117" class="cab-avatar" alt="Twin Avatar" style="object-fit:cover;border-radius:50%;">
+        <div class="avatar-edit-overlay" id="avatar-overlay">📷</div>
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarSelect(this)">
       <div>
         <h2 id="cab-name">My Twin</h2>
         <p id="cab-wallet" class="mono caption"></p>
@@ -361,6 +366,25 @@
 <script src="https://unpkg.com/@tonconnect/ui@2.0.6/dist/tonconnect-ui.min.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/cabinet.js"></script>
+
+    <!-- ── Demo Lock Modal ── -->
+    <div id="demo-lock-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeDemoLockModal()">
+      <div class="modal-box" style="max-width:460px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">🎭</div>
+        <h3 data-i18n="demo.lockTitle">Demo Mode</h3>
+        <p style="margin:12px 0 8px;font-size:15px;line-height:1.6;" data-i18n="demo.lockDesc">
+          This view is provided for demonstration purposes only.<br>
+          Your changes are not saved.
+        </p>
+        <p style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:24px;" data-i18n="demo.lockCta">
+          To work with your personal digital twin — connect your TON wallet in the cabinet. Your data will be private, encrypted, and anchored on the blockchain.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="closeDemoLockModal();exitDemo();document.getElementById('connect-wallet-btn').click()" data-i18n="demo.lockConnect">🔗 Connect TON Wallet</button>
+          <button class="btn-secondary" onclick="closeDemoLockModal()" data-i18n="demo.lockClose">Continue Demo</button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
                      

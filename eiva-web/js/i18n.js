@@ -170,6 +170,14 @@ const TRANSLATIONS = {
 
     // Nav extras (cabinet)
     "nav.disconnect": "🔌 Disconnect",
+    "nav.exitDemo": "← Exit Demo",
+
+    // Demo lock modal
+    "demo.lockTitle": "Demo Mode",
+    "demo.lockDesc": "This view is provided for demonstration purposes only. Your changes are not saved.",
+    "demo.lockCta": "To personalise your digital twin — connect your TON wallet. Your data will be private, encrypted, and anchored on the TON blockchain.",
+    "demo.lockConnect": "🔗 Connect TON Wallet",
+    "demo.lockClose": "Continue Demo",
 
     // Sources tab
     "tabs.sources": "📤 Sources",
@@ -364,6 +372,14 @@ const TRANSLATIONS = {
 
     // Nav extras (cabinet)
     "nav.disconnect": "🔌 Выйти",
+    "nav.exitDemo": "← Выйти из демо",
+
+    // Demo lock modal
+    "demo.lockTitle": "Демо-режим",
+    "demo.lockDesc": "Этот раздел предоставлен исключительно для демонстрации. Ваши изменения не сохраняются.",
+    "demo.lockCta": "Чтобы настроить своего личного цифрового двойника — авторизуйтесь с TON-кошельком. Ваши данные будут приватны, зашифрованы и закреплены на блокчейне TON.",
+    "demo.lockConnect": "🔗 Подключить TON-кошелёк",
+    "demo.lockClose": "Продолжить демо",
 
     // Sources tab
     "tabs.sources": "📤 Источники",

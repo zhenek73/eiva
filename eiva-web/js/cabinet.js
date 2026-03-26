@@ -19,6 +19,18 @@ function showTab(name, btn) {
 }
 
 // ── Demo Mode ─────────────────────────────────────────────────────────────────
+function exitDemo() {
+  window._demoMode = false;
+  window._demoWallet = null;
+  document.getElementById('cabinet').classList.add('hidden');
+  document.getElementById('not-connected').classList.remove('hidden');
+  document.getElementById('demo-badge').classList.add('hidden');
+  // Hide exit demo button, show nothing (user not connected)
+  const exitBtn = document.getElementById('exit-demo-btn');
+  if (exitBtn) exitBtn.classList.add('hidden');
+  clearChatLog();
+}
+
 async function loadDemoMode() {
   window._demoMode = true;
   window._demoWallet = 'demo';
@@ -27,6 +39,12 @@ async function loadDemoMode() {
   document.getElementById('not-connected').classList.add('hidden');
   document.getElementById('cabinet').classList.remove('hidden');
   document.getElementById('demo-badge').classList.remove('hidden');
+
+  // Show exit-demo button in nav, hide disconnect button
+  const exitBtn = document.getElementById('exit-demo-btn');
+  if (exitBtn) exitBtn.classList.remove('hidden');
+  const disconnectBtn = document.getElementById('disconnect-btn');
+  if (disconnectBtn) disconnectBtn.classList.add('hidden');
 
   // Set avatar & name immediately (will update from API)
   document.getElementById('cab-name').textContent = 'Pavel Durov';
@@ -162,6 +180,8 @@ async function disconnectWallet() {
 
   const disconnectBtn = document.getElementById('disconnect-btn');
   if (disconnectBtn) disconnectBtn.classList.add('hidden');
+  const exitBtn = document.getElementById('exit-demo-btn');
+  if (exitBtn) exitBtn.classList.add('hidden');
 }
 
 async function loadProfileForWallet(walletAddr) {
@@ -282,6 +302,12 @@ async function setMode(mode) {
 
 // ── Hallucination Settings ────────────────────────────────────────────────────
 async function saveHallucinationSettings() {
+  // Demo mode: show info modal instead of saving
+  if (window._demoMode) {
+    document.getElementById('demo-lock-modal')?.classList.remove('hidden');
+    return;
+  }
+
   const settings = {
     show_uncertainty:      document.getElementById('ctrl-uncertainty')?.checked,
     refuse_low_confidence: document.getElementById('ctrl-refuse')?.checked,
@@ -547,3 +573,46 @@ window.loadHallucinationSettings = loadHallucinationSettings;
 window.openPaidSourceModal = openPaidSourceModal;
 window.closePaidSourceModal = closePaidSourceModal;
 window.openTonPayment = openTonPayment;
+window.exitDemo = exitDemo;
+window.closeDemoLockModal = closeDemoLockModal;
+window.openAvatarPicker = openAvatarPicker;
+window.handleAvatarSelect = handleAvatarSelect;
+
+// ── Demo lock modal ────────────────────────────────────────────────────────────
+function closeDemoLockModal() {
+  document.getElementById('demo-lock-modal')?.classList.add('hidden');
+}
+
+// ── Avatar Upload ─────────────────────────────────────────────────────────────
+function openAvatarPicker() {
+  if (window._demoMode) return; // no avatar change in demo
+  document.getElementById('avatar-file-input')?.click();
+}
+
+async function handleAvatarSelect(input) {
+  const file = input?.files?.[0];
+  if (!file) return;
+
+  const walletAddr = window._walletAddr;
+  if (!walletAddr) return;
+
+  // Preview immediately
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const avatar = document.getElementById('cab-avatar');
+    if (avatar) avatar.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  // Upload to API
+  try {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const res = await fetch(`${API_URL}/api/avatar`, {
+      method: 'POST',
+      headers: { 'x-wallet-address': walletAddr },
+      body: formData,
+    });
+    if (!res.ok) console.warn('Avatar upload failed');
+  } catch (e) { console.warn('Avatar upload error', e); }
+}

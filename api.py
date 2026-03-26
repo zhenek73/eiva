@@ -337,6 +337,31 @@ async def get_demo_profile():
     }
 
 
+@app.post("/api/avatar")
+async def upload_avatar(
+    avatar: UploadFile = File(...),
+    x_wallet_address: str = Header(...),
+):
+    """Upload custom avatar image for the twin profile"""
+    try:
+        user_id = _user_id_from_wallet(x_wallet_address)
+        store = EmbeddingStore(user_id)
+        if not store.is_ready():
+            raise HTTPException(status_code=404, detail="Twin not found.")
+        contents = await avatar.read()
+        if len(contents) > 2 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="Avatar too large. Max 2 MB.")
+        import base64
+        avatar_b64 = base64.b64encode(contents).decode()
+        store.save_meta("avatar_b64", avatar_b64)
+        store.save_meta("avatar_mime", avatar.content_type or "image/jpeg")
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/settings")
 async def save_settings(req: SettingsRequest, x_wallet_address: str = Header(...)):
     """Save hallucination control settings for wallet"""
