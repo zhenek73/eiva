@@ -255,9 +255,10 @@ function initAOS() {
       if (e.isIntersecting) {
         const delay = parseInt(e.target.dataset.aosDelay || 0);
         setTimeout(() => e.target.classList.add('aos-animate'), delay);
+        observer.unobserve(e.target);
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
   items.forEach(el => observer.observe(el));
 }
 
@@ -308,4 +309,11 @@ document.addEventListener('DOMContentLoaded', () => {
         animateCounter(document.getElementById('stat-src'), 2, 600);
         io.disconnect();
       }
-    }, {
+    }, { threshold: 0.3 });
+    io.observe(statsSection);
+  }
+});
+</script>
+
+</body>
+</html>
