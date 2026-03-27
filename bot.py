@@ -130,32 +130,22 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         agent = _load_agent(user.id)
         if agent:
             agents[user.id] = agent
-        text += "✅ *Your twin is live!* Start chatting and I'll respond as you.\n\n"
-        text += "*Commands:*\n"
-        text += "💬 Chat freely — I'll respond as your digital twin\n"
-        text += "👤 /profile — view extracted personality\n"
-        text += "💎 /mint — create your Soul Certificate NFT\n"
-        text += "🎨 /avatar — generate AI portrait\n"
-        text += "💳 /wallet — link TON wallet\n"
-        text += "📊 /status — twin indexing stats\n"
-        text += "🔄 /reset — clear conversation history\n"
-        text += "❓ /help — show all commands"
+        text += "✅ *Your twin is live!* Just chat — I'll respond as you.\n\n_/help for all commands_"
         keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("🌐 Web Cabinet", url="https://eiva.space/app.html"),
+            InlineKeyboardButton("🌐 Web Dashboard", url="https://eiva.space/app.html"),
             InlineKeyboardButton("💎 Mint NFT", callback_data="start_mint"),
         ]])
     else:
         text += (
-            "To create your twin, upload a Telegram chat export and I'll extract your personality.\n\n"
+            "Upload your Telegram chat export to create your twin.\n\n"
             "*📝 3 Easy Steps:*\n"
-            "1️⃣ *Export:* Telegram Desktop → Settings → Advanced → Export Telegram Data\n"
-            "2️⃣ *Select:* Personal chats, JSON format\n"
-            "3️⃣ *Upload:* Send the `result.json` file with /setup\n\n"
-            "Then chat with your twin, mint it as an NFT, and share it with the world."
+            "1️⃣ Telegram Desktop → Settings → Advanced → Export\n"
+            "2️⃣ Format: JSON\n"
+            "3️⃣ Send `result.json` via /setup"
         )
         keyboard = InlineKeyboardMarkup([[
             InlineKeyboardButton("📂 Start Setup", callback_data="start_setup"),
-            InlineKeyboardButton("🌐 Web Cabinet", url="https://eiva.space/app.html"),
+            InlineKeyboardButton("🌐 Web Dashboard", url="https://eiva.space/app.html"),
         ]])
 
     await update.message.reply_text(
