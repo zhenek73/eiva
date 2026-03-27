@@ -743,13 +743,13 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "2. I'll analyze your messages and create your digital twin\n"
         "3. Chat freely — I'll respond as you!\n"
         "4. Use /mint to immortalize your twin as an on-chain NFT\n\n"
-        "🌐 *[Open Dashboard](https://zhenek73.github.io/eiva/eiva-web/)* — "
+        "🌐 *[Open Dashboard](https://eiva.space/app.html)* — "
         "View your NFTs, manage settings, and connect your TON wallet\n\n"
         "Need help? Check out the project docs or ask in the dashboard."
     )
 
     keyboard = InlineKeyboardMarkup([[
-        InlineKeyboardButton("🌐 Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+        InlineKeyboardButton("🌐 Dashboard", url="https://eiva.space/app.html"),
     ]])
 
     await update.message.reply_text(help_text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
@@ -899,10 +899,10 @@ async def cmd_wallet(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             f"Send your TON wallet address to link it with your twin.\n"
             f"This will be used as the owner address when minting your Soul Certificate NFT.\n\n"
             f"_Example:_ `UQDxxx...`\n\n"
-            f"Or connect via the 🌐 [Eiva Dashboard](https://zhenek73.github.io/eiva/eiva-web/) with TON Connect."
+            f"Or connect via the 🌐 [Eiva Dashboard](https://eiva.space/app.html) with TON Connect."
         )
         keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("🌐 Connect on Dashboard", url="https://zhenek73.github.io/eiva/eiva-web/"),
+            InlineKeyboardButton("🌐 Connect on Dashboard", url="https://eiva.space/app.html"),
         ]])
 
     await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
