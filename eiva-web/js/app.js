@@ -8,7 +8,9 @@
 
 // ── Config ──────────────────────────────────────────────────────────────────
 const NETWORK   = 'testnet';   // change to 'mainnet' for production
-const API_URL   = 'https://api.eiva.space'; // Eiva backend
+const API_URL   = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:8010'
+  : 'https://api.eiva.space'; // Eiva backend
 const TONCENTER = NETWORK === 'testnet'
   ? 'https://testnet.toncenter.com/api/v2'
   : 'https://toncenter.com/api/v2';

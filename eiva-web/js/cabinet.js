@@ -5,7 +5,9 @@
 
 'use strict';
 
-const API_URL = 'https://api.eiva.space';
+const API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:8010'
+  : 'https://api.eiva.space';
 
 // ── Tab navigation ────────────────────────────────────────────────────────────
 function showTab(name, btn) {
