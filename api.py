@@ -6,7 +6,7 @@ import os, json, uuid, asyncio, logging
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, UploadFile, File, HTTPException, Header, Request
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -121,8 +121,8 @@ async def upload_export(
     file: UploadFile = File(...),
     x_wallet_address: str = Header(..., description="TON wallet address"),
     x_demo_mode: bool = Header(False),
-    source_type: str = "telegram_channel",
-    source_comment: str = "",
+    source_type: str = Form("telegram_channel"),
+    source_comment: str = Form(""),
 ):
     """Upload Telegram JSON export and build digital twin"""
     try:
