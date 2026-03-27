@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
     paths:
-      # Trigger when backend Python code or config changes
       - '**.py'
       - 'requirements.txt'
       - 'locales/**'
@@ -29,34 +28,40 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: 22
           script: |
+            set -e
             cd /var/www/eiva
+
+            echo "[1/4] Pulling latest code..."
             git pull origin main
 
-            source eiva-bot/venv/bin/activate
-            pip install -r requirements.txt -q
-            pip install fastapi "uvicorn[standard]" python-multipart -q
-            deactivate
+            echo "[2/4] Installing dependencies..."
+            eiva-bot/venv/bin/pip install -r requirements.txt -q
+            eiva-bot/venv/bin/pip install fastapi "uvicorn[standard]" python-multipart -q
 
-            # Graceful restart — kill old, start fresh
-            pkill -f "python3 bot.py" 2>/dev/null || true
-            pkill -f "uvicorn api:app" 2>/dev/null || true
-            sleep 2
+            echo "[3/4] Restarting services..."
+            pkill -f "bot.py" || true
+            pkill -f "uvicorn api:app" || true
+            sleep 3
 
             mkdir -p logs
-            nohup python3 bot.py >> logs/bot.log 2>&1 &
-            echo $! > /tmp/eiva-bot.pid
+            nohup eiva-bot/venv/bin/python3 bot.py >> logs/bot.log 2>&1 </dev/null &
+            BOT_PID=$!
+            echo $BOT_PID > /tmp/eiva-bot.pid
 
-            nohup python3 -m uvicorn api:app --host 127.0.0.1 --port 8000 --workers 2 >> logs/api.log 2>&1 &
-            echo $! > /tmp/eiva-api.pid
+            nohup eiva-bot/venv/bin/python3 -m uvicorn api:app --host 127.0.0.1 --port 8000 >> logs/api.log 2>&1 </dev/null &
+            API_PID=$!
+            echo $API_PID > /tmp/eiva-api.pid
 
-            sleep 3
-            kill -0 $(cat /tmp/eiva-bot.pid) 2>/dev/null && echo "Bot: OK" || echo "Bot: FAILED"
-            kill -0 $(cat /tmp/eiva-api.pid) 2>/dev/null && echo "API: OK" || echo "API: FAILED"
+            echo "[4/4] Checking processes..."
+            sleep 4
+            kill -0 $BOT_PID 2>/dev/null && echo "Bot: OK (pid $BOT_PID)" || echo "Bot: FAILED"
+            kill -0 $API_PID 2>/dev/null && echo "API: OK (pid $API_PID)" || echo "API: FAILED"
+            echo "Deploy done at $(date)"
 
       - name: Notify success
         if: success()
-        run: echo "✅ Deployed to TimeWeb VPS successfully"
+        run: echo "✅ Deployed successfully"
 
       - name: Notify failure
         if: failure()
-        run: echo "❌ Deployment failed — check VPS logs"
+        run: echo "❌ Deploy failed — check GitHub Actions log"
