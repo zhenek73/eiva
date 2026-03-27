@@ -440,4 +440,5 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
   // Set initial language button state
   const langBtn = document.querySelector(`[data-lang="${currentLang}"]`);
-  if (langBtn) langBtn.classList.add('activ
+  if (langBtn) langBtn.classList.add('active');
+});
