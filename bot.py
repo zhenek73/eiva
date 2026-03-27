@@ -1586,8 +1586,8 @@ def main():
     app.add_handler(CommandHandler("wallet",   cmd_wallet))
     app.add_handler(CommandHandler("twins",    cmd_twins))
     app.add_handler(CommandHandler("stats",    cmd_stats))
-    # Callback handlers: setup, mint, settings, and mode
-    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|setting_|mode_|lang_)$"))
+    # Callback handlers: setup, mint, settings, mode, and language selection
+    app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|start_lang_|setting_|mode_|lang_)"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

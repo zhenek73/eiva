@@ -4,11 +4,11 @@ on:
   push:
     branches: [ main ]
     paths:
-      # Trigger only when backend code changes (not docs/web)
-      - 'eiva-bot/**.py'
-      - 'eiva-bot/requirements.txt'
-      - 'eiva-bot/locales/**'
-      - 'eiva-bot/deploy/**'
+      # Trigger when backend Python code or config changes
+      - '**.py'
+      - 'requirements.txt'
+      - 'locales/**'
+      - 'deploy/**'
       - '.github/workflows/deploy.yml'
 
 jobs:
@@ -31,15 +31,27 @@ jobs:
           script: |
             cd /var/www/eiva
             git pull origin main
+
             source eiva-bot/venv/bin/activate
             pip install -r requirements.txt -q
             pip install fastapi "uvicorn[standard]" python-multipart -q
             deactivate
-            systemctl restart eiva-api
-            systemctl restart eiva-bot
+
+            # Graceful restart — kill old, start fresh
+            pkill -f "python3 bot.py" 2>/dev/null || true
+            pkill -f "uvicorn api:app" 2>/dev/null || true
             sleep 2
-            systemctl is-active eiva-api && echo "API: OK" || echo "API: FAILED"
-            systemctl is-active eiva-bot && echo "Bot: OK" || echo "Bot: FAILED"
+
+            mkdir -p logs
+            nohup python3 bot.py >> logs/bot.log 2>&1 &
+            echo $! > /tmp/eiva-bot.pid
+
+            nohup python3 -m uvicorn api:app --host 127.0.0.1 --port 8000 --workers 2 >> logs/api.log 2>&1 &
+            echo $! > /tmp/eiva-api.pid
+
+            sleep 3
+            kill -0 $(cat /tmp/eiva-bot.pid) 2>/dev/null && echo "Bot: OK" || echo "Bot: FAILED"
+            kill -0 $(cat /tmp/eiva-api.pid) 2>/dev/null && echo "API: OK" || echo "API: FAILED"
 
       - name: Notify success
         if: success()
