@@ -212,38 +212,40 @@
 <script src="js/i18n.js?v=20260327133627"></script>
 
 <script>
-/* ── Particles Neural Network ── */
-if (window.particlesJS) particlesJS('particles-js', {
-  particles: {
-    number: { value: 70, density: { enable: true, value_area: 900 } },
-    color: { value: ['#00e5ff', '#0098ea', '#8b5cf6'] },
-    shape: { type: 'circle' },
-    opacity: { value: 0.4, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.1 } },
-    size: { value: 2, random: true },
-    line_linked: {
-      enable: true, distance: 160,
-      color: '#00e5ff', opacity: 0.12, width: 1
+function initParticles() {
+  if (!window.particlesJS) return;
+  window.particlesJS('particles-js', {
+    particles: {
+      number: { value: 70, density: { enable: true, value_area: 900 } },
+      color: { value: ['#00e5ff', '#0098ea', '#8b5cf6'] },
+      shape: { type: 'circle' },
+      opacity: { value: 0.4, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.1 } },
+      size: { value: 2, random: true },
+      line_linked: {
+        enable: true, distance: 160,
+        color: '#00e5ff', opacity: 0.12, width: 1
+      },
+      move: {
+        enable: true, speed: 0.6, direction: 'none',
+        random: true, straight: false, out_mode: 'out',
+        attract: { enable: false }
+      }
     },
-    move: {
-      enable: true, speed: 0.6, direction: 'none',
-      random: true, straight: false, out_mode: 'out',
-      attract: { enable: false }
-    }
-  },
-  interactivity: {
-    detect_on: 'canvas',
-    events: {
-      onhover: { enable: true, mode: 'grab' },
-      onclick: { enable: true, mode: 'push' },
-      resize: true
+    interactivity: {
+      detect_on: 'canvas',
+      events: {
+        onhover: { enable: true, mode: 'grab' },
+        onclick: { enable: true, mode: 'push' },
+        resize: true
+      },
+      modes: {
+        grab: { distance: 180, line_linked: { opacity: 0.5 } },
+        push: { particles_nb: 3 }
+      }
     },
-    modes: {
-      grab: { distance: 180, line_linked: { opacity: 0.5 } },
-      push: { particles_nb: 3 }
-    }
-  },
-  retina_detect: true
-});
+    retina_detect: true
+  });
+}
 
 /* ── AOS scroll animations (lightweight built-in) ── */
 function initAOS() {
@@ -290,7 +292,11 @@ function mintDurovNFT() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initAOS();
+  // Simple marker: if you don't see it in page source, JS didn't run.
+  document.documentElement.dataset.js = 'on';
+
+  try { initParticles(); } catch (e) { console.error('[particles] init failed', e); }
+  try { initAOS(); } catch (e) { console.error('[aos] init failed', e); }
 
   // Animate stats when they come into view
   const statsSection = document.querySelector('.demo-stats');
