@@ -144,6 +144,10 @@ class EivaAgent:
         # Get personality profile
         personality = self.store.load_meta("personality_profile") or ""
 
+        # Get persona override (name + bio set in /settings)
+        persona_name = self.store.load_meta("persona_name") or ""
+        persona_bio  = self.store.load_meta("persona_bio") or ""
+
         # Get mode (personal/professional)
         mode = self.store.load_meta("mode") or "personal"
         mode_instruction = (
@@ -159,8 +163,17 @@ class EivaAgent:
         # Get custom instructions
         custom_instructions = self.store.load_meta("custom_instructions")
 
+        # Build identity line
+        if persona_name:
+            identity_line = f"You are {persona_name}."
+            if persona_bio:
+                identity_line += f" {persona_bio}."
+            identity_line += " Stay fully in character at all times."
+        else:
+            identity_line = "You are a digital twin of a real person. Your goal is to sound like them — not like an AI."
+
         # Build full system prompt
-        full_system = f"""You are a digital twin of a real person. Your goal is to sound like them — not like an AI.
+        full_system = f"""{identity_line}
 
 ## Personality Profile
 {personality}

@@ -556,111 +556,81 @@ async def cmd_add_source(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 # ── /settings ──────────────────────────────────────────────────────────────────
 
+def _settings_main_keyboard(store) -> InlineKeyboardMarkup:
+    """Main settings menu — 3 sections."""
+    persona_name = store.load_meta("persona_name") or ""
+    persona_label = f"🎭 Persona: {persona_name}" if persona_name else "🎭 Persona"
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(persona_label, callback_data="setting_section:persona")],
+        [InlineKeyboardButton("🎨 Style", callback_data="setting_section:style"),
+         InlineKeyboardButton("🤖 AI Control", callback_data="setting_section:ai")],
+        [InlineKeyboardButton("💾 Save & Close", callback_data="setting_save")],
+    ])
+
+
+def _settings_persona_keyboard(store) -> InlineKeyboardMarkup:
+    """Persona section keyboard."""
+    name = store.load_meta("persona_name") or "not set"
+    bio  = store.load_meta("persona_bio") or "not set"
+    instructions = store.load_meta("custom_instructions") or "not set"
+    name_short = name[:20] + "…" if len(name) > 20 else name
+    bio_short  = bio[:20]  + "…" if len(bio)  > 20 else bio
+    instr_short = instructions[:20] + "…" if len(instructions) > 20 else instructions
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(f"✏️ Name: {name_short}", callback_data="setting_persona_name")],
+        [InlineKeyboardButton(f"📝 Bio: {bio_short}", callback_data="setting_persona_bio")],
+        [InlineKeyboardButton(f"📋 Instructions: {instr_short}", callback_data="setting_custom_instructions")],
+        [InlineKeyboardButton("← Back", callback_data="setting_section:main")],
+    ])
+
+
+def _settings_style_keyboard(settings: dict) -> InlineKeyboardMarkup:
+    """Style section keyboard."""
+    def tog(key, label):
+        return InlineKeyboardButton(
+            f"{'✅' if settings.get(key) else '❌'} {label}",
+            callback_data=f"setting_toggle:{key}"
+        )
+    return InlineKeyboardMarkup([
+        [tog("emoji", "Emoji"), tog("humor", "Humor")],
+        [tog("formal_mode", "Formal mode"), tog("short_responses", "Short")],
+        [tog("signature_phrases", "Signature phrases")],
+        [InlineKeyboardButton("← Back", callback_data="setting_section:main")],
+    ])
+
+
+def _settings_ai_keyboard(settings: dict) -> InlineKeyboardMarkup:
+    """AI Control section keyboard."""
+    hal = settings.get("hallucination_control", True)
+    lang = settings.get("language", "auto")
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(
+            f"{'✅' if hal else '❌'} Hallucination Control",
+            callback_data="setting_toggle:hallucination_control"
+        )],
+        [InlineKeyboardButton(f"🌐 Language: {lang.title()}", callback_data="setting_lang")],
+        [InlineKeyboardButton("← Back", callback_data="setting_section:main")],
+    ])
+
+
 async def cmd_settings(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    """Show and edit personality response settings."""
+    """Show main settings menu."""
     user_id = update.effective_user.id
     store   = EmbeddingStore(str(user_id))
-
-    # Check if setup is complete
-    if not store.is_ready():
-        await update.message.reply_text(
-            "❌ You need to run /setup first to create your digital twin.",
-        )
-        return
-
-    settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
-    ctx.user_data["editing_settings"] = True
-
-    # Build keyboard with toggle buttons
-    keyboard = _build_settings_keyboard(settings)
-
-    hallucination_status = "ON" if settings.get("hallucination_control", True) else "OFF"
-    hallucination_desc = (
-        "This tells your twin to:\n"
-        "- Show uncertainty (\"I think...\" vs \"I remember...\")\n"
-        "- Refuse to answer if confidence is too low\n"
-        "- Not invent memories\n"
-        "- Ask clarifying questions\n\n"
-        "Turn OFF if you want more creative/confident responses."
-    )
-
+    keyboard = _settings_main_keyboard(store)
+    persona_name = store.load_meta("persona_name") or "—"
     await update.message.reply_text(
-        "⚙️ *Personality Settings*\n\n"
-        "Configure how your digital twin responds:\n\n"
-        f"🤖 AI Hallucination Control — {hallucination_status}\n\n"
-        f"{hallucination_desc}",
+        f"⚙️ *Settings*\n\n"
+        f"Active persona: *{persona_name}*\n\n"
+        "Choose a section to configure:",
         parse_mode=ParseMode.MARKDOWN,
         reply_markup=keyboard,
     )
 
 
 def _build_settings_keyboard(settings: dict) -> InlineKeyboardMarkup:
-    """Build an inline keyboard for settings toggles."""
-    buttons = []
-
-    # First row: signature_phrases, formal_mode
-    buttons.append([
-        InlineKeyboardButton(
-            f"{'✅' if settings.get('signature_phrases') else '❌'} Signature phrases",
-            callback_data="setting_toggle:signature_phrases"
-        ),
-        InlineKeyboardButton(
-            f"{'✅' if settings.get('formal_mode') else '❌'} Formal mode",
-            callback_data="setting_toggle:formal_mode"
-        ),
-    ])
-
-    # Second row: emoji, humor
-    buttons.append([
-        InlineKeyboardButton(
-            f"{'✅' if settings.get('emoji') else '❌'} Emoji in replies",
-            callback_data="setting_toggle:emoji"
-        ),
-        InlineKeyboardButton(
-            f"{'✅' if settings.get('humor') else '❌'} Humor",
-            callback_data="setting_toggle:humor"
-        ),
-    ])
-
-    # Third row: short_responses
-    buttons.append([
-        InlineKeyboardButton(
-            f"{'✅' if settings.get('short_responses') else '❌'} Short responses",
-            callback_data="setting_toggle:short_responses"
-        ),
-    ])
-
-    # Hallucination control row
-    buttons.append([
-        InlineKeyboardButton(
-            f"{'🤖' if settings.get('hallucination_control') else '❌'} AI Hallucination Control",
-            callback_data="setting_toggle:hallucination_control"
-        ),
-    ])
-
-    # Language selector
-    current_lang = settings.get("language", "auto")
-    buttons.append([
-        InlineKeyboardButton(
-            f"🌐 Language: {current_lang.title()}",
-            callback_data="setting_lang"
-        ),
-    ])
-
-    # Custom Instructions button
-    buttons.append([
-        InlineKeyboardButton(
-            "✏️ Custom Instructions",
-            callback_data="setting_custom_instructions"
-        ),
-    ])
-
-    # Save button
-    buttons.append([
-        InlineKeyboardButton("💾 Save Settings", callback_data="setting_save"),
-    ])
-
-    return InlineKeyboardMarkup(buttons)
+    """Legacy helper — kept for compatibility with lang_ callback redirect."""
+    return _settings_style_keyboard(settings)
 
 
 # ── /demo ──────────────────────────────────────────────────────────────────────
@@ -1094,31 +1064,82 @@ async def handle_inline_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
         lang_name = "English" if lang_code == "en" else "Русский"
         await query.answer(f"Language changed to {lang_name}", show_alert=False)
 
-        # Show success and return to settings
         settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
         settings["language"] = lang_code
         store.save_meta("settings", settings)
-        keyboard = _build_settings_keyboard(settings)
-
         await query.edit_message_text(
-            f"✅ {lang_name}!\n\n"
-            f"Your bot will now respond in {lang_name}.\n\n"
-            "⚙️ *Twin Settings*:",
-            reply_markup=keyboard,
+            f"✅ Language set to {lang_name}.\n\n⚙️ *AI Control:*",
+            reply_markup=_settings_ai_keyboard(settings),
             parse_mode=ParseMode.MARKDOWN,
         )
+
+    # ── Settings section navigation ───────────────────────────────────────────
+    elif query.data.startswith("setting_section:"):
+        section = query.data.split(":")[1]
+        store = EmbeddingStore(str(user_id))
+        settings = store.load_meta("settings") or config.DEFAULT_SETTINGS
+        persona_name = store.load_meta("persona_name") or "—"
+        if section == "main":
+            await query.edit_message_text(
+                f"⚙️ *Settings*\n\nActive persona: *{persona_name}*\n\nChoose a section:",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=_settings_main_keyboard(store),
+            )
+        elif section == "persona":
+            await query.edit_message_text(
+                "🎭 *Persona*\n\n"
+                "Set who your bot *thinks it is*.\n\n"
+                "• *Name* — the bot will introduce itself with this name\n"
+                "• *Bio* — one-line description shown in profile\n"
+                "• *Instructions* — rules for how the bot should respond\n\n"
+                "_Example instructions:_ \"Don't ask follow-up questions. "
+                "Answer confidently, like Pavel Durov would.\"",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=_settings_persona_keyboard(store),
+            )
+        elif section == "style":
+            await query.edit_message_text(
+                "🎨 *Style*\n\nToggle response style options:",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=_settings_style_keyboard(settings),
+            )
+        elif section == "ai":
+            await query.edit_message_text(
+                "🤖 *AI Control*\n\n"
+                "*Hallucination Control* — makes the twin say \"I think…\" "
+                "instead of inventing facts. Turn OFF for more creative responses.",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=_settings_ai_keyboard(settings),
+            )
+
+    # ── Persona field callbacks ───────────────────────────────────────────────
+    elif query.data == "setting_persona_name":
+        await query.edit_message_text(
+            "🎭 *Persona Name*\n\n"
+            "Send the name your bot should use.\n\n"
+            "_Example:_ `Pavel Durov`",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        user_state[user_id] = "persona_name"
+
+    elif query.data == "setting_persona_bio":
+        await query.edit_message_text(
+            "📝 *Persona Bio*\n\n"
+            "Send a short one-line description.\n\n"
+            "_Example:_ `Entrepreneur, philanthropist, billionaire, superhero — "
+            "just like Iron Man`",
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        user_state[user_id] = "persona_bio"
 
     # ── Custom Instructions callback ──────────────────────────────────────────
     elif query.data == "setting_custom_instructions":
         await query.edit_message_text(
-            "✏️ *Custom Instructions*\n\n"
-            "Send me a message with your custom instructions for your twin.\n\n"
-            "Examples:\n"
-            "• Don't talk about my job\n"
-            "• Always respond in Russian\n"
-            "• Keep responses short\n"
-            "• If asked about family, be vague\n\n"
-            "Type your instructions in your next message:",
+            "📋 *Instructions*\n\n"
+            "Rules for how your bot should respond.\n\n"
+            "_Example:_ Don't ask follow-up questions. "
+            "Respond confidently and directly. Keep answers brief.\n\n"
+            "Type your instructions:",
             parse_mode=ParseMode.MARKDOWN,
         )
         user_state[user_id] = "custom_instructions"
@@ -1399,14 +1420,21 @@ async def handle_message(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     text    = update.message.text.strip()
 
-    # ── Handle custom instructions input ────────────────────────────────────
-    if user_state.get(user_id) == "custom_instructions":
+    # ── Handle persona / custom instructions input ──────────────────────────
+    state = user_state.get(user_id)
+    if state in ("persona_name", "persona_bio", "custom_instructions"):
         store = EmbeddingStore(str(user_id))
-        store.save_meta("custom_instructions", text)
+        store.save_meta(state, text)
         user_state.pop(user_id, None)
+        labels = {
+            "persona_name": "🎭 Persona name",
+            "persona_bio": "📝 Persona bio",
+            "custom_instructions": "📋 Instructions",
+        }
         await update.message.reply_text(
-            "✅ Custom instructions saved!\n\n"
-            "Your twin will follow these rules from now on."
+            f"✅ *{labels[state]} saved!*\n\n`{text[:80]}{'…' if len(text)>80 else ''}`\n\n"
+            "Use /settings to continue configuring.",
+            parse_mode=ParseMode.MARKDOWN,
         )
         return
 
@@ -1586,7 +1614,7 @@ def main():
     app.add_handler(CommandHandler("wallet",   cmd_wallet))
     app.add_handler(CommandHandler("twins",    cmd_twins))
     app.add_handler(CommandHandler("stats",    cmd_stats))
-    # Callback handlers: setup, mint, settings, mode, and language selection
+    # Callback handlers: all interactive buttons
     app.add_handler(CallbackQueryHandler(handle_inline_callback, pattern="^(start_setup|start_mint|start_lang_|setting_|mode_|lang_)"))
     app.add_handler(setup_conv)
     app.add_handler(mint_conv)
