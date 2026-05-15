@@ -1,58 +1,55 @@
-# ── PRIVATE DOCS — concept, vision, monetization (stay local only) ───────────
-_private/
-project-docs/
-CHANGELOG.md
-# DEMO.md — tracked
-push_to_github.bat
-
-# ── SECRETS — never commit ────────────────────────────────────────────────────
+# Secrets
 .env
-*.env
+.env.*
 !.env.example
 
-# ── LOCAL DATA — stays on your machine ───────────────────────────────────────
+# Local data
 data/
-# demo_data/ — tracked (scripts and seed data needed for deployment)
-*.db
 chroma/
+*.db
 
-# ── PYTHON ────────────────────────────────────────────────────────────────────
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+*.py[cod]
+*$py.class
 *.egg-info/
+.eggs/
 dist/
 build/
-.eggs/
 venv/
 .venv/
 env/
-pip-log.txt
+.pytest_cache/
+.coverage
+htmlcov/
 
-# ── OS ────────────────────────────────────────────────────────────────────────
+# Node (if any tooling added later)
+node_modules/
+
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ── IDE ───────────────────────────────────────────────────────────────────────
+# IDE / editors
 .vscode/
 .idea/
 *.swp
 *.swo
+*.code-workspace
 
-# ── AVATARS / GENERATED IMAGES (local cache) ─────────────────────────────────
-  
-
-# ── LOGS ──────────────────────────────────────────────────────────────────────
+# Logs & temp
 *.log
 logs/
-
-# ── TEMP / MISC ───────────────────────────────────────────────────────────────
 *.bak
 *.tmp
 *.orig
-node_modules/
+
+# AI assistant local state
 .cursor/
 .claude/
+
+# Private notes (keep local only)
+_private/
+project-docs/
+push_to_github.bat

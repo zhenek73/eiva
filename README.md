@@ -145,8 +145,8 @@ curl -X POST https://api.eiva.space/api/chat \
 ## Quick Start (Local Dev)
 
 ```bash
-git clone https://github.com/zhenek73/eiva
-cd eiva/eiva-bot
+git clone ssh://ssh.sourcecraft.dev/echirochkin/eiva-project.git
+cd eiva-project
 cp .env.example .env       # Fill in TELEGRAM_BOT_TOKEN + OPENROUTER_API_KEY
 pip install -r requirements.txt
 uvicorn api:app --reload   # API → http://localhost:8000
@@ -200,6 +200,6 @@ Enforced at system prompt level — cannot be disabled.
 
 ## Built for TON AI Hackathon 2026
 
-🌐 [eiva.space](https://eiva.space) · 🤖 [@eivatonbot](https://t.me/eivatonbot) · 💻 [GitHub](https://github.com/zhenek73/eiva)
+🌐 [eiva.space](https://eiva.space) · 🤖 [@eivatonbot](https://t.me/eivatonbot) · 💻 [Sourcecraft](ssh://ssh.sourcecraft.dev/echirochkin/eiva-project.git)
 
 *MIT License*
